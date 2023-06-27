@@ -460,13 +460,13 @@ function LaptopRoom(props) {
 
 
 	return (
-		<div className="w-full h-full bg-white absolute top-0 ">
-			<div id="board-section" className="w-full h-full top-[-1000px] absolute z-[1000000000000000] transition-all fade-in-out duration-500">
-				<Board peers={peers} />
-			</div>
+		<div>
+		<div className="w-full h-screen bg-white absolute top-0  border-2 border-red-500">
+			
 			<UserJoinModal peerUserID={peerUserID} socket={socket} JoinModal={JoinModal} setIsJoinModal={setIsJoinModal} />
 			<div className="flex w-full h-full ">
 				{<LocalScreenSharePreview socketId={props.socketId} screenShareStream={ScreenSharingStream.current} />}
+				
 				<div
 					id="Left_Nav"
 					className="hidden lg:flex  h-full flex-col items-center justify-center transition-all fade-in-out w-[100px] border-r-2"
@@ -750,6 +750,10 @@ function LaptopRoom(props) {
 
 
 				</div>
+			</div>
+		</div>
+		<div id="board-section" className="w-full h-full top-[-1000px] absolute z-[1000000000000000] transition-all fade-in-out duration-500">
+				<Board peers={peers} />
 			</div>
 		</div>
 	);
