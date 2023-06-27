@@ -14,6 +14,9 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
     
     
     navigator.mediaDevices.getUserMedia(defaultControls).then((stream) => {
+        if(localStream.current){
+            localStream.current.getTracks().forEach(t => t.stop())
+        }
         localStream.current = stream;
         setoverlay(false)
         axios.post('https://www.pradeeps-video-conferencing.store/api/v1/UserStatus/', { roomID: roomID }, {
