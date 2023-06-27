@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-mr^q9hv3l!1hz3c27r)($#fv$w9*qw+%5_@xt(_vwgto(27ss6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 AUTH_USER_MODEL = 'api.User'
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app','main.d2lgzunn7eb2w2.amplifyapp.com','52.66.242.114','43.204.45.215','localhost','127.0.0.1','pradeeps-video-conferencing.store','www.pradeeps-video-conferencing.store']
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # Application definition
