@@ -461,7 +461,7 @@ function LaptopRoom(props) {
 
 	return (
 		<div>
-		<div className="w-full h-screen bg-white absolute top-0  border-2 border-red-500">
+		<div className="w-full h-screen bg-white absolute top-0 ">
 			
 			<UserJoinModal peerUserID={peerUserID} socket={socket} JoinModal={JoinModal} setIsJoinModal={setIsJoinModal} />
 			<div className="flex w-full h-full ">
