@@ -6,4 +6,4 @@ class UserAdmin(admin.ModelAdmin):
     list_display = ['id',"username","email","otp"]
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ['id',"room_id","name","created_by"]
+    list_display = ['id',"room_id","name","created_by","joined_by"]

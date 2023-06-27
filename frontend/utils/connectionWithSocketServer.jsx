@@ -33,7 +33,7 @@ const handleSignallingData = (peers, data) => {
 
 
 export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript,IceServers,setIsJoinModal,setpeerUserID,innerWidth,length_of_participants) => {
-    socket.current = new WebSocket('ws://127.0.0.1:8000/ws/chat/')
+    socket.current = new WebSocket('wss://www.pradeeps-video-conferencing.store/ws/chat/')
     
     socket.current.onopen = () =>{
         socket.current.send(JSON.stringify({

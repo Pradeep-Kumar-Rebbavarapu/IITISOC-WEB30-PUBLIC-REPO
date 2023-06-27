@@ -33,7 +33,7 @@ export const getLocalPreviewAndInitRoomMobileConnection = (socket, localStream, 
         console.log('getLocalPreviewAndInitRoomConnection Called')
         localStream.current = stream;
         setoverlay(false)
-        axios.post('http://127.0.0.1:8000/api/v1/UserStatus/', { roomID: roomID }, {
+        axios.post('https://www.pradeeps-video-conferencing.store/api/v1/UserStatus/', { roomID: roomID }, {
             headers: {
                 Authorization: 'Bearer ' + auth.access
             }

@@ -140,7 +140,7 @@ export default function SignupPage() {
 
 const CreateUser = (user) => {
     
-    return axios.post('http://127.0.0.1:8000/api/v1/Signup/',user)
+    return axios.post('https://www.pradeeps-video-conferencing.store/api/v1/Signup/',user)
 }
 
 const useCreateUser = () => {

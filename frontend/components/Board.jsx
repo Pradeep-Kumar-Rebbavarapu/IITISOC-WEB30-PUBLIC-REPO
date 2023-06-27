@@ -227,7 +227,7 @@ export default function Board({ peers }) {
 		}
 
 		function dragStop(event) {
-			saveToHistory()
+			
 			draggingRef.current = false;
 			const position = getCanvasCoordinates(event);
 			restoreSnapShot();
