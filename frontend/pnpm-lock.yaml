@@ -50,9 +50,11 @@ specifiers:
   react-color: ^2.19.3
   react-dom: 18.2.0
   react-icons: ^4.9.0
+  react-modal: ^3.16.1
   react-p5: ^1.3.35
   react-p5-wrapper: ^4.1.2
   react-redux: ^8.0.7
+  react-reveal: ^1.2.2
   react-sketch: ^0.5.1
   react-sketch-whiteboard: ^3.9.3
   react-sketchpad: ^0.0.3
@@ -118,9 +120,11 @@ dependencies:
   react-color: 2.19.3_react@18.2.0
   react-dom: 18.2.0_react@18.2.0
   react-icons: 4.9.0_react@18.2.0
+  react-modal: 3.16.1_biqbaboplfbrettd7655fr4n2y
   react-p5: 1.3.35_biqbaboplfbrettd7655fr4n2y
   react-p5-wrapper: 4.1.2_biqbaboplfbrettd7655fr4n2y
   react-redux: 8.0.7_nwi3xlk233aiuojbhb7nbpwlty
+  react-reveal: 1.2.2_react@18.2.0
   react-sketch: 0.5.1
   react-sketch-whiteboard: 3.9.3_eveahbx3r3okkkxu7l44ces2q4
   react-sketchpad: 0.0.3
@@ -4738,6 +4742,10 @@ packages:
       strip-final-newline: 3.0.0
     dev: false
 
+  /exenv/1.2.2:
+    resolution: {integrity: sha512-Z+ktTxTwv9ILfgKCk32OX3n/doe+OcLTRtqK9pcL+JsP3J1/VW8Uvl4ZjLlKqeW4rzK4oesDOGMEMRIZqtP4Iw==}
+    dev: false
+
   /ext/1.7.0:
     resolution: {integrity: sha512-6hxeJYaL110a9b5TEJSj0gojyHQAmA2ch5Os+ySCiA1QGdS697XWY1pzsrSjqA9LDEEgdB/KypIlR59RcLuHYw==}
     dependencies:
@@ -7137,6 +7145,25 @@ packages:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
     dev: false
 
+  /react-lifecycles-compat/3.0.4:
+    resolution: {integrity: sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==}
+    dev: false
+
+  /react-modal/3.16.1_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-VStHgI3BVcGo7OXczvnJN7yT2TWHJPDXZWyI/a0ssFNhGZWsPmB8cF0z33ewDXq4VfYMO1vXgiv/g8Nj9NDyWg==}
+    engines: {node: '>=8'}
+    peerDependencies:
+      react: ^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18
+      react-dom: ^0.14.0 || ^15.0.0 || ^16 || ^17 || ^18
+    dependencies:
+      exenv: 1.2.2
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      react-lifecycles-compat: 3.0.4
+      warning: 4.0.3
+    dev: false
+
   /react-p5-wrapper/4.1.2_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-UwLokWbC/jL7l0UoYZ9Y5kUwfX9sinFoHbxQOwiajzNqCtguuWAme7dZC6jtlEhO9RmgTa/LEAaNDrgJ/t5ROA==}
     deprecated: This package has now been renamed to '@p5-wrapper/react' as of version 4.1.2 onwards. Please update the dependency name in your package.json to recieve future updates and features.
@@ -7210,6 +7237,15 @@ packages:
       react-dom: 18.2.0_react@18.2.0
       react-is: 18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
+    dev: false
+
+  /react-reveal/1.2.2_react@18.2.0:
+    resolution: {integrity: sha512-JCv3fAoU6Z+Lcd8U48bwzm4pMZ79qsedSXYwpwt6lJNtj/v5nKJYZZbw3yhaQPPgYePo3Y0NOCoYOq/jcsisuw==}
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
     dev: false
 
   /react-sketch-whiteboard/3.9.3_eveahbx3r3okkkxu7l44ces2q4:
@@ -8573,6 +8609,12 @@ packages:
     dependencies:
       acorn: 8.8.2
       acorn-walk: 8.2.0
+    dev: false
+
+  /warning/4.0.3:
+    resolution: {integrity: sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==}
+    dependencies:
+      loose-envify: 1.4.0
     dev: false
 
   /webidl-conversions/3.0.1:
