@@ -29,7 +29,7 @@ export default function VideoGrid({ localStream, length }) {
 	return (
 		<div
 			id="VideoGrid"
-			className={`h-full border-2 border-red-500 w-full  rounded-md my-auto justify-center mx-auto items-center grid gap-4`}
+			className={`h-full  w-full  rounded-md my-auto justify-center mx-auto items-center grid gap-4`}
 			ref={videoGridRef}
 		>
 			<video id="my_video" className="mx-auto"></video>
