@@ -10,6 +10,7 @@ import 'regenerator-runtime/runtime'
 import { store } from '../store/store';
 import { Provider } from 'react-redux';
 import { useEffect } from 'react'
+
 export default function App({ Component, pageProps }) {
   const queryClient = new QueryClient()
   const state = store.getState()

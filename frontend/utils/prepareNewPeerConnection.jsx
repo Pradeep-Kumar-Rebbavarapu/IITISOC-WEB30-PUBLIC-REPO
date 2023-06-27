@@ -136,7 +136,8 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants)
     remoteVideo.playsInline = true
     remoteVideo.srcObject = stream;
     remoteVideo.muted = true
-    remoteVideo.className = 'h-full w-full'
+    remoteVideo.className = 'object-cover mx-auto'
+    remoteVideo.objectFit = "cover"
 
     remoteVideo.style.borderRadius = "10px"
     remoteVideo.style.objectFit = "cover"
@@ -148,26 +149,26 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants)
     const numVideos = localStorage.getItem('participants_length');
 
 
-    if (innerWidth < 1000) {
+    // if (innerWidth < 1000) {
 
-        let columns = 1;
-        if (numVideos <= 2) columns = 1
-        if (numVideos > 2 && numVideos <= 4) columns = 2;
-        else if (numVideos > 4 && numVideos <= 8) columns = 3;
-        else if (numVideos > 8 && numVideos <= 16) columns = 3;
-        else if (numVideos > 16 && numVideos <= 35) columns = 4;
-        VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-    }
-    else if (innerWidth > 1000) {
+    //     let columns = 1;
+    //     if (numVideos <= 2) columns = 1
+    //     if (numVideos > 2 && numVideos <= 4) columns = 2;
+    //     else if (numVideos > 4 && numVideos <= 8) columns = 3;
+    //     else if (numVideos > 8 && numVideos <= 16) columns = 3;
+    //     else if (numVideos > 16 && numVideos <= 35) columns = 4;
+    //     VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    // }
+    // else if (innerWidth > 1000) {
 
-        let columns = 1;
-        if (numVideos === 1) columns = 1
-        else if (numVideos > 1 && numVideos <= 4) columns = 2;
-        else if (numVideos > 4 && numVideos <= 9) columns = 3;
-        else if (numVideos > 9 && numVideos <= 16) columns = 4;
-        else if (numVideos > 16 && numVideos <= 25) columns = 5;
-        VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-    }
+    //     let columns = 1;
+    //     if (numVideos === 1) columns = 1
+    //     else if (numVideos > 1 && numVideos <= 4) columns = 2;
+    //     else if (numVideos > 4 && numVideos <= 9) columns = 3;
+    //     else if (numVideos > 9 && numVideos <= 16) columns = 4;
+    //     else if (numVideos > 16 && numVideos <= 25) columns = 5;
+    //     VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    // }
 
 
 

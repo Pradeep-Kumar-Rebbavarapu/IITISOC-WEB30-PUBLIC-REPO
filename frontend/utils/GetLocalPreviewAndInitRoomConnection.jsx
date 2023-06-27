@@ -4,9 +4,7 @@ import { createNewRoom } from "./CreateNewRoom"
 import { JoinRoom } from "./JoinRoom"
 const defaultControls = {
     audio: true,
-    video: {
-        aspectRatio: { ideal: 3 / 1 } // Set the desired aspect ratio (width:height)
-    }
+    video: true
 };
 
 
