@@ -140,7 +140,7 @@ export default function SignupPage() {
 
 const CreateUser = (user) => {
     
-    return axios.post('your api post request for signup',user)
+    return axios.post('http://127.0.0.1:8000/api/v1/Signup/',user)
 }
 
 const useCreateUser = () => {

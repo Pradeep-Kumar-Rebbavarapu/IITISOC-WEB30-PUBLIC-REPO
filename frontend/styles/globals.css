@@ -5,9 +5,9 @@
 
 
 body {
-  overflow-x:hidden;
+  overflow-x: hidden;
   color: black;
-  background: white;
+  background: white !important;
 }
 
 
@@ -84,14 +84,14 @@ form {
   transition: 0.3s;
 }
 
-.input-div > div {
+.input-div>div {
   position: relative;
   height: 45px;
 }
 
-.input-div > div > h5 {
+.input-div>div>h5 {
   position: absolute;
-  text-align:center;
+  text-align: center;
   left: 0;
   top: 50%;
   transform: translateY(-50%);
@@ -124,16 +124,16 @@ form {
   width: 50%;
 }
 
-.input-div.focus > div > h5 {
+.input-div.focus>div>h5 {
   top: -5px;
   font-size: 15px;
 }
 
-.input-div.focus > .i > i {
+.input-div.focus>.i>i {
   color: coral;
 }
 
-.input-div > div > input {
+.input-div>div>input {
   position: absolute;
   left: 0;
   top: 0;
@@ -152,7 +152,7 @@ form {
   margin-bottom: 4px;
 }
 
-#auth > a {
+#auth>a {
   display: block;
   text-align: right;
   text-decoration: none;
@@ -161,7 +161,7 @@ form {
   transition: 0.3s;
 }
 
-#auth > a:hover {
+#auth>a:hover {
   color: coral;
 }
 
@@ -182,6 +182,7 @@ form {
   cursor: pointer;
   transition: 0.5s;
 }
+
 .btn:hover {
   background-position: right;
 }
@@ -225,7 +226,7 @@ form {
   }
 }
 
-.ToggleLeftNav{
+.ToggleLeftNav {
   display: none;
 }
 
@@ -238,7 +239,7 @@ form {
 }
 
 
-video{
+video {
   border-radius: 10px;
 }
 
@@ -252,14 +253,11 @@ video{
   background-color: transparent;
 }
 
-::-webkit-scrollbar-corner {
-}
+::-webkit-scrollbar-corner {}
 
-::-webkit-scrollbar-track {
-}
+::-webkit-scrollbar-track {}
 
-::-webkit-scrollbar-button {
-}
+::-webkit-scrollbar-button {}
 
 ::-webkit-scrollbar-thumb {
   width: 5px;
@@ -272,4 +270,22 @@ video{
 
   background-color: rgb(146, 146, 146);
   border-radius: 40px;
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+  transform: translateY(-100px);
+  transition: all 500ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+  transform: translateY(0px);
+  transform: scale(1.1);
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+  transform: translateY(-100px);
+  transform: scale(0.9);
 }

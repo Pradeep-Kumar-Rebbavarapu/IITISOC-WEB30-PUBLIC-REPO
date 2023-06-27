@@ -13,19 +13,21 @@ import { useEffect } from 'react'
 export default function App({ Component, pageProps }) {
   const queryClient = new QueryClient()
   const state = store.getState()
-  
+
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <ContextProvider>
           <Provider store={store}>
             <div className=''>
-              <Navbar />
-              <ToastContainer />
+              <div className='z-[1000]'>
+                <Navbar />
+              </div>
+              
               <div className='z-0 '>
                 <Component {...pageProps} />
               </div>
-              
+
             </div>
           </Provider>
         </ContextProvider>

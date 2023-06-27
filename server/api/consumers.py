@@ -12,6 +12,7 @@ rooms = []
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
+        print(self.channel_name)
         self.test = []
         self.room_id = None
         await self.accept()
@@ -20,7 +21,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.leave_room()
 
     async def receive_json(self, text_data):
-        
 
         data = text_data['data']
         if text_data['type'] == 'create-new-room':
@@ -31,15 +31,34 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.SignallingHandler(data)
         elif text_data['type'] == "conn-init":
             await self.InitialConnectionHandler(data)
+        elif text_data['type'] == 'init-user':
+            await self.InitUser(data)
+        elif text_data['type'] == "get-socket-id":
+            await self.SendSocketId()
+
+    async def SendSocketId(self):
+        response = {
+            "type": "get-socket-id",
+            "socketId": self.channel_name
+        }
+        await self.send_json_to_user(self.channel_name,response)
+
+    async def InitUser(self, data):
+        roomID = data['roomID']
+        room = await self.get_created_room(roomID)
+        if room is not None:
+            self.send_json_to_user(self.channel_name, "create-room")
+        else:
+            self.send_json_to_user(self.channel_name, 'join-room')
 
     async def create_new_room(self, data):
-        
+
         username = data['username']
         user = self.get_user(username)
         if user is not None:
             userInstance = await self.get_user_instance(username)
             room_id = data['roomID']
-            room_name = data['title']
+            room_name = room_id
 
             newUser = {
                 "identity": username,
@@ -51,7 +70,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
             connectedUsers.append(newUser)
 
-            
             self.test.append(newUser)
             newRoom = {
                 "id": room_id,
@@ -65,31 +83,30 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'type': 'room-id',
                 'roomID': room_id,
             }
-            await self.send_json_to_room(room_id,response)
+            await self.send_json_to_room(room_id, response)
 
-            
             response = {
                 'type': 'room-update',
                 'connectedUsers': newRoom["connectedUsers"],
             }
-            room = await self.save_room_and_user(room_id, room_name, userInstance)
+            room = await self.save_room_and_user(room_id, room_name, userInstance,userInstance)
             await database_sync_to_async(room.save)()
-            await self.send_json_to_room(room_id,response)
-
-    
+            await self.send_json_to_room(room_id, response)
 
     async def join_user_to_room(self, data):
-       
+
         username = data['username']
         user = self.get_user(username)
         if user is not None:
             room_id = data['roomID']
-            userInstance = await self.get_user_instance(username)
-            old_room = await self.get_old_room(userInstance, room_id)
+            JoineduserInstance = await self.get_user_instance(username)
+            created_room = await self.get_created_room(room_id)
+            CreatedUserInstance = await self.get_user_of_created_room(room_id)
+            old_room = await self.get_old_room(JoineduserInstance, room_id)
             if old_room is not None:
                 newUser = {
                     "identity": username,
-                    "id":  userInstance.id,
+                    "id":  CreatedUserInstance.id,
                     "socketId": self.channel_name,
                     "isRoomHost": True,
                     "roomID": room_id
@@ -97,38 +114,41 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             else:
                 newUser = {
                     "identity": username,
-                    "id":  userInstance.id,
+                    "id":  JoineduserInstance.id,
                     "socketId": self.channel_name,
                     "isRoomHost": False,
                     "roomID": room_id
                 }
-            room = next((r for r in rooms if r['id'] == room_id), None)
-            
+            room = [r for r in rooms if r['id'] == room_id][0]
+            print('room outside',room)
             if room:
-                created_room = await self.get_created_room(room_id)
+                print('room inside',room)
+                
+                print(created_room)
                 room['connectedUsers'].append(newUser)
                 await self.join_room(room_id)
+                print(room['connectedUsers'])
                 for user in room['connectedUsers']:
                     if user['socketId'] != self.channel_name:
                         data = {
-                            "type":"conn-prepare",
+                            "type": "conn-prepare",
                             'connUserSocketId': self.channel_name,
                             'connUserIdentity': newUser['identity'],
                             'connUserId': newUser['id']
                         }
                         await self.send_json_to_user(user['socketId'], data)
                 connectedUsers.append(newUser)
-
-                
             if old_room is None:
-                room = await self.save_room_and_user(room_id, created_room.title, userInstance)
-                await database_sync_to_async(room.save)()
+                new_room = await self.save_room_and_user(room_id,room_id,CreatedUserInstance,JoineduserInstance)
+                await database_sync_to_async(new_room.save)()
             response = {
-                    'type': 'room-update',
-                    'connectedUsers': room["connectedUsers"],
+                'type': 'room-update',
+                'connectedUsers': room["connectedUsers"],
             }
-            await self.send_json_to_room(room_id,response)
-
+            await self.send_json_to_room(room_id, response)
+    @database_sync_to_async
+    def get_user_of_created_room(self, room_id):
+        return Room.objects.filter(room_id=room_id).first().created_by  
     @database_sync_to_async
     def get_created_room(self, room_id):
         return Room.objects.filter(room_id=room_id).first()
@@ -138,21 +158,27 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return Room.objects.filter(created_by=userInstance).filter(room_id=room_id).first()
 
     async def leave_room(self):
-        if self.room_id is not None:
-
-            user = list(
-                filter(lambda user: user['socketId'] == self.channel_name, connectedUsers))[0]
+            print('room leaved')
+        
+            user = list(filter(lambda user: user['socketId'] == self.channel_name, connectedUsers))[0]
+            print(user)
             if user:
-                room = list(
-                    filter(lambda room: room['id'] == user['roomID']))[0]
-                room['connectedUsers'] = list(filter(
-                    lambda user: user["socketId"] != self.channel_name, room['connectedUsers']))
-                await self.channel_layer.group_discard(self.room_id, self.channel_name)
+                room = list(filter(lambda room: room['id'] == user['roomID'],rooms))[0]
+                room['connectedUsers'] = list(filter(lambda user: user["socketId"] != self.channel_name, room['connectedUsers']))
+                
                 response = {
                     'type': 'room-update',
-                    'connectedUsers': connectedUsers,
+                    'connectedUsers': room['connectedUsers'],
                 }
-                await self.send_json(response)
+                await self.send_json_to_room(user['roomID'],response)
+
+                #send the socket id of the disconnected user
+                response = {
+                    "type": "user-disconnected",
+                    "socketId": self.channel_name
+                }
+                await self.send_json_to_room(user['roomID'], response)
+                await self.channel_layer.group_discard(user['roomID'], self.channel_name)
 
     async def SignallingHandler(self, data):
         signal = data['signal']
@@ -162,15 +188,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             "signal": signal,
             "connUserSocketId": self.channel_name
         }
-        await self.send_json_to_user(connUserSocketId,response)
+        await self.send_json_to_user(connUserSocketId, response)
 
     async def InitialConnectionHandler(self, data):
         connUserSocketId = data['connUserSocketId']
         response = {
-            "type":"conn-init",
+            "type": "conn-init",
             "connUserSocketId": self.channel_name
         }
-        await self.send_json_to_user(connUserSocketId,response)
+        await self.send_json_to_user(connUserSocketId, response)
 
     @database_sync_to_async
     def get_connected_users(self, room_id):
@@ -186,13 +212,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return User.objects.get(username=username)
 
     @database_sync_to_async
-    def save_room_and_user(self, room_id, room_name, user):
+    def save_room_and_user(self, room_id, room_name, created_user,joined_user):
         room = Room.objects.create(
             room_id=room_id,
             name=room_name,
             capacity=10,
             is_active=True,
-            created_by=user
+            created_by=created_user,
+            joined_by=joined_user
         )
         return room
 
@@ -205,7 +232,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         pass
 
     async def join_room(self, room_id):
-        
+
         self.room_name = room_id
         await self.channel_layer.group_add(self.room_name, self.channel_name)
 
@@ -226,7 +253,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-
     async def send_json_to_user(self, socket_id, data):
         await self.channel_layer.send(
             socket_id,
@@ -235,7 +261,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'data': data
             }
         )
-
 
     async def send_json(self, event):
         data = event['data']

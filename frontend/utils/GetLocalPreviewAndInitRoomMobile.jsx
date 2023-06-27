@@ -3,17 +3,17 @@ import axios from "axios"
 import { createNewRoom } from "./CreateNewRoom"
 import { JoinRoom } from "./JoinRoom"
 import { fetchTurnCredentials, getTurnIceServers } from "./TurnServers"
+const defaultControls = {
+    audio: true,
+    video: {
+        aspectRatio: { ideal: 2 / 1 } // Set the desired aspect ratio (width:height)
+    }
+};
 
 
+export const getLocalPreviewAndInitRoomMobileConnection = (socket, localStream, isRoomHost, auth, roomID, setoverlay, title, IceServers, innerWidth) => {
 
-export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoomHost, auth, roomID, setoverlay, title, IceServers,number) => {
-    const defaultControls = {
-        audio: true,
-        video: {
-            aspectRatio: { ideal: 3 / 1 } // Set the desired aspect ratio (width:height)
-        }
-    };
-    
+
     navigator.mediaDevices.getUserMedia(defaultControls).then((stream) => {
         var VideoTrack = stream.getVideoTracks()[0]
         var imageCapture = new ImageCapture(VideoTrack);
@@ -43,7 +43,7 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
                 JoinRoom(socket, auth, roomID)
             }
             else {
-                createNewRoom(socket, auth, roomID,true,title)
+                createNewRoom(socket, auth, roomID, isRoomHost, title)
             }
         })
 

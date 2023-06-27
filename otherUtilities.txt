@@ -39,3 +39,137 @@ export const connectionWithSocketServer = (socket,peers,ScreenSharingStream,loca
     })
 
 }
+
+
+let columns = 1;
+        if (numVideos === 1) columns = 1
+        else if (numVideos > 1 && numVideos <= 4) columns = 2;
+        else if (numVideos > 4 && numVideos <= 9) columns = 3;
+        else if (numVideos > 9 && numVideos <= 16) columns = 4;
+        else if (numVideos > 16 && numVideos <= 25) columns = 5;
+        VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+
+
+
+import React, { useEffect, useState } from 'react';
+import { SendImageDataToPeers } from '../utils/BoardUtils';
+import { AiOutlineClose } from 'react-icons/ai';
+import { SliderPicker } from 'react-color';
+import useWindowSize from '@rooks/use-window-size';
+
+export default function Board({ peers }) {
+	const [sliderValue, setSliderValue] = useState(5);
+	const [ColorValue, setColorValue] = useState('#4340bf');
+	const [currentTool, setCurrentTool] = useState('brush');
+	const { innerWidth } = useWindowSize();
+
+	useEffect(() => {
+		const canvas = document.querySelector('#paint');
+		const ctx = canvas.getContext('2d');
+
+		const sketch = document.querySelector('#sketch');
+		const sketch_style = getComputedStyle(sketch);
+		const offsetX = sketch.offsetLeft;
+		const offsetY = sketch.offsetTop;
+		canvas.width = parseInt(sketch_style.getPropertyValue('width'));
+		canvas.height = parseInt(sketch_style.getPropertyValue('height'));
+
+		let mouse = { x: 0, y: 0 };
+		let last_mouse = { x: 0, y: 0 };
+		let timeout;
+
+		/* Mouse Capturing Work */
+		canvas.addEventListener('mousemove', function (e) {
+			last_mouse.x = mouse.x;
+			last_mouse.y = mouse.y;
+
+			mouse.x = e.pageX - offsetX;
+			mouse.y = e.pageY - offsetY;
+		}, false);
+
+		/* Drawing on Paint App */
+		ctx.lineWidth = sliderValue;
+		ctx.lineJoin = 'round';
+		ctx.lineCap = 'round';
+		ctx.strokeStyle = ColorValue;
+
+		const onPaint = function () {
+			ctx.beginPath();
+			ctx.moveTo(last_mouse.x, last_mouse.y);
+			ctx.lineTo(mouse.x, mouse.y);
+			ctx.closePath();
+			ctx.stroke();
+
+			if (timeout !== undefined) clearTimeout(timeout);
+			timeout = setTimeout(() => {
+				const base64ImageData = canvas.toDataURL('image/png');
+				console.log(base64ImageData);
+				SendImageDataToPeers(base64ImageData, peers);
+			}, 1000);
+		};
+
+		canvas.addEventListener('mousedown', function (e) {
+			if (currentTool === 'brush' || currentTool === 'pen' || currentTool === 'pencil') {
+				canvas.addEventListener('mousemove', onPaint, false);
+			}
+			// Add more conditions for other tools
+		}, false);
+
+		canvas.addEventListener('mouseup', function () {
+			canvas.removeEventListener('mousemove', onPaint, false);
+		}, false);
+	}, [currentTool, sliderValue, ColorValue, peers]);
+
+	const handleSliderChange = (color) => {
+		const canvas = document.querySelector('#paint');
+		const ctx = canvas.getContext('2d');
+		ctx.strokeStyle = color.hex;
+		setColorValue(color.hex);
+	};
+
+	const changeTool = (tool) => {
+		setCurrentTool(tool);
+	};
+
+	return (
+		<div className='w-full h-full bg-white border-2 border-black relative'>
+			<div id="CloseBoard" className="flex absolute z-[100] w-full h-[100px]  items-center px-5 3 border-2 border-red-500" >
+				<div className='mx-5'>
+					<div onClick={() => {
+						const BoardSection = document.getElementById('board-section')
+						const VideoSection = document.getElementById('video-section')
+						const TextEditor = document.getElementById('TextEditor')
+						VideoSection.className = "w-full h-full absolute left-[0px] z-[100] transition-all fade-in-out duration-500"
+						BoardSection.className = "w-full h-full top-[-1000px] absolute z-[1000000000000000]  transition-all fade-in-out duration-500"
+						TextEditor.className = "w-full h-full absolute left-[-2000px] z-[100] transition-all fade-in-out duration-500"
+					}} className='border-2 border-red-500 p-2 bg-orange-500 hover:bg-orange-600 rounded-md transition-all fade-in-out text-white cursor-pointer my-auto flex items-center justify-center'>
+						Close Board
+					</div>
+				</div>
+				<div className='w-[200px] mx-10'>
+					<p>Pen Color : {ColorValue}</p>
+					<SliderPicker color={ColorValue} onChangeComplete={handleSliderChange} />
+				</div>
+				<div className='mx-10'>
+					<p>Pen Size : {sliderValue}</p>
+					<input type="range" defaultValue={5} max={40} onChange={(e) => {
+						const canvas = document.querySelector('#paint');
+						const ctx = canvas.getContext('2d');
+						ctx.lineWidth = e.target.value;
+						setSliderValue(e.target.value);
+					}} />
+				</div>
+				<div className='mx-10'>
+					<button onClick={() => changeTool('brush')}>Brush</button>
+					<button onClick={() => changeTool('pen')}>Pen</button>
+					<button onClick={() => changeTool('pencil')}>Pencil</button>
+					{/* Add more buttons for other tools */}
+				</div>
+			</div>
+			<div id='sketch' className='object-fit h-full w-full '>
+				<canvas id='paint' className='border-2 border-red-500 !h-full !w-full object-fit'></canvas>
+			</div>
+		</div>
+	);
+}

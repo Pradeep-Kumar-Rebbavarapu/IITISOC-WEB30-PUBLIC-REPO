@@ -19,6 +19,7 @@
     "nodemon": "^2.0.22",
     "openai": "^3.3.0",
     "puppeteer": "^20.7.2",
+    "react-reveal": "^1.2.2",
     "socket.io": "^4.6.2",
     "three": "^0.153.0",
     "twilio": "^4.12.0",

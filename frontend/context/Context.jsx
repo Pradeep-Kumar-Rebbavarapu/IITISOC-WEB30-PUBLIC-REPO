@@ -13,12 +13,16 @@ export const ContextProvider = ({ children }) => {
     const [identity,setidentity] = useState(typeof window!=="undefined" && localStorage.getItem('identity')?localStorage.getItem('identity'):null)
     const [isHost,setisHost] = useState(false)
     const [overlay,setoverlay] = useState(true)
+    const [joinroom,setjoinroom] = useState(true)
     const [auth,setauth] = useState(typeof window!=="undefined" && localStorage.getItem('auth-details')?JSON.parse(localStorage.getItem('auth-details')):null)
     const [roomID,setroomID] = useState(typeof window!=="undefined" && localStorage.getItem('roomID')?localStorage.getItem('roomID'):null)
     const [VideoGrid,setVideoGrid] = useState(typeof window!=="undefined"?document.getElementById('VideoGrid'):null)
     
     const [connectedUsers,setconnectedUsers] = useState(null)
     console.log(connectedUsers)
+    const [video, setvideo] = useState(true)
+    const [audio, setaudio] = useState(true)
+    const localStream = useRef()
     const ContextData = {
         title:title,
         settitle:settitle,
@@ -38,6 +42,13 @@ export const ContextProvider = ({ children }) => {
         setVideoGrid:setVideoGrid,
         number:number,
         setnumber:setnumber,
+        joinroom:joinroom,
+        setjoinroom:setjoinroom,
+        localStream:localStream,
+        video:video,
+        setvideo:setvideo,
+        audio:audio,
+        setaudio:setaudio
     }
     return <Context.Provider value={ContextData}>{children}</Context.Provider>
 }

@@ -4,41 +4,61 @@ import Link from 'next/link'
 import { v4 as uuidv4 } from 'uuid';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
-
+import CreateRoomPage1 from '../../public/images/CreateRoomPage1.png'
+import { IoCreateSharp } from 'react-icons/io5'
+import Image from 'next/image'
 export default function index() {
-  const { title, roomID, isHost, identity, settitle, setidentity, setisHost, setroomID } = useContext(Context)
-  const [JoinRoomId, setJoinRoomId] = useState()
-  const router = useRouter()
-  useEffect(() => {
-   
-    setroomID(uuidv4())
-  }, [])
-  return (
-    <div>
-      <input type="text" placeholder='Title of the Room' onChange={(event) => {
-        settitle(event.target.value)
-      }} />
-      <input type="text" placeholder='Your Name' onChange={(event) => {
-        setidentity(event.target.value)
+	const {setroomID,roomID,title,settitle,setjoinroom } = useContext(Context)
+	const [JoinRoomID,setJoinRoomID] = useState(null)
+	const router = useRouter()
+	useEffect(() => {
 
-      }} />
-      <input type="text" placeholder='Is Host' onChange={(event) => {
-        setisHost(event.target.value)
-      }} />
-      <input id="roomIDInput" type="text" placeholder="enter RoomID" onChange={(e) => {
-        setJoinRoomId(e.target.value)
-      }} />
-      <Link onClick={() => {
-        setisHost(false)
-      }} href={`/RoomPage/${JoinRoomId}`} >Join Room</Link>
-      <button onClick={() => {
-        localStorage.setItem('title', title)
-        localStorage.setItem('roomID', roomID)
-        setisHost(true)
-        localStorage.setItem('identity', identity)
-        localStorage.setItem('isHost', isHost)
-        router.push(`/RoomPage/${roomID}`)
-      }} className='border-2 border-black p-2'>Start An Instant Meeting</button>
-    </div>
-  )
+		setroomID(uuidv4())
+	}, [])
+	return (
+		<div>
+			<div className='  lg:grid md:grid-cols-2 tracking-wide'>
+			<div className='mx-10 my-20 flex lg:hidden  justify-center items-center '>
+					<Image src={CreateRoomPage1}  placeholder="blur mx-auto " />
+				</div>
+				<div className='mx-10 lg:ml-32 '>
+					<div className='text-xl lg:text-3xl text-center lg:text-start font-semibold lg:font-bold  my-20 '>
+						Simplify Meetings: Seamlessly Initiate, Schedule, or Join for Streamlined Collaboration and Enhanced Productivity.</div>
+					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
+						<button onClick={()=>{
+							setjoinroom(false)
+							router.push(`/RoomPage/${roomID}`)
+						}} className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]'><IoCreateSharp className="w-7 h-7 mr-2"  /> Start Instant Meeting</button>
+						<div>
+							<input onChange={(e)=>{
+								
+								localStorage.setItem('title',e.target.value)
+								settitle(e.target.value)
+								
+							}} id="title" name='title' type="text" placeholder='Title Of Your Room' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none w-full lg:w-[250px] z-1 transition-all fade-in-out duration-500' />
+						</div>
+					</div>
+					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
+						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]' onClick={()=>{
+							router.push(`/RoomPage/${JoinRoomID}`)
+						}}><IoCreateSharp className="w-7 h-7 mr-2" />Join A Room</button>
+						<div>
+							<input onChange={(e)=>{
+								setJoinRoomID(e.target.value)
+							}} id="roomID" name="roomID" type="text" placeholder='Enter The Room ID' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none z-1 w-full lg:w-[250px] transition-all fade-in-out duration-500' />
+						</div>
+					</div>
+					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
+						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]'><IoCreateSharp className="w-7 h-7 mr-2" />Schedule A Meeting</button>
+						<div>
+							<input id="title" name='title' type="date"  className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none w-full lg:w-[250px] z-1 transition-all fade-in-out duration-500' />
+						</div>
+					</div>
+				</div>
+				<div className='mx-10 my-20 hidden lg:flex -skew-x-12 translate-x-[-50px] justify-center items-center '>
+					<Image src={CreateRoomPage1} width="500" placeholder="blur mx-auto " />
+				</div>
+			</div>
+		</div>
+	)
 }

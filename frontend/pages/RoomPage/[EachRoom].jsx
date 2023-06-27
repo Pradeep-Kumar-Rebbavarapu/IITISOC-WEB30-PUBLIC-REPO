@@ -1,32 +1,32 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import LaptopRoom from '../../components/LaptopRoom'
 import MobileRoom from '../../components/MobileRoom'
 import Context from '../../context/Context'
+import AreYouReady from '../../components/AreYouReady'
 
-const  EachRoom = () => {
-    const { auth } = useContext(Context);
+import useWindowSize from "@rooks/use-window-size"
+const EachRoom = () => {
+    const { auth, joinroom, localStream } = useContext(Context);
+    const { innerWidth, innerHeight, outerHeight, outerWidth } = useWindowSize();
+    const socket = useRef()
     const router = useRouter();
     useEffect(() => {
         if (!auth) {
-
             router.push('/LoginPage')
             return;
         }
-        localStorage.setItem('roomID',router.query.EachRoom)
+        localStorage.setItem('roomID', router.query.EachRoom)
     })
 
-    
-    return (
-        <div>
-            <div>
-                <div className='hidden lg:block'><LaptopRoom  /></div>
-                <div className='lg:hidden'><MobileRoom /></div>
-            </div>
-        </div>
-    )
+    if (joinroom) {
+        return <AreYouReady localStream={localStream} socket={socket} />
+    }
+    return <div className=''><LaptopRoom socket={socket} /></div>
+
 }
+
 
 
 export default EachRoom

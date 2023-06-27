@@ -1,9 +1,32 @@
 
 import { store } from "../store/store";
+import { JoinRoom } from "./JoinRoom";
 const ScreenShareConstraints = {
     audio: false,
-    video: true,
-}
+    video: {
+        aspectRatio: { ideal: 3 / 1 } // Set the desired aspect ratio (width:height)
+    }
+};
+
+// export const handleScreenShare = async (ScreenShareOn,ScreenSharingStream,setScreenShareOn,peers,socketId,localStream,socket,auth,roomID) => {
+//     const my_video = document.getElementById('my_video')
+//     if (ScreenShareOn === false) {
+//         try {
+
+//             const stream = await navigator.mediaDevices.getDisplayMedia(ScreenShareConstraints);
+//             ScreenSharingStream.current = stream
+//             JoinRoom(socket,auth,roomID)
+//             setScreenShareOn(true);
+            
+//         } catch (err) {
+//             console.log(err)
+//             alert('Screen Share Error');
+//         }
+
+//     } else {
+        
+//     }
+// };
 
 export const handleScreenShare = async (ScreenShareOn,ScreenSharingStream,setScreenShareOn,peers,socketId,localStream) => {
     const my_video = document.getElementById('my_video')

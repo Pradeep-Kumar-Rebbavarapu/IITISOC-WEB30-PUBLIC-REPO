@@ -15,5 +15,6 @@ class Room(models.Model):
     name = models.CharField(max_length=100)
     capacity = models.IntegerField()
     is_active = models.BooleanField(default=True)
-    created_by = models.ForeignKey(User,to_field="username",on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,related_name="creater")
+    joined_by = models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,related_name="joiner",default=None)
     created_at = models.CharField(max_length=100,default = getdate)

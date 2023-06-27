@@ -78,8 +78,6 @@ class Login(APIView):  # making a class based view called Login Using APIView
             # if the user has entered wrong password then an error is sent to the frontend
             if not user.check_password(password):
                 return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
-            if user.email_is_verified == False:  # if the user has signed up but hasnt verified his email yet so again an error is sent to the frontend
-                return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 if email == user.email:  # checking if the email sent by the frontend is same as the email stored in the database
                     # providing a refresh token for the user
@@ -135,3 +133,18 @@ class TurnServers(APIView):
         token = client.tokens.create()
         ice_servers = token.ice_servers  # Retrieve the iceServers from the token
         return Response(ice_servers)
+    
+
+class UserStatus(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        user = self.request.user
+        data = request.data
+        room_id = data['roomID']
+        room = Room.objects.filter(room_id = room_id).first()
+        if room is not None:
+            return Response('joinroom')
+        else:
+            return Response('createroom')
+        
