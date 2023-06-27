@@ -9,7 +9,7 @@ class User(AbstractUser):
     otp = models.CharField(max_length=10,null=True,blank=True,default=None)
     
     REQUIRED_FIELDS = []
-restoreHistory
+
 class Room(models.Model):
     room_id = models.UUIDField(default = uuid.uuid4,editable = False)
     name = models.CharField(max_length=100)

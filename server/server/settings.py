@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-
+import dj_database_url
 import environ
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     "api.apps.ApiConfig",
     "admin_interface",
     "colorfield",
-    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -99,7 +98,11 @@ DATABASES = {
     }
 }
 
-
+DATABASES['default'] = dj_database_url.config(
+    default='postgres://iitisoc_database_user:S1hHlL2qIZ3cjZmBXY67nLks0TPSEwW5@dpg-cidc93tgkuvncfdhdaug-a.singapore-postgres.render.com/iitisoc_database',
+    conn_max_age=600,
+    conn_health_checks=True,
+)
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
