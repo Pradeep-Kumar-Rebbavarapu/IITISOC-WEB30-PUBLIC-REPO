@@ -45,7 +45,7 @@ export default function AreYouReady({socket}) {
                     <button onClick={()=>{
                         setjoinroom(false)
                         router.push(`/RoomPage/${router.query.EachRoom}`)
-                    }} className='bg-blue-600 text-lg lg:text-2xl text-white hover:bg-blue-600/90 transition-all fade-in-out px-4 p-2 lg:p-4 rounded-full  h-fit w-fit my-5 lg:my-20 lg:my-auto hover:scale-110'>Are You Ready To Join ??</button>
+                    }} className='bg-blue-600 text-lg lg:text-2xl text-white hover:bg-blue-600/90 transition-all fade-in-out px-4 p-2 lg:p-4 rounded-full  h-fit w-fit my-5  lg:my-auto hover:scale-110'>Are You Ready To Join ??</button>
             </div>
         </div>
 
