@@ -45,18 +45,9 @@ class VerifyOTP(APIView):  # Making a Class Based View Called Verify OTP
         return Response('OTP Succesfully Verified', status=status.HTTP_200_OK)
 
 
-class Signup(APIView):  # making a class Based view using APIView
-    def post(self, request):  # making a Post Reuqest
-        data = request.data  # obtaining the data sent by the frontend
-        # Serializing(converting objects into certain datatypes here its json and vice versa) data given by frontend
-        serializer = UserSerializer(data=data)
-        if serializer.is_valid():  # if serializer accepts the incomming data without any error
-            serializer.save()  # saving the user instance with the serializer
-            # sending the otp through a function called send_otp_via_email in the .emails file
-            send_otp_via_email(serializer.data["email"])
-            return Response({"email": serializer.data["email"]}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class Signup(CreateAPIView):  # making a class Based view using APIView
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
 
 class Login(APIView):  # making a class based view called Login Using APIView
@@ -147,4 +138,14 @@ class UserStatus(APIView):
             return Response('joinroom')
         else:
             return Response('createroom')
-        
+class CheckJoinRoomStatus(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        data = request.data
+        room_id = data['roomID']
+        room = Room.objects.filter(room_id = room_id).first()
+        if room is not None:
+            return Response(True)
+        else:
+            return Response(False)

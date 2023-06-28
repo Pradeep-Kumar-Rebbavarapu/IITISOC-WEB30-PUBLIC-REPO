@@ -35,7 +35,7 @@ import { FiMoreVertical } from 'react-icons/fi'
 import { FaHandPaper } from 'react-icons/fa'
 import { AiOutlineClose } from 'react-icons/ai'
 import { toast } from 'react-toastify'
-
+import { LeaveRoom } from "../utils/LeaveRoom";
 function LaptopRoom(props) {
 	console.log('props', props.messages)
 	const { socket } = props
@@ -129,10 +129,10 @@ function LaptopRoom(props) {
 		}
 		document.addEventListener('click', handleClickOutsideMoreBtn, true)
 		document.addEventListener("click", handleClickOutsideAttachmentBtn, true);
-		// return () => {
-		// 	worker.current?.terminate()
-		// 	LeaveRoom(peers, localStream)
-		// }
+		return () => {
+			worker.current?.terminate()
+			LeaveRoom(peers, localStream)
+		}
 
 	}, [])
 

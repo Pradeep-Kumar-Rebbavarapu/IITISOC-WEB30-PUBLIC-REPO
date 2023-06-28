@@ -2,6 +2,7 @@ import axios from "axios"
 import { setIdentity, setRoomId } from "../store/actions"
 import { setIsRoomHost } from "../store/actions"
 import { store } from "../store/store"
+import {toast} from 'react-toastify'
 export const JoinRoom = (socket, auth, roomID) => {
     axios.post('https://www.pradeeps-video-conferencing.store/api/v1/GetRoomDetails/', { roomID: roomID }, {
         headers:{
@@ -19,6 +20,10 @@ export const JoinRoom = (socket, auth, roomID) => {
             "type": "join-room",
             "data": data
         }))
+    }).catch((err)=>{
+        window.location.href = "/CreateRoomPage";
+        toast.error('Some Error Occured',{position: toast.POSITION.TOP_LEFT})
+
     })
 
 }

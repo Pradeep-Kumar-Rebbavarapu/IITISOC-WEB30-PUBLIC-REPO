@@ -3,27 +3,7 @@ import { Field, ErrorMessage } from 'formik'
 import { useEffect } from 'react';
 export default function Input(props1) {
     const { children, id, type, name, className, icon, label, ...rest } = props1
-    useEffect(() => {
-        const inputs = document.querySelectorAll(".input");
 
-        function addClass() {
-            let parent = this.parentNode.parentNode;
-            parent.classList.add("focus");
-        }
-
-        function removeClass() {
-            let parent = this.parentNode.parentNode;
-            if (this.value == "") {
-                parent.classList.remove("focus");
-            }
-        }
-
-        inputs.forEach((input) => {
-            input.addEventListener("focus", addClass);
-            input.addEventListener("blur", removeClass);
-        });
-
-    }, []);
     return (
         <div id="input" className=''>
 
@@ -38,19 +18,12 @@ export default function Input(props1) {
 
                             return (
 
-                                <div className='flex '>
+                                <div className="relative w-full h-[50px] border-b-2 border-[#162983] my-[30px] flex">
+                                    <span className="absolute right-2 text-xl text-[#154360] leading-[57px]"><ion-icon name="lock-closed"></ion-icon></span>
 
 
-                                    <div className="input-div pass !w-full">
-                                        <div className="i">
-                                            {icon}
-                                        </div>
-                                        <div className="div">
-                                            <h5 className='!w-full !text-center '>{children}</h5>
-                                            <input {...field} type={type} name={name} id={id} className="input" />
-                                        </div>
-                                    </div>
-
+                                    <input {...field} className="w-full h-full bg-transparent border-none outline-none peer font-semibold pr-8 pl-1" required name={name} id={name} type={type} />
+                                    <label htmlFor={name} className="absolute top-[30px] left-[5px] translate-y-[-50%] text-lg text-[#154360] font-semibold peer-focus:top-[-5px] peer-valid:top-[-5px] transition-all duration-500 uppercase">{name}</label>
                                     <div className='translate-y-[20px] text-red-500'>
                                         <ErrorMessage className='' name={name}>
                                             {msg => {
@@ -79,7 +52,7 @@ export default function Input(props1) {
             </div>
 
 
-            
+
 
         </div>
 

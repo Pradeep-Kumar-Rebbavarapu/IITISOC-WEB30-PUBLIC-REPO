@@ -7,8 +7,9 @@ import { useRouter } from 'next/router';
 import CreateRoomPage1 from '../../public/images/CreateRoomPage1.png'
 import { IoCreateSharp } from 'react-icons/io5'
 import Image from 'next/image'
+import { toast } from 'react-toastify';
 export default function index() {
-	const {setroomID,roomID,title,settitle,setjoinroom } = useContext(Context)
+	const {setroomID,roomID,title,settitle,setjoinroom,auth } = useContext(Context)
 	const [JoinRoomID,setJoinRoomID] = useState(null)
 	const router = useRouter()
 	useEffect(() => {
@@ -26,8 +27,16 @@ export default function index() {
 						Simplify Meetings: Seamlessly Initiate, Schedule, or Join for Streamlined Collaboration and Enhanced Productivity.</div>
 					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
 						<button onClick={()=>{
-							setjoinroom(false)
-							router.push(`/RoomPage/${roomID}`)
+							if (!auth) {
+								router.push('/JoinUsPage')
+								toast.warning('Login To Start A Meet',{position: toast.POSITION.TOP_LEFT })
+								return;
+							}
+							else{
+								setjoinroom(false)
+								router.push(`/RoomPage/${roomID}`)
+							}
+							
 						}} className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]'><IoCreateSharp className="w-7 h-7 mr-2"  /> Start Instant Meeting</button>
 						<div>
 							<input onChange={(e)=>{
@@ -39,8 +48,10 @@ export default function index() {
 						</div>
 					</div>
 					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
-						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]' onClick={()=>{
+						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]' onClick={()=>{	
+							localStorage.setItem('roomID',JoinRoomID)
 							router.push(`/RoomPage/${JoinRoomID}`)
+							
 						}}><IoCreateSharp className="w-7 h-7 mr-2" />Join A Room</button>
 						<div>
 							<input onChange={(e)=>{

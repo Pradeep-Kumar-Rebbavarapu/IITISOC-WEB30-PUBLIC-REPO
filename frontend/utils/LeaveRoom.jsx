@@ -7,5 +7,5 @@ export const LeaveRoom = (peers,localStream) => {
     peers.current = {}
     localStream.current.getTracks().forEach(t => t.stop())
     localStream.current = null
-    window.location.href = '/CreateRoomPage'
+    
 }

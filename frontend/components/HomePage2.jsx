@@ -7,7 +7,7 @@ import HomeCard3 from '../public/images/HomeCard3.png'
 import HomeCard4 from '../public/images/HomeCard4.png'
 export default function HomePage2() {
   return (
-    <div id="HomePage2" className='w-full h-full md:grid grid-cols-2'>
+    <div id="HomePage2" className=' h-full lg:grid grid-cols-2 justify-center  items-center flex flex-col w-screen px-10'>
 
       <HomeCard image={HomeCard1} powered={"Speech To Text"} height="h-[200px]" title="AI WRITES FOR YOU">
 Effortlessly Capture and Organize Ideas: AI-Enhanced Note-Making for Streamlined Collaboration and Productivity.</HomeCard>

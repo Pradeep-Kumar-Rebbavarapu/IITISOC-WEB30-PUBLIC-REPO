@@ -7,23 +7,32 @@ import Context from '../../context/Context'
 import AreYouReady from '../../components/AreYouReady'
 
 import useWindowSize from "@rooks/use-window-size"
+import { toast } from 'react-toastify'
 const EachRoom = () => {
     const { auth, joinroom, localStream } = useContext(Context);
     const { innerWidth, innerHeight, outerHeight, outerWidth } = useWindowSize();
     const socket = useRef()
     const router = useRouter();
     useEffect(() => {
+        localStorage.setItem('roomID', router.query.EachRoom)
         if (!auth) {
-            router.push('/LoginPage')
+            router.push('/JoinUsPage')
+            toast.warning('Login To Start A Meet', { position: toast.POSITION.TOP_LEFT })
             return;
         }
-        localStorage.setItem('roomID', router.query.EachRoom)
-    })
 
-    if (joinroom) {
-        return <AreYouReady localStream={localStream} socket={socket} />
+    },[router.query.EachRoom])
+    
+    if (joinroom && auth) {
+        return <AreYouReady  roomID={router.query.EachRoom} localStream={localStream} socket={socket} />
     }
-    return <div className=''><LaptopRoom socket={socket} /></div>
+    if(auth && !joinroom){
+        return <div className=''><LaptopRoom socket={socket} /></div>
+    }
+    else{
+        return ;
+    }
+    
 
 }
 

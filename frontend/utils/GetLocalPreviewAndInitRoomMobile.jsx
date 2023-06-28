@@ -1,5 +1,7 @@
 import useWindowSize from "@rooks/use-window-size"
 import axios from "axios"
+import { BsWindowSidebar } from "react-icons/bs"
+import { toast } from "react-toastify"
 import { createNewRoom } from "./CreateNewRoom"
 import { JoinRoom } from "./JoinRoom"
 import { fetchTurnCredentials, getTurnIceServers } from "./TurnServers"
@@ -38,7 +40,7 @@ export const getLocalPreviewAndInitRoomMobileConnection = (socket, localStream, 
                 Authorization: 'Bearer ' + auth.access
             }
         }).then((response) => {
-            alert(response.data)
+            
             if (response.data === "joinroom") {
                 JoinRoom(socket, auth, roomID)
             }
@@ -49,6 +51,8 @@ export const getLocalPreviewAndInitRoomMobileConnection = (socket, localStream, 
 
     }).catch(err => {
         console.log(err)
+        window.location.href = "/CreateRoomPage"
+        toast.error('Some Error Occured Cannot Raise Video/Audio',{position:toast.POSITION.TOP_LEFT})
         alert('error in navigatore.mediaDevices')
     })
 

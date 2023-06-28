@@ -2,6 +2,7 @@ import useWindowSize from "@rooks/use-window-size"
 import axios from "axios"
 import { createNewRoom } from "./CreateNewRoom"
 import { JoinRoom } from "./JoinRoom"
+import {toast} from 'react-toastify'
 const defaultControls = {
     audio: true,
     video: true
@@ -22,7 +23,7 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
                 Authorization: 'Bearer ' + auth.access
             }
         }).then((response) => {
-            alert(response.data)
+            
             if (response.data === "joinroom") {
                 JoinRoom(socket, auth, roomID)
             }
@@ -32,6 +33,11 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
         })
 
     }).catch(err => {
+        if(localStream.current){
+            localStream.current.getTracks().forEach(t => t.stop())
+        }
+        window.location.href = '/CreateRoomPage'
+        toast.error('Some Error Occured',{position:toast.POSITION.TOP_LEFT})
         console.log(err)
         alert(err)
     })

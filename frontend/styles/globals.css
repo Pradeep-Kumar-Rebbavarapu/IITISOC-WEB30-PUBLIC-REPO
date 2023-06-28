@@ -289,3 +289,7 @@ video {
   transform: translateY(-100px);
   transform: scale(0.9);
 }
+
+.smenu {
+  left: 0%;
+}

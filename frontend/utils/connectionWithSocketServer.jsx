@@ -3,6 +3,7 @@ import { setSocketId, setRoomId, setParticipants } from "../store/actions"
 import { prepareNewPeerConnection } from "./prepareNewPeerConnection"
 import { w3cwebsocket as W3CWebSocket } from "websocket"
 import axios from 'axios'
+import { toast } from "react-toastify"
 
 const handleDisconnectedUser = (peers, socketId,length_of_participants,innerWidth) => {
     const VideoGrid = document.getElementById('VideoGrid')
@@ -86,6 +87,11 @@ export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, l
         }
 
         
+    }
+
+    socket.current.onerror = () =>{
+        window.location.href = "/CreateRoomPage"
+        toast.error('Error Connecting Websockets',{position:toast.POSITION.TOP_LEFT})
     }
 }
 
