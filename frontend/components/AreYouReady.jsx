@@ -21,11 +21,6 @@ export default function AreYouReady({ socket}) {
     //if the room is present .filter(room_id = room_id)
     
     useEffect(() => {
-        
-        
-        
-           
-            
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
                     
                     ReadyStream.current = stream
@@ -36,7 +31,9 @@ export default function AreYouReady({ socket}) {
                     }
 
                 })
-
+                return () =>{
+                    ReadyStream.current.getTracks().forEach((track) => track.stop())
+                }
     }, [])
     
     return (
@@ -46,10 +43,12 @@ export default function AreYouReady({ socket}) {
                 <video id="my_video" className='mt-28 md:mt-10 w-[300px] lg:w-full ' />
                 <div className=''>
                     <button onClick={() => {
+                        ReadyStream.current.getVideoTracks()[0].enabled = !video
                         setvideo(!video)
                         
                     }}>{video ? <AiFillVideoCamera className='border-2 border-orange-600 w-10 h-10 lg:w-16 lg:h-16 hover:bg-orange-500 hover:text-white text-orange-600 p-2 lg:p-4 rounded-full transition-all fade-in-out duration-300 my-4 mx-4' /> : <BsFillCameraVideoOffFill className='border-2 border-orange-600 w-10 h-10 lg:w-16 lg:h-16 bg-orange-500 text-white  p-2 lg:p-4 rounded-full transition-all fade-in-out duration-300 my-4 mx-4' />}</button>
                     <button onClick={() => {
+                        ReadyStream.current.getAudioTracks()[0].enabled = !audio
                         setaudio(!audio)
                         
                     }}>{audio ? <AiFillAudio className='border-2 border-orange-600 w-10 h-10 lg:w-16 lg:h-16 hover:bg-orange-500 hover:text-white text-orange-600 p-2 lg:p-4 rounded-full transition-all fade-in-out duration-300 my-4 mx-4' /> : <BsFillMicMuteFill className='border-2 border-orange-600 w-10 h-10 lg:w-16 lg:h-16 bg-orange-500 text-white  p-2 lg:p-4 rounded-full transition-all fade-in-out duration-300 my-4 mx-4' />}</button>

@@ -135,7 +135,6 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants)
     remoteVideo.autoplay = true;
     remoteVideo.playsInline = true
     remoteVideo.srcObject = stream;
-    remoteVideo.muted = true
     remoteVideo.className = 'object-cover mx-auto'
     remoteVideo.objectFit = "cover"
 
@@ -209,8 +208,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
 
 
     peers.current[connUserSocketId].on('signal', (data) => {
-        console.log(data)
-        //here we have the sdp offer,sdp answer and also the  information about the ice candidates
+        
         const SignalData = {
             signal: data,
             connUserSocketId: connUserSocketId

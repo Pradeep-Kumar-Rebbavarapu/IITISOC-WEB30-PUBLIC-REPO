@@ -30,7 +30,7 @@ import { AiFillFileText, AiOutlineFileText } from 'react-icons/ai';
 import axios from "axios";
 import UserJoinModal from "./UserJoinModal";
 import useWindowSize from "@rooks/use-window-size";
-import { getLocalPreviewAndInitRoomMobileConnection } from "../utils/GetLocalPreviewAndInitRoomMobile";
+
 import { FiMoreVertical } from 'react-icons/fi'
 import { FaHandPaper } from 'react-icons/fa'
 import { AiOutlineClose } from 'react-icons/ai'
