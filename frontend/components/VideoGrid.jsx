@@ -16,7 +16,7 @@ export default function VideoGrid({ localStream, length }) {
 		localVideo.style.borderRadius = "10px";
 		localVideo.style.objectFit = "cover";
 		localVideo.id = "my_video";
-
+		
 		const VideoGrid = document.getElementById("VideoGrid");
 		VideoGrid.append(localVideo);
 
