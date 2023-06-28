@@ -200,13 +200,13 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
-        config: configuration,
+        
         stream: streamToUse,
     })
 
     peers.current[connUserSocketId] = peer
 
-
+    console.log(peers)
     peers.current[connUserSocketId].on('signal', (data) => {
         
         const SignalData = {

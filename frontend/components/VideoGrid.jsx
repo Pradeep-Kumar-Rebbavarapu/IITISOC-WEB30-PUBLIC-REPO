@@ -32,7 +32,7 @@ export default function VideoGrid({ localStream, length }) {
 			className={`h-full  w-full  rounded-md my-auto justify-center mx-auto items-center grid gap-4`}
 			ref={videoGridRef}
 		>
-			<video id="my_video" className="mx-auto"></video>
+			<video id="my_video" muted className="mx-auto"></video>
 
 			<style jsx>
 				{`

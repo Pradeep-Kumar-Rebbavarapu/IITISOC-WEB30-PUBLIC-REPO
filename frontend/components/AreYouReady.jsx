@@ -21,12 +21,12 @@ export default function AreYouReady({ socket}) {
     //if the room is present .filter(room_id = room_id)
     
     useEffect(() => {
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: {echoCancellation: false } }).then((stream) => {
                     
                     ReadyStream.current = stream
                     let video = document.getElementById('my_video');
                     video.srcObject = stream;
-                    video.onloadeddata = () => {
+                    video.onloadedmetadata = () => {
                         video.play()
                     }
 
