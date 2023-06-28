@@ -9,8 +9,8 @@ import { IoCreateSharp } from 'react-icons/io5'
 import Image from 'next/image'
 import { toast } from 'react-toastify';
 export default function index() {
-	const {setroomID,roomID,title,settitle,setjoinroom,auth } = useContext(Context)
-	const [JoinRoomID,setJoinRoomID] = useState(null)
+	const {setroomID,roomID,title,settitle,setjoinroom,auth,JoinRoomID,setJoinRoomID } = useContext(Context)
+	
 	const router = useRouter()
 	useEffect(() => {
 
@@ -49,6 +49,7 @@ export default function index() {
 					</div>
 					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
 						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]' onClick={()=>{	
+							setJoinRoomID(JoinRoomID)
 							localStorage.setItem('roomID',JoinRoomID)
 							router.push(`/RoomPage/${JoinRoomID}`)
 							

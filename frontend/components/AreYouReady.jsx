@@ -12,7 +12,7 @@ import axios from 'axios'
 import {toast} from 'react-toastify'
 export default function AreYouReady({ socket}) {
 
-    const { setjoinroom,roomID, localStream, auth, video, setvideo, audio, setaudio } = useContext(Context)
+    const { setJoinRoomID,JoinRoomID,localStream, auth, video, setvideo, audio, setaudio,setjoinroom } = useContext(Context)
     console.log(auth)
     const router = useRouter()
     const ReadyStream = useRef()
@@ -22,14 +22,10 @@ export default function AreYouReady({ socket}) {
     
     useEffect(() => {
         
-        console.log(roomID)
-        axios.post('https://www.pradeeps-video-conferencing.store/api/v1/CheckJoinRoomStatus/', { roomID:roomID}, {
-            headers: {
-                Authorization: 'Bearer ' + auth.access
-            }
-        }).then((response) => {
+        
+        
            
-            if (response.data) {
+            
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
                     localStream.current = stream
                     ReadyStream.current = stream
@@ -40,23 +36,9 @@ export default function AreYouReady({ socket}) {
                     }
 
                 })
-            }
-            else {
-                router.push('/CreateRoomPage')
-                toast.error('Room Does Not Exist', { position: toast.POSITION.TOP_LEFT })
-            }
-            setloading(false)
-        }).catch((err) => {
-            console.log(err)
-            router.push('/CreateRoomPage')
-            toast.error('Room Does Not Exist', { position: toast.POSITION.TOP_LEFT })
-            setloading(false)
-        })
 
     }, [])
-    if(loading){
-        return <div className='h-screen w-screen flex justify-center items-center text-2xl font-semibold my-20'>Loading...</div>
-    }
+    
     return (
 
         <div className='grid md:grid-cols-2 h-full z-[1]  w-full  bg-[url("/images/AreYouReady2.png")] bg-cover bg-no-repeat lg:px-32  lg:my-auto'>

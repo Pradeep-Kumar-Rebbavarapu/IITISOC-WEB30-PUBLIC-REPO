@@ -23,6 +23,7 @@ export const ContextProvider = ({ children }) => {
     const [video, setvideo] = useState(true)
     const [audio, setaudio] = useState(true)
     const localStream = useRef()
+    const [JoinRoomID,setJoinRoomID] = useState(null)
     const ContextData = {
         title:title,
         settitle:settitle,
@@ -48,7 +49,9 @@ export const ContextProvider = ({ children }) => {
         video:video,
         setvideo:setvideo,
         audio:audio,
-        setaudio:setaudio
+        setaudio:setaudio,
+        JoinRoomID:JoinRoomID,
+        setJoinRoomID:setJoinRoomID
     }
     return <Context.Provider value={ContextData}>{children}</Context.Provider>
 }

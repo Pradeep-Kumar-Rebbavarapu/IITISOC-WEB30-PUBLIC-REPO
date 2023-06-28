@@ -10,11 +10,27 @@ import 'regenerator-runtime/runtime'
 import { store } from '../store/store';
 import { Provider } from 'react-redux';
 import { useEffect } from 'react'
-
+import LoadingBar from 'react-top-loading-bar'
+import { useRouter } from 'next/router'
 export default function App({ Component, pageProps }) {
   const queryClient = new QueryClient()
   const state = store.getState()
+  const router = useRouter()
+  const [Progress, setProgress] = React.useState(0)
 
+  React.useEffect(() => {
+
+    router.events.on('routeChangeStart', () => {
+      setProgress(40)
+      
+    })
+    router.events.on('routeChangeComplete', () => {
+      setProgress(100)
+
+
+    })
+
+  }, [])
   return (
     <>
       <QueryClientProvider client={queryClient}>
@@ -23,8 +39,16 @@ export default function App({ Component, pageProps }) {
             <div className=''>
               <div className='z-[1000]'>
                 <Navbar />
+                <LoadingBar
+                  color='#E11D48'
+                  progress={Progress}
+                  height={5}
+                  shadowStyle={{ 'height': '5px', 'width': '20px' }}
+                  waitingTime={200}
+                  onLoaderFinished={() => setProgress(0)}
+                />
               </div>
-              
+
               <div className='z-0 '>
                 <Component {...pageProps} />
               </div>
