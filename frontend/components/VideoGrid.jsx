@@ -23,7 +23,7 @@ export default function VideoGrid({ localStream, length }) {
 		localVideo.onloadedmetadata = () => {
 			localVideo.play();
 		};
-	}, []);
+	}, [localStream]);
 
 
 	return (

@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react'
-import { download } from '../utils/ShareFileUtils'
+import { download } from '../utils/ShareFileTwo'
 
-export default function EachMessage({ worker, setGotFile, message,setProgress }) {
+export default function EachMessage({worker,setGotFile,message,setProgress,DownlaodingText,UploadingText }) {
     useEffect(()=>{
         console.log('sp',setProgress)
         
     },[])
     return (
         <div id='EachMessage' className=' '>
-            {message.messageCreatedByMe ? (
+            {message?.messageCreatedByMe || message.isAuthor ? (
                 <>
                     <div className='grid grid-cols-[auto_50px] h-full w-full'>
 
@@ -19,9 +19,7 @@ export default function EachMessage({ worker, setGotFile, message,setProgress })
                             {message.File ? (
                                 <div id="DownloadMessage" className='flex flex-col justify-center items-center text-center p-2 m-5 rounded-lg bg-gradient-to-tr from-orange-400 to-orange-600 '>
                                     <div className='font-bold text-white'>You Sent A File</div>
-                                    <div className='font-bold underline-offset-2 cursor-pointer border-2 p-2 rounded-md my-2 bg-white text-orange-600  break-all' onClick={() => {
-                                        download(worker, setGotFile, message.content)
-                                    }}>{message.content}</div>
+                                    <button disabled id={message.id} className='font-bold underline-offset-2 cursor-pointer border-2 p-2 rounded-md my-2 bg-white text-orange-600  break-all'>{UploadingText}</button>
                                 </div>
                             ) : (
                                 <div id="User_Message" className='p-2 w-fit break-all text-end flex justify-end   my-5 border-0 border-blue-500 bg-orange-500 text-white  rounded-md ml-auto'>
@@ -52,9 +50,10 @@ export default function EachMessage({ worker, setGotFile, message,setProgress })
                             {message.File ? (
                                 <div id="DownloadMessage" className='flex flex-col justify-center items-center text-center p-2 m-5 rounded-lg bg-gradient-to-tr bg-white '>
                                     <div className='font-bold text-orange-600 '>Hey {message.identity} Has Sent You All A File</div>
-                                    <div className='font-bold underline-offset-2 cursor-pointer border-2 p-2 rounded-md my-2 bg-gradient-to-tr from-orange-400 to-orange-600 text-white break-all' onClick={() => {
-                                        download(worker, setGotFile, message.content)
-                                    }}>{message.content}</div>
+                                    <button id={message.id} className='font-bold underline-offset-2 cursor-pointer border-2 p-2 rounded-md my-2 bg-gradient-to-tr from-orange-400 to-orange-600 text-white break-all' onClick={() => {
+                                        download(message.id)
+                                        console.log(message.id)
+                                    }}>{DownlaodingText}</button>
                                 </div>
                             ) : (
                                 <div id="User_Message" className='p-2 w-fit break-all  my-5 text-start flex justify-start border-0 border-blue-500 bg-white rounded-md'>

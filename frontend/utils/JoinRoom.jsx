@@ -21,7 +21,7 @@ export const JoinRoom = (socket, auth, roomID) => {
             "data": data
         }))
     }).catch((err)=>{
-        window.location.href = "/CreateRoomPage";
+       
         toast.error('Some Error Occured',{position: toast.POSITION.TOP_LEFT})
 
     })

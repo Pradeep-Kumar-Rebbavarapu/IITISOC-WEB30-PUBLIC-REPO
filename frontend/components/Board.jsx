@@ -137,7 +137,7 @@ export default function Board({ peers }) {
 			context.globalCompositeOperation = 'destination-out';
 			context.lineTo(position.x, position.y);
 			context.stroke();
-			
+
 			if (context.globalCompositeOperation === 'destination-out') {
 				// Switch back to the default drawing mode
 				context.globalCompositeOperation = previousCompositeOperation;
@@ -158,7 +158,10 @@ export default function Board({ peers }) {
 
 			IdBtns.map((btn) => {
 				if (btn === shape) {
-					document.getElementById(btn).className = "mx-2  transition-all fade-in-out rounded-md border-2 p-2 h-fit w-full flex break-none  ring-4 ring-opacity-50"
+					if(document.getElementById(btn)){
+						document.getElementById(btn).className = "mx-2  transition-all fade-in-out rounded-md border-2 p-2 h-fit w-full flex break-none  ring-4 ring-opacity-50"
+					}
+					
 
 				}
 				else {
@@ -227,18 +230,18 @@ export default function Board({ peers }) {
 		}
 
 		function dragStop(event) {
-			
+
 			draggingRef.current = false;
 			const position = getCanvasCoordinates(event);
 			restoreSnapShot();
 			if (shape === 'eraser') {
 				erase(position); // Erase the last drawn path
 				context.clearRect(position.x - EraserSize / 2, position.y - EraserSize / 2, EraserSize, EraserSize); // Clear the specific region
-				
+
 			} else {
 				draw(position);
 			}
-			
+
 			if (timeout !== undefined) clearTimeout(timeout);
 			timeout = setTimeout(() => {
 				const base64ImageData = canvas.toDataURL('image/png');
@@ -246,17 +249,22 @@ export default function Board({ peers }) {
 			}, 1000);
 		}
 
-		
+
 		const IdBtns = ['freestyle', 'line', 'circle', 'polygon', 'square', 'ellipse', 'rect', 'eraser']
 		const Btns = document.getElementById('Btns')
 		document.addEventListener('click', (e) => {
 			IdBtns.map((btn) => {
 				if (shape === btn) {
-					document.getElementById(btn).className = "mx-2  transition-all fade-in-out rounded-md border-2 p-2 h-fit w-full flex break-none  ring-4 ring-opacity-50"
+					if(document.getElementById(btn)){
+						document.getElementById(btn).className = "mx-2  transition-all fade-in-out rounded-md border-2 p-2 h-fit w-full flex break-none  ring-4 ring-opacity-50"
+					}
 
 				}
 				else {
-					document.getElementById(btn).className = "mx-2  transition-all fade-in-out rounded-md border-2 p-2 h-fit w-full flex break-none  hover:ring-4 ring-opacity-50"
+					if(document.getElementById(btn)){
+						document.getElementById(btn).className = "mx-2  transition-all fade-in-out rounded-md border-2 p-2 h-fit w-full flex break-none  hover:ring-4 ring-opacity-50"
+					}
+					
 
 				}
 			})
@@ -285,10 +293,10 @@ export default function Board({ peers }) {
 		}
 
 		function saveToHistory() {
-      const canvasData = canvas.toDataURL();
-      setHistory((prevHistory) => [...prevHistory, canvasData]);
-      setHistoryIndex((prevIndex) => prevIndex + 1);
-    }
+			const canvasData = canvas.toDataURL();
+			saveToHistory((prevHistory) => [...prevHistory, canvasData]);
+			historyIndexRef((prevIndex) => prevIndex + 1);
+		}
 
 		function restoreHistory() {
 			const canvasData = new Image();
@@ -301,13 +309,14 @@ export default function Board({ peers }) {
 		canvas.addEventListener('mousedown', dragStart, false);
 		canvas.addEventListener('mousemove', drag, false);
 		canvas.addEventListener('mouseup', dragStop, false);
-		document.getElementById('UndoBtn').addEventListener('click',undo)
-		document.getElementById('RedoBtn').addEventListener('click',redo)
-		document.getElementById('ClearCanvasBtn').addEventListener('click',clearCanvas)
+		document.getElementById('UndoBtn').addEventListener('click', undo)
+		document.getElementById('RedoBtn').addEventListener('click', redo)
+		document.getElementById('ClearCanvasBtn').addEventListener('click', clearCanvas)
 		return () => {
 			canvas.removeEventListener('mousedown', dragStart, false);
 			canvas.removeEventListener('mousemove', drag, false);
 			canvas.removeEventListener('mouseup', dragStop, false);
+			
 
 		};
 

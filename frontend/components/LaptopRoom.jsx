@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { BsCameraVideoFill, BsFillCameraVideoOffFill, BsChatLeftDots, BsPeople, BsClipboard2Fill, BsClipboard2XFill, BsFillMicFill, BsFillMicMuteFill, BsFillSendFill, BsFillEmojiSmileFill } from "react-icons/bs";
+import { BsCameraVideoFill, BsFillCameraVideoOffFill, BsChatLeftDots, BsPeople, BsClipboard2Fill, BsClipboard2XFill, BsFillMicFill, BsFillMicMuteFill, BsFillSendFill, BsFillEmojiSmileFill, BsFillRecordBtnFill } from "react-icons/bs";
 
 import Stack from '@mui/material/Stack';
 import VolumeDown from '@mui/icons-material/VolumeDown';
@@ -21,8 +21,9 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 import { getLocalPreviewAndInitRoomConnection } from '../utils/GetLocalPreviewAndInitRoomConnection'
 import { sendMessage } from "../utils/MessageUtils";
-import { sendFile, selectFile } from "../utils/ShareFileUtils";
-import { connectionWithSocketServer } from "../utils/connectionWithSocketServer";
+import { selectFile } from "../utils/ShareFileUtils";
+import { sendFile } from "../utils/ShareFileTwo";
+import { connectionWithSocketServer, handleDisconnectedUser } from "../utils/connectionWithSocketServer";
 import { handleScreenShare } from "../utils/ScreenShareUtils";
 import Board from "./Board";
 import SpeechToText from "../utils/SpeechToText";
@@ -36,6 +37,8 @@ import { FaHandPaper } from 'react-icons/fa'
 import { AiOutlineClose } from 'react-icons/ai'
 import { toast } from 'react-toastify'
 import { LeaveRoom } from "../utils/LeaveRoom";
+import { BiMessageAltError } from 'react-icons/bi'
+import PrivateMessaing from "./PrivateMessaing";
 function LaptopRoom(props) {
 	console.log('props', props.messages)
 	const { socket } = props
@@ -63,6 +66,10 @@ function LaptopRoom(props) {
 	const setProgress = useRef()
 	const isDrawing = useRef(false)
 	const IceServers = useRef(null)
+	const [RecordingOn, setRecordingOn] = useState(false)
+	const mediaRecorder = useRef()
+	const [DownlaodingText,setDownloadingText] = useState(0)
+	const [UploadingText,setUploadingText] = useState(0)
 	const {
 		transcript,
 		listening,
@@ -90,9 +97,9 @@ function LaptopRoom(props) {
 	useEffect(() => {
 
 		worker.current = new Worker('/worker.js')
-		connectionWithSocketServer(socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, props.participants.length)
+		connectionWithSocketServer(socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, props.participants.length,isHost,auth,roomID,setoverlay,title,setDownloadingText)
 
-		getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth, roomID, setoverlay, title, IceServers, 3)
+		
 
 
 
@@ -130,8 +137,10 @@ function LaptopRoom(props) {
 		document.addEventListener('click', handleClickOutsideMoreBtn, true)
 		document.addEventListener("click", handleClickOutsideAttachmentBtn, true);
 		return () => {
+			document.removeEventListener('click', handleClickOutsideMoreBtn, true)
+			document.removeEventListener("click", handleClickOutsideAttachmentBtn, true);
 			worker.current?.terminate()
-			LeaveRoom(peers, localStream)
+			handleDisconnectedUser(peers,props.socketId)
 		}
 
 	}, [])
@@ -286,7 +295,6 @@ function LaptopRoom(props) {
 			ChatParticipantsBox.classList.add('hidden')
 
 		}
-
 	}
 
 
@@ -369,13 +377,13 @@ function LaptopRoom(props) {
 		const BoardSection = document.getElementById('board-section')
 		const VideoSection = document.getElementById('video-section')
 		const TextEditor = document.getElementById('TextEditor')
-		
-			BoardSection.className = "w-full h-full top-[0px] absolute z-[1000000000000000]  transition-all fade-in-out duration-500"
-			VideoSection.className = "w-full h-full absolute left-[2000px] z-[100] transition-all fade-in-out duration-500"
-			TextEditor.className = "w-full h-full absolute left-[-2000px] z-[100] transition-all fade-in-out duration-500"
+
+		BoardSection.className = "w-full h-full top-[0px] absolute z-[1000000000000000]  transition-all fade-in-out duration-500"
+		VideoSection.className = "w-full h-full absolute left-[2000px] z-[100] transition-all fade-in-out duration-500"
+		TextEditor.className = "w-full h-full absolute left-[-2000px] z-[100] transition-all fade-in-out duration-500"
 
 
-		
+
 	}
 
 
@@ -447,6 +455,66 @@ function LaptopRoom(props) {
 	}
 
 
+	const CaptureScreen = async () => {
+		const stream = await navigator.mediaDevices.getDisplayMedia({
+			video: {
+				cursor: "always"
+			},
+			audio: {
+				echoCancellation: true,
+				noiseSuppression: true
+			}
+		})
+		return stream
+	}
+	const CaptureAudio = async () => {
+		const stream = await navigator.mediaDevices.getUserMedia({
+			video: false,
+			audio: {
+				echoCancellation: true,
+				noiseSuppression: true
+			}
+		})
+		return stream
+	}
+	const handleRecording = async () => {
+		const chunks = []; // Initialize chunks as an array
+
+		if (RecordingOn === false) {
+			const RecordingStream = await CaptureScreen();
+			const AudioStream = await CaptureAudio();
+			RecordingStream.addTrack(AudioStream.getAudioTracks()[0]);
+			mediaRecorder.current = new MediaRecorder(RecordingStream);
+			mediaRecorder.current.start();
+
+			mediaRecorder.current.onstop = () => {
+				RecordingStream.getTracks().forEach((track) => track.stop());
+				const blob = new Blob(chunks, { type: 'video/webm' });
+				console.log(blob)
+				const url = window.URL.createObjectURL(blob);
+				console.log(url);
+				const a = document.createElement('a');
+				a.style.display = "none"
+				a.href = url;
+				a.download = 'test.webm'
+				document.body.appendChild(a);
+				a.click();
+				setTimeout(() => {
+					document.body.removeChild(a);
+					window.URL.revokeObjectURL(url);
+				}, 100)
+			};
+
+			mediaRecorder.current.ondataavailable = (e) => {
+				chunks.push(e.data); // Add the received data to the chunks array
+			};
+
+			setRecordingOn(true);
+		} else {
+			mediaRecorder.current.stop();
+			setRecordingOn(false);
+		}
+	};
 
 
 
@@ -454,305 +522,325 @@ function LaptopRoom(props) {
 
 
 
-
-
-
+	const OpenPrivateMessaging = () => {
+		const PrivateMessaging = document.getElementById('PrivateMessaging')
+		if (PrivateMessaging.classList.contains('left-[-2000px]')) {
+			PrivateMessaging.className = 'absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto]  left-[0px] z-[10000000000000] transition-all fade-in-out duration-500';
+		}
+		else {
+			PrivateMessaging.className = 'absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto] left-[-2000px] z-[100000000000] transition-all fade-in-out duration-500';
+		}
+	}
 
 
 	return (
 		<div>
-		<div className="w-full h-screen bg-white absolute top-0 ">
-			
-			<UserJoinModal peerUserID={peerUserID} socket={socket} JoinModal={JoinModal} setIsJoinModal={setIsJoinModal} />
-			<div className="flex w-full h-full ">
-				{<LocalScreenSharePreview socketId={props.socketId} screenShareStream={ScreenSharingStream.current} />}
-				
-				<div
-					id="Left_Nav"
-					className="hidden lg:flex  h-full flex-col items-center justify-center transition-all fade-in-out w-[100px] border-r-2"
-				>
-					<div onClick={() => {
-						handleToggleChatParticipantsArea('Video')
-					}} id="Left_Nav_Video_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" >
-						<BsCameraVideoFill className="w-7 h-7 " />
-					</div>
-					<div id="Left_Nav_Message_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
-						handleToggleChatParticipantsArea('Chat')
-					}} >
-						<BsChatLeftDots className="w-7 h-7 " />
-					</div>
-					<div id="Left_Nav_Participants_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
-						handleToggleChatParticipantsArea('Participants')
-					}} >
-						<BsPeople className="w-7 h-7 " />
-					</div>
-					<SpeechToText peers={peers} transcript={transcript} browserSupportsSpeechRecognition={browserSupportsSpeechRecognition} />
-					<div id="Left_Nav_Editor_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
-						OpenTextEditor()
-					}} >
-						<AiFillFileText className="w-7 h-7 " />
-					</div>
+			<PrivateMessaing message={message} setmessage={setmessage} sendMessage={sendMessage} File={File} setFile={setFile} sendFile={sendFile} Attachmentref={Attachmentref} handleToggleFileInput={handleToggleFileInput} selectFile={selectFile} socket={socket} props={props} worker={worker} peers={peers} />
+			<div className="w-full h-screen bg-white absolute top-0 ">
 
-					<div className="w-[60px] h-[60px] rounded-full bg-orange-600 bottom-0 mt-auto mb-5"></div>
-				</div>
+				<UserJoinModal peerUserID={peerUserID} socket={socket} JoinModal={JoinModal} setIsJoinModal={setIsJoinModal} />
 
-				<div className="border-0 border-black flex w-full h-full overflow-x-hidden lg:py-auto">
+				<div className="flex w-full h-full ">
+					{<LocalScreenSharePreview socketId={props.socketId} screenShareStream={ScreenSharingStream.current} />}
+
 					<div
-						id="Video_Element"
-						className="w-full border-0 border-red-500 mx-auto grid grid-rows-[auto_100px] lg:grid-rows-[60px_auto_100px] px-5 py-5 lg:py-0 relative overflow-hidden"
+						id="Left_Nav"
+						className="hidden lg:flex  h-full flex-col items-center justify-center transition-all fade-in-out w-[100px] border-r-2"
 					>
-						<div id="MoreBtnMenu" className="absolute w-full lg:hidden  h-[200px] bottom-[-500px] right-0 bg-white border-2 border-blue-500 z-[1000000000] transition-all fade-in-out duration-500">
-							<div className="w-full h-full grid grid-cols-3 justify-between flex-wrap items-center">
-								<div id="Left_Nav_Message_Btn" className="focus:bg-orange-500 cursor-pointer  my-5 p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center w-full h-full justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20" onClick={() => {
-									handleToggleChatParticipantsArea('Chat')
-								}} >
-									<BsChatLeftDots className="w-7 h-7 mx-auto" />
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{"Messages"}</div>
-								</div>
-								<div id="Left_Nav_Participants_Btn" className="focus:bg-orange-500 cursor-pointer  my-5 p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center w-full h-full justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20" onClick={() => {
-									handleToggleChatParticipantsArea('Participants')
-								}} >
-									<BsPeople className="w-7 h-7 mx-auto" />
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{"Participants"}</div>
-								</div>
-								<SpeechToText peers={peers} transcript={transcript} browserSupportsSpeechRecognition={browserSupportsSpeechRecognition} />
-								<div id="Left_Nav_Editor_Btn" className="focus:bg-orange-500 cursor-pointer  my-5 p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center w-full h-full justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20" onClick={() => {
-									OpenTextEditor()
-								}} >
-									<AiFillFileText className="w-7 h-7 mx-auto" />
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{"Text Editor"}</div>
-								</div>
-								<div className="group transition-all hover:bg-orange-500 flex flex-col text-center w-full h-full justify-center mx-auto lg:hidden fade-in-out hover:bg-opacity-20">
-									<div onClick={() => {
-										handleScreenShare(ScreenShareOn, ScreenSharingStream, setScreenShareOn, peers, props.socketId, localStream, socket, auth, roomID)
-									}} className="border-0 rounded-lg p-2 w-fit mx-auto text-orange-500  transition-all fade-in-out  " >{ScreenShareOn ? (<LuScreenShareOff className="w-4 h-4 lg:w-5 lg:h-5 mx-auto" />) : (<LuScreenShare className="w-4 h-4 lg:w-5 lg:h-5 mx-auto" />)}</div>
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{!ScreenShareOn ? "Start Sharing" : "Stop Sharing"}</div>
-								</div>
-
-
-								<div className="group transition-all hover:bg-orange-500 flex flex-col text-center w-full h-full justify-center mx-auto lg:hidden fade-in-out hover:bg-opacity-20">
-									<div onClick={() => {
-										ToggleBoard()
-									}} className="border-0 rounded-lg p-2 w-fit mx-auto text-orange-500  transition-all fade-in-out " ><BsClipboard2Fill className="w-4 h-4 lg:w-5 lg:h-5" /></div>
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Open Board</div>
-								</div>
-							</div>
+						<div onClick={() => {
+							handleToggleChatParticipantsArea('Video')
+						}} id="Left_Nav_Video_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" >
+							<BsCameraVideoFill className="w-7 h-7 " />
 						</div>
-						<div className="h-[60px] hidden lg:flex w-full  border-b-2 py-3">
-							<div
-								onClick={handleToggleLeftNav}
-								className="my-auto p-2 border-0 w-fit ml-5 bg-gray-300 bg-opacity-30 hover:bg-gray-400 hover:bg-opacity-20 transition-all fade-in-out cursor-pointer rounded-md"
+						<div id="Left_Nav_Message_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
+							handleToggleChatParticipantsArea('Chat')
+						}} >
+							<BsChatLeftDots className="w-7 h-7 " />
+						</div>
+						<div id="Left_Nav_Participants_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
+							handleToggleChatParticipantsArea('Participants')
+						}} >
+							<BsPeople className="w-7 h-7 " />
+						</div>
+						<div id="Left_Nav_Recordings_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
+							handleRecording()
+						}} >
+							<BsFillRecordBtnFill className="w-7 h-7 " />
+						</div>
+						<SpeechToText peers={peers} transcript={transcript} browserSupportsSpeechRecognition={browserSupportsSpeechRecognition} />
 
-							>
-								{LeftNavOpen ? (
-									<AiOutlineLeft className="w-6 h-6 mx-auto my-auto text-gray-500 " />
-
-								) : (
-									<AiOutlineRight className="w-6 h-6 mx-auto my-auto text-gray-500 " />
-								)}
-							</div>
-							<div className=" text-center font-bold items-center flex text-xl ml-4">
-								{title}
-							</div>
+						<div id="Left_Nav_Editor_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
+							OpenTextEditor()
+						}} >
+							<AiFillFileText className="w-7 h-7 " />
 						</div>
 
-						<div id="otherTemplate" className={`p-0 relative  border-0 border-blue-500 h-full `}>
-
-
-							<div id='video-section' className="w-full h-full top-0  absolute z-[0] transition-all fade-in-out duration-500">
-								<VideoGrid length={props.participants.length} localStream={localStream.current} />
-							</div>
-							<div>
-								<div id='TextEditor' className="w-full h-full absolute z-[10000] left-[-2000px] transition-all fade-in-out duration-500 border-2 border-black"  >{transcript}</div>
-							</div>
-
+						<div id="Left_Nav_Editor_Btn" className="focus:bg-orange-500 cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-orange-500 transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20" onClick={() => {
+							OpenPrivateMessaging()
+						}} >
+							<BiMessageAltError className="w-7 h-7 " />
 						</div>
 
+						<div className="w-[60px] h-[60px] rounded-full bg-orange-600 bottom-0 mt-auto mb-5"></div>
+					</div>
 
-						<div className="h-[100px] z-[100000000] bg-white   pt-2 flex justify-center border-t-2 absolute lg:relative w-full bottom-0">
+					<div className="border-0 border-black flex w-full h-full overflow-x-hidden lg:py-auto">
+						<div
+							id="Video_Element"
+							className="w-full border-0 border-red-500 mx-auto grid grid-rows-[auto_100px] lg:grid-rows-[60px_auto_100px] px-5 py-5 lg:py-0 relative overflow-hidden"
+						>
+							<div id="MoreBtnMenu" className="absolute w-full lg:hidden  h-[200px] bottom-[-500px] right-0 bg-white border-2 border-blue-500 z-[1000000000] transition-all fade-in-out duration-500">
+								<div className="w-full h-full grid grid-cols-3 justify-between flex-wrap items-center">
+									<div id="Left_Nav_Message_Btn" className="focus:bg-orange-500 cursor-pointer  my-5 p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center w-full h-full justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20" onClick={() => {
+										handleToggleChatParticipantsArea('Chat')
+									}} >
+										<BsChatLeftDots className="w-7 h-7 mx-auto" />
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{"Messages"}</div>
+									</div>
+									<div id="Left_Nav_Participants_Btn" className="focus:bg-orange-500 cursor-pointer  my-5 p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center w-full h-full justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20" onClick={() => {
+										handleToggleChatParticipantsArea('Participants')
+									}} >
+										<BsPeople className="w-7 h-7 mx-auto" />
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{"Participants"}</div>
+									</div>
+									<SpeechToText peers={peers} transcript={transcript} browserSupportsSpeechRecognition={browserSupportsSpeechRecognition} />
+									<div id="Left_Nav_Editor_Btn" className="focus:bg-orange-500 cursor-pointer  my-5 p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center w-full h-full justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20" onClick={() => {
+										OpenTextEditor()
+									}} >
+										<AiFillFileText className="w-7 h-7 mx-auto" />
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{"Text Editor"}</div>
+									</div>
+									<div className="group transition-all hover:bg-orange-500 flex flex-col text-center w-full h-full justify-center mx-auto lg:hidden fade-in-out hover:bg-opacity-20">
+										<div onClick={() => {
+											handleScreenShare(ScreenShareOn, ScreenSharingStream, setScreenShareOn, peers, props.socketId, localStream, socket, auth, roomID)
+										}} className="border-0 rounded-lg p-2 w-fit mx-auto text-orange-500  transition-all fade-in-out  " >{ScreenShareOn ? (<LuScreenShareOff className="w-4 h-4 lg:w-5 lg:h-5 mx-auto" />) : (<LuScreenShare className="w-4 h-4 lg:w-5 lg:h-5 mx-auto" />)}</div>
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{!ScreenShareOn ? "Start Sharing" : "Stop Sharing"}</div>
+									</div>
 
-							<div className="grid grid-cols-5 lg:grid-cols-6 text-center items-center ">
+
+									<div className="group transition-all hover:bg-orange-500 flex flex-col text-center w-full h-full justify-center mx-auto lg:hidden fade-in-out hover:bg-opacity-20">
+										<div onClick={() => {
+											ToggleBoard()
+										}} className="border-0 rounded-lg p-2 w-fit mx-auto text-orange-500  transition-all fade-in-out " ><BsClipboard2Fill className="w-4 h-4 lg:w-5 lg:h-5" /></div>
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Open Board</div>
+									</div>
+								</div>
+							</div>
+							<div className="h-[60px] hidden lg:flex w-full  border-b-2 py-3">
+								<div
+									onClick={handleToggleLeftNav}
+									className="my-auto p-2 border-0 w-fit ml-5 bg-gray-300 bg-opacity-30 hover:bg-gray-400 hover:bg-opacity-20 transition-all fade-in-out cursor-pointer rounded-md"
+
+								>
+									{LeftNavOpen ? (
+										<AiOutlineLeft className="w-6 h-6 mx-auto my-auto text-gray-500 " />
+
+									) : (
+										<AiOutlineRight className="w-6 h-6 mx-auto my-auto text-gray-500 " />
+									)}
+								</div>
+								<div className=" text-center font-bold items-center flex text-xl ml-4">
+									{title}
+								</div>
+							</div>
+
+							<div id="otherTemplate" className={`p-0 relative  border-0 border-blue-500 h-full `}>
 
 
-								<div className="group transition-all fade-in-out mx-5">
-									<div onClick={() => {
-									}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " ><BsFillEmojiSmileFill /></div>
-									<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Emoji</div>
+								<div id='video-section' className="w-full h-full top-0  absolute z-[0] transition-all fade-in-out duration-500">
+									<VideoGrid length={props.participants.length} localStream={localStream.current} />
+								</div>
+								<div>
+									<div id='TextEditor' className="w-full h-full absolute z-[10000] left-[-2000px] transition-all fade-in-out duration-500 border-2 border-black"  >{transcript}</div>
 								</div>
 
-								<div className="group transition-all fade-in-out mx-5">
-									<div onClick={() => {
-										ToggleMic(MicOn)
-									}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " >{!MicOn ? (<BsFillMicMuteFill className="w-4 h-4 lg:w-5 lg:h-5" />) : (<BsFillMicFill className="w-4 h-4 lg:w-5 lg:h-5" />)}</div>
-									<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">{MicOn ? "Mic On" : "Mic Off"}</div>
-								</div>
+							</div>
 
 
-								<div className="group transition-all fade-in-out mx-5">
-									<div onClick={() => {
-										ToggleCamera(CamOn)
-									}} id="ToggleVideoBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 text-sm" >{!CamOn ? (<BsFillCameraVideoOffFill className="w-4 h-4 lg:w-5 lg:h-5" />) : (<BsCameraVideoFill className="w-4 h-4 lg:w-5 lg:h-5" />)}</div>
-									<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">{CamOn ? "Cam On" : "Cam Off"}</div>
-								</div>
+							<div className="h-[100px] z-[100000000] bg-white   pt-2 flex justify-center border-t-2 absolute lg:relative w-full bottom-0">
 
-								<div className="group transition-all hidden lg:block fade-in-out mx-5">
-									<div onClick={() => {
-										handleScreenShare(ScreenShareOn, ScreenSharingStream, setScreenShareOn, peers, props.socketId, localStream, socket, auth, roomID)
-									}} className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500" >{ScreenShareOn ? (<LuScreenShareOff className="w-4 h-4 lg:w-5 lg:h-5" />) : (<LuScreenShare className="w-4 h-4 lg:w-5 lg:h-5" />)}</div>
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">{!ScreenShareOn ? "Start Sharing" : "Stop Sharing"}</div>
-								</div>
+								<div className="grid grid-cols-5 lg:grid-cols-6 text-center items-center ">
 
 
-								<div className="group transition-all hidden lg:block fade-in-out mx-5">
-									<div onClick={() => {
-										ToggleBoard()
-									}} className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500" > <BsClipboard2Fill className="w-4 h-4 lg:w-5 lg:h-5" /></div>
-									<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Open Board</div>
-								</div>
+									<div className="group transition-all fade-in-out mx-5">
+										<div onClick={() => {
+										}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " ><BsFillEmojiSmileFill /></div>
+										<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Emoji</div>
+									</div>
+
+									<div className="group transition-all fade-in-out mx-5">
+										<div onClick={() => {
+											ToggleMic(MicOn)
+										}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " >{!MicOn ? (<BsFillMicMuteFill className="w-4 h-4 lg:w-5 lg:h-5" />) : (<BsFillMicFill className="w-4 h-4 lg:w-5 lg:h-5" />)}</div>
+										<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">{MicOn ? "Mic On" : "Mic Off"}</div>
+									</div>
 
 
-								<div id="HandRaise" className="group transition-all fade-in-out mx-5">
-									<div onClick={() => {
-										console.log('clicked')
-										const handRaiseData = {
-											handraise: true,
-											username: props.identity
-										}
-										for (let socketId in peers.current) {
-											let peer = peers.current[socketId];
-											peer.send(JSON.stringify(handRaiseData))
-										}
-										toast(`${props.identity} has raised his hand`, {
-											position: "bottom-center",
-											autoClose: 800,
-											hideProgressBar: false,
-											closeOnClick: false,
-											pauseOnHover: false,
-											draggable: false,
-											theme: "colored",
+									<div className="group transition-all fade-in-out mx-5">
+										<div onClick={() => {
+											ToggleCamera(CamOn)
+										}} id="ToggleVideoBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 text-sm" >{!CamOn ? (<BsFillCameraVideoOffFill className="w-4 h-4 lg:w-5 lg:h-5" />) : (<BsCameraVideoFill className="w-4 h-4 lg:w-5 lg:h-5" />)}</div>
+										<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">{CamOn ? "Cam On" : "Cam Off"}</div>
+									</div>
 
-											style: {
-												backgroundColor: '#ff6f00',
-												color: 'white',
-												bottom: '120px'
+									<div className="group transition-all hidden lg:block fade-in-out mx-5">
+										<div onClick={() => {
+											handleScreenShare(ScreenShareOn, ScreenSharingStream, setScreenShareOn, peers, props.socketId, localStream, socket, auth, roomID)
+										}} className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500" >{ScreenShareOn ? (<LuScreenShareOff className="w-4 h-4 lg:w-5 lg:h-5" />) : (<LuScreenShare className="w-4 h-4 lg:w-5 lg:h-5" />)}</div>
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">{!ScreenShareOn ? "Start Sharing" : "Stop Sharing"}</div>
+									</div>
+
+
+									<div className="group transition-all hidden lg:block fade-in-out mx-5">
+										<div onClick={() => {
+											ToggleBoard()
+										}} className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500" > <BsClipboard2Fill className="w-4 h-4 lg:w-5 lg:h-5" /></div>
+										<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Open Board</div>
+									</div>
+
+
+									<div id="HandRaise" className="group transition-all fade-in-out mx-5">
+										<div onClick={() => {
+											console.log('clicked')
+											const handRaiseData = {
+												handraise: true,
+												username: props.identity
 											}
+											for (let socketId in peers.current) {
+												let peer = peers.current[socketId];
+												peer.send(JSON.stringify(handRaiseData))
+											}
+											toast(`${props.identity} has raised his hand`, {
+												position: "bottom-center",
+												autoClose: 800,
+												hideProgressBar: false,
+												closeOnClick: false,
+												pauseOnHover: false,
+												draggable: false,
+												theme: "colored",
 
-										});
+												style: {
+													backgroundColor: '#ff6f00',
+													color: 'white',
+													bottom: '120px'
+												}
 
-
-									}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " ><FaHandPaper /></div>
-									<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Raise Hand</div>
-								</div>
-
-
-
-								<div id="MoreBtn" className="group lg:hidden transition-all fade-in-out mx-5">
-									<div onClick={() => {
-										ToggleMoreBtn()
-									}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " ><FiMoreVertical className="w-4 h-4 lg:w-5 lg:h-5" /></div>
-									<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">More</div>
-								</div>
-
-							</div>
-							<div className="flex justify-center items-center">
-								<div className="group transition-all fade-in-out mx-5">
-									<div className="border-0 rounded-lg text-white p-2 w-fit mx-auto bg-red-500 hover:bg-red-600 transition-all fade-in-out "><IoExit className="w-4 h-4 lg:w-5 lg:h-5" /></div>
-									<div className="hidden md:block lg:text-md transition-all fade-in-out  mt-2 text-red-500 hover:text-red-600 ">Leave Call</div>
-								</div>
-							</div>
+											});
 
 
-						</div>
-					</div>
-					<div
-						id="ChatParticipantsBox"
-						className="h-full z-[10000000000] border-0 pt-12 lg:pt-0 absolute lg:relative w-full lg:p-5 lg:w-[550px] hidden border-l-2 rounded-lg"
-					>
-						<div id="CloseChatParticipantsBox" className=" lg:hidden absolute top-0 w-full h-12 bg-gray-200 flex items-center px-5 pt-3">
-							<AiOutlineClose className='w-6 h-6 ' onClick={() => {
-								document.getElementById('ChatParticipantsBox').classList.add('hidden')
-							}} />
-						</div>
-						<div className="bg-gray-200 w-full h-full  grid grid-rows-[80px_auto_80px] rounded-lg">
-							<div className="w-full h-full border-0 rounded-t-xl border-black  p-3">
-								<div className="border-0 border-red-500 rounded-lg bg-gray-100 w-full h-full grid grid-cols-2 text-center p-2">
-									<div onClick={handleToggleMessageBtn} id="MessageBtn" className="" >Messages</div>
-									<div onClick={handleToggleParticipantsBtn} id="ParticipantsBtn"  >Participants({props.participants.length})</div>
-								</div>
-							</div>
-							<div id="Chat_Area" className=" h-full border-0 border-black relative flex justify-center overflow-x-hidden">
-
-								<div id="Messages" className="h-full w-full mx-2">
-
-
-									{props.messages.map((message, index) => {
-										return (
-											<div key={index}>
-												<EachMessage setProgress={setProgress} worker={worker} setGotFile={setGotFile} message={message} />
-											</div>
-										)
-									})}
-
-
-								</div>
-								<div id="Participants" className="p-3 w-full h-full">
-									<ParticipantsList isRoomHost={props.isRoomHost} participants={props.participants} />
-								</div>
-							</div>
-
-							<div onClick={(event) => {
-
-								handleToggleMessageBtn()
-							}} id="SendMessage" className="w-full  border-0 border-black p-3 ">
-
-								<div className="bg-white rounded-lg w-full  flex relative justify-center ">
-
-
-
-									<div id="FileInput" className="bg-white border-2 border-red-500 h-[30px] w-full absolute  mx-auto bottom-0 top-[10px] z-[-100]">
-										<input type="File" id="DataInput" name='DataInput' onChange={(e) => {
-											selectFile(setFile, e)
-										}} />
+										}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " ><FaHandPaper /></div>
+										<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">Raise Hand</div>
 									</div>
 
-									<div className="border-r-2 border-gray-300 flex justify-center items-center mx-auto my-auto px-3 py-2 cursor-pointer z-[100] transition-all fade-in-out" ref={Attachmentref} onClick={handleToggleFileInput} >
-										<GrAttachment className="w-4 h-4 lg:w-5 lg:h-5" />
+
+
+									<div id="MoreBtn" className="group lg:hidden transition-all fade-in-out mx-5">
+										<div onClick={() => {
+											ToggleMoreBtn()
+										}} id="ToggleMicBtn" className="border-0 rounded-lg p-2 w-fit mx-auto group-hover:bg-orange-500 group-hover:bg-opacity-20 transition-all fade-in-out group-hover:text-orange-500 " ><FiMoreVertical className="w-4 h-4 lg:w-5 lg:h-5" /></div>
+										<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">More</div>
 									</div>
-									<input id="sendInput" onKeyDown={(event) => {
-										if (event.key === 'Enter') {
-											if (File && (message?.length === 0 || !message)) sendFile(File, peers, props.identity, setProgress, setFile)
+
+								</div>
+								<div className="flex justify-center items-center">
+									<div className="group transition-all fade-in-out mx-5">
+										<div className="border-0 rounded-lg text-white p-2 w-fit mx-auto bg-red-500 hover:bg-red-600 transition-all fade-in-out "><IoExit className="w-4 h-4 lg:w-5 lg:h-5" /></div>
+										<div className="hidden md:block lg:text-md transition-all fade-in-out  mt-2 text-red-500 hover:text-red-600 ">Leave Call</div>
+									</div>
+								</div>
+
+
+							</div>
+						</div>
+						<div
+							id="ChatParticipantsBox"
+							className="h-full z-[10000000000] border-0 pt-12 lg:pt-0 absolute lg:relative w-full lg:p-5 lg:w-[550px] hidden border-l-2 rounded-lg"
+						>
+							<div id="CloseChatParticipantsBox" className=" lg:hidden absolute top-0 w-full h-12 bg-gray-200 flex items-center px-5 pt-3">
+								<AiOutlineClose className='w-6 h-6 ' onClick={() => {
+									document.getElementById('ChatParticipantsBox').classList.add('hidden')
+								}} />
+							</div>
+							<div className="bg-gray-200 w-full h-full  grid grid-rows-[80px_auto_80px] rounded-lg">
+								<div className="w-full h-full border-0 rounded-t-xl border-black  p-3">
+									<div className="border-0 border-red-500 rounded-lg bg-gray-100 w-full h-full grid grid-cols-2 text-center p-2">
+										<div onClick={handleToggleMessageBtn} id="MessageBtn" className="" >Messages</div>
+										<div onClick={handleToggleParticipantsBtn} id="ParticipantsBtn"  >Participants({props.participants.length})</div>
+									</div>
+								</div>
+								<div id="Chat_Area" className=" h-full border-0 border-black relative flex justify-center overflow-x-hidden">
+
+									<div id="Messages" className="h-full w-full mx-2">
+
+
+										{props.messages.map((message, index) => {
+											return (
+												<div key={index}>
+													<EachMessage DownlaodingText={DownlaodingText} setProgress={setProgress} worker={worker} setGotFile={setGotFile} message={message} UploadingText={UploadingText} />
+												</div>
+											)
+										})}
+
+
+									</div>
+									<div id="Participants" className="p-3 w-full h-full">
+										<ParticipantsList isRoomHost={props.isRoomHost} participants={props.participants} />
+									</div>
+								</div>
+
+								<div onClick={(event) => {
+
+									handleToggleMessageBtn()
+								}} id="SendMessage" className="w-full  border-0 border-black p-3 ">
+
+									<div className="bg-white rounded-lg w-full  flex relative justify-center ">
+
+
+
+										<div id="FileInput" className="bg-white border-2 border-red-500 h-[30px] w-full absolute  mx-auto bottom-0 top-[10px] z-[-100]">
+											<input type="File" id="DataInput" name='DataInput' onChange={(e) => {
+												selectFile(setFile, e)
+											}} />
+										</div>
+
+										<div className="border-r-2 border-gray-300 flex justify-center items-center mx-auto my-auto px-3 py-2 cursor-pointer z-[100] transition-all fade-in-out" ref={Attachmentref} onClick={handleToggleFileInput} >
+											<GrAttachment className="w-4 h-4 lg:w-5 lg:h-5" />
+										</div>
+										<input id="sendInput" onKeyDown={(event) => {
+											if (event.key === 'Enter') {
+												if (File && (message?.length === 0 || !message)) sendFile(File, peers, props.identity, setProgress,socket,false,null,setFile)
+												else if (!File && (message?.length > 0 || message)
+												) sendMessage(message, peers,'message')
+												setFile(null)
+												setmessage(null)
+											}
+										}} onChange={(e) => {
+											setmessage(e.target.value)
+										}} placeholder="Write a Message ..." className="w-full text-start items-center px-2 outline-none" />
+
+
+										<div id="SendMessageBtn" onClick={() => {
+
+											if (File && (message?.length === 0 || !message)) sendFile(File,peers,setFile,props.identity,setUploadingText)
 											else if (!File && (message?.length > 0 || message)
-											) sendMessage(message, setmessage, peers)
+											) sendMessage(message,peers,"message")
 											setFile(null)
 											setmessage(null)
-										}
-									}} onChange={(e) => {
-										setmessage(e.target.value)
-									}} placeholder="Write a Message ..." className="w-full text-start items-center px-2 outline-none" />
-
-
-									<div id="SendMessageBtn" onClick={() => {
-
-										if (File && (message?.length === 0 || !message)) sendFile(File, peers, props.identity, setProgress, setFile)
-										else if (!File && (message?.length > 0 || message)
-										) sendMessage(message, setmessage, peers)
-										setFile(null)
-										setmessage(null)
-									}} className="border-l-2 flex my-auto mx-auto justify-center items-center  border-gray-300 py-2 px-2">
-										<BsFillSendFill className="w-10 h-10 bg-yellow-500 p-3 text-white rounded-lg hover:bg-yellow-600/80 transition-all fade-in-out" />
+										}} className="border-l-2 flex my-auto mx-auto justify-center items-center  border-gray-300 py-2 px-2">
+											<BsFillSendFill className="w-10 h-10 bg-yellow-500 p-3 text-white rounded-lg hover:bg-yellow-600/80 transition-all fade-in-out" />
+										</div>
 									</div>
 								</div>
 							</div>
+
 						</div>
 
+
+
 					</div>
-
-
-
 				</div>
 			</div>
-		</div>
-		<div id="board-section" className="w-full h-full top-[-1000px] absolute z-[1000000000000000] transition-all fade-in-out duration-500">
+			<div id="board-section" className="w-full h-full top-[-1000px] absolute z-[1000000000000000] transition-all fade-in-out duration-500">
 				<Board peers={peers} />
 			</div>
 		</div>

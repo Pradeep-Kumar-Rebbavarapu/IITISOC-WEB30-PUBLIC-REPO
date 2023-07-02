@@ -5,7 +5,10 @@ import { JoinRoom } from "./JoinRoom"
 import { toast } from 'react-toastify'
 const defaultControls = {
     audio: true,
-    video: true
+    video: {
+        echoCancellation: true,
+		noiseSuppression: true
+    }
 };
 
 
@@ -22,8 +25,7 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
         if (localStream.current) {
             localStream.current.getTracks().forEach(t => t.stop())
         }
-        window.location.href = '/CreateRoomPage'
-        toast.error('Some Error Occured', { position: toast.POSITION.TOP_LEFT })
+        
         console.log(err)
         alert(err)
     })

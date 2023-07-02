@@ -7,7 +7,9 @@ const initState = {
   roomId: null,
   participants : [],
   socketId:null,
-  messages:[]
+  messages:[],
+  activeConversations:null,
+  directChatHistory:[],
 };
 
 const reducer = (state = initState, action) => {
@@ -43,6 +45,10 @@ const reducer = (state = initState, action) => {
     case Actions.SET_MESSAGES:
       return {
         ...state,messages:action.messages
+      }
+    case Actions.SET_DIRECT_CHAT_HISTORY:
+      return {
+        ...state,directChatHistory:action.directChatHistory
       }
     default:
       return state;

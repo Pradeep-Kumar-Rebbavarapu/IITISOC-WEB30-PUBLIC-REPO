@@ -44,7 +44,7 @@ export default function OffCanvasNavbar() {
                             />
                         </button>
                         <h1 className="text-center text-white font-bold mx-5  text-3xl my-10">
-                            The Cynaptics Club
+                            ConferoLive ; Meet Now
                         </h1>
                         <ul className=" w-fit mx-auto ">
                             <Link

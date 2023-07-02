@@ -4,6 +4,8 @@ import { appendNewMessage } from './MessageUtils'
 import { UpdateBoardCanvas } from './BoardUtils'
 import { updateTranscript } from './SpokenData'
 import { toast } from 'react-toastify'
+import { handleData } from './ShareFileTwo'
+import { store } from '../store/store'
 import MessageToast from '../components/MessageToast'
 
 const getConfiguration = () => {
@@ -21,30 +23,40 @@ const getConfiguration = () => {
 
 
 
-const handleOnPeerData = (worker, setGotFile, FileNameRef, peerdata, FileSentBy, setProgress, isDrawing, Transcript) => {
-    if (peerdata.toString().includes('file')) {
+const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingText) => {
+    if (peerdata.toString().includes('File')) {
+        const data = JSON.parse(peerdata)
+        if (data.first) {
+            let messageData = {
+                id: data.id,
+                File: true,
+                content: data.file_name,
+                identity: store.getState().identity,
+            }
+            const ChatParticipantsBox = document.getElementById('ChatParticipantsBox')
+            if (ChatParticipantsBox.classList.contains('hidden')) {
+                toast(<MessageToast identity={store.getState().identity} content={data.file_name} />, {
+                    position: "top-right",
+                    autoClose: 1000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    theme: "colored",
+                    style: {
+                        maxWidth: 'fit-content',
+                        maxHeight: 'fit-content',
+                        borderRadius: '10px',
+                        margin: "20px",
+                        backgroundColor: '#fffffff5',
+                    }
 
-        handleReceiveData(worker, setGotFile, FileNameRef, peerdata, FileSentBy, setProgress)
-        const ChatParticipantsBox = document.getElementById('ChatParticipantsBox')
-        if (ChatParticipantsBox.classList.contains('hidden')) {
-            toast(<MessageToast identity={FileSentBy.current} content={FileNameRef.current} />, {
-                position: "top-right",
-                autoClose: 1000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: true,
-                theme: "colored",
-                style: {
-                    maxWidth: 'fit-content',
-                    maxHeight: 'fit-content',
-                    borderRadius: '10px',
-                    margin: "20px",
-                    backgroundColor: '#fffffff5',
-                }
-
-            });
+                });
+            }
+            await appendNewMessage(messageData)
         }
+        handleData(data, setDownloadingText)
+
     }
     else if (peerdata.toString().includes('videostarted')) {
         const data = JSON.parse(peerdata)
@@ -62,7 +74,7 @@ const handleOnPeerData = (worker, setGotFile, FileNameRef, peerdata, FileSentBy,
 
     }
     else if (peerdata.toString().includes('handraise')) {
-        
+
         const data = JSON.parse(peerdata)
         toast(`${data.username} has raised his hand`, {
             position: "bottom-center",
@@ -72,11 +84,11 @@ const handleOnPeerData = (worker, setGotFile, FileNameRef, peerdata, FileSentBy,
             pauseOnHover: false,
             draggable: false,
             theme: "colored",
-            
+
             style: {
                 backgroundColor: '#ff6f00',
                 color: 'white',
-                bottom:'120px'
+                bottom: '120px'
             }
 
         });
@@ -193,14 +205,14 @@ const SignalPeerData = (socket, data) => {
 }
 
 
-export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, innerWidth, length_of_participants) => {
+export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText) => {
 
     const configuration = getConfiguration()
 
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
-        
+
         stream: streamToUse,
     })
 
@@ -208,7 +220,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
 
     console.log(peers)
     peers.current[connUserSocketId].on('signal', (data) => {
-        
+
         const SignalData = {
             signal: data,
             connUserSocketId: connUserSocketId
@@ -222,13 +234,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         addStream(stream, connUserSocketId, innerWidth, length_of_participants);
     })
     peers.current[connUserSocketId].on('data', (peerdata) => {
-
-        const Chat_Area = document.getElementById('Chat_Area')
-        setTimeout(() => {
-            Chat_Area.scrollTop = Chat_Area.scrollHeight - Chat_Area.clientHeight;
-        }, 100);
-        handleOnPeerData(worker, setGotFile, FileNameRef, peerdata, FileSentBy, setProgress, isDrawing, Transcript)
-
+        handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers)
     });
     peers.current[connUserSocketId].on('error', err => {
         console.error('An error occurred:', err);

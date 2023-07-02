@@ -3,7 +3,8 @@ let array = [];
 self.addEventListener("message", event => {
     
     if (event.data === "download") {
-        const blob = new Blob(array); // Pass empty options object
+        const uint8Array = new Uint8Array(array.flat());
+        const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
         self.postMessage(blob);
         array = [];
     } else {
@@ -12,3 +13,4 @@ self.addEventListener("message", event => {
     }
     
 });
+

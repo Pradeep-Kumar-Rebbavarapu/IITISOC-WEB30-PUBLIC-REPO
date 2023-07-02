@@ -6,8 +6,12 @@ from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from .models import Room, User
 from uuid import uuid4
+import io
+import base64
+import json
 connectedUsers = []
 rooms = []
+array = []
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -35,13 +39,44 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.InitUser(data)
         elif text_data['type'] == "get-socket-id":
             await self.SendSocketId()
+        elif text_data['type'] == "direct-message":
+            await self.sendDirectMessage(data)
+
+    async def sendDirectMessage(self, data):
+        RecieverSocketId = data['RecieverSocketId']
+        message = data['messageContent']
+        AuthorIdentity = data['OurIdentity']
+        File = data['File']
+        response = {
+            "type": "direct-message",
+            "message": message,
+            "isAuthor": False,
+            "File":File,
+            "AuthorSocketID": self.channel_name,
+            "RecieverSocketId": RecieverSocketId,
+            "AuthorIdentity": AuthorIdentity
+        }
+        await self.send_json_to_user(RecieverSocketId, response)
+        AuthorData = {
+            "type": "direct-message",
+            "message": message,
+            "isAuthor": True,
+            "File":File,
+            "RecieverSocketId": RecieverSocketId,
+            "AuthorSocketID": self.channel_name,
+            "AuthorIdentity": AuthorIdentity
+        }
+        await self.send_json({
+            "type": "direct-message",
+            "data": AuthorData
+        })
 
     async def SendSocketId(self):
         response = {
             "type": "get-socket-id",
             "socketId": self.channel_name
         }
-        await self.send_json_to_user(self.channel_name,response)
+        await self.send_json_to_user(self.channel_name, response)
 
     async def InitUser(self, data):
         roomID = data['roomID']
@@ -89,7 +124,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'type': 'room-update',
                 'connectedUsers': newRoom["connectedUsers"],
             }
-            room = await self.save_room_and_user(room_id, room_name, userInstance,userInstance)
+            room = await self.save_room_and_user(room_id, room_name, userInstance, userInstance)
             await database_sync_to_async(room.save)()
             await self.send_json_to_room(room_id, response)
 
@@ -120,10 +155,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "roomID": room_id
                 }
             room = [r for r in rooms if r['id'] == room_id][0]
-            print('room outside',room)
+            print('room outside', room)
             if room:
-                print('room inside',room)
-                
+                print('room inside', room)
+
                 print(created_room)
                 room['connectedUsers'].append(newUser)
                 await self.join_room(room_id)
@@ -139,16 +174,18 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                         await self.send_json_to_user(user['socketId'], data)
                 connectedUsers.append(newUser)
             if old_room is None:
-                new_room = await self.save_room_and_user(room_id,room_id,CreatedUserInstance,JoineduserInstance)
+                new_room = await self.save_room_and_user(room_id, room_id, CreatedUserInstance, JoineduserInstance)
                 await database_sync_to_async(new_room.save)()
             response = {
                 'type': 'room-update',
                 'connectedUsers': room["connectedUsers"],
             }
             await self.send_json_to_room(room_id, response)
+
     @database_sync_to_async
     def get_user_of_created_room(self, room_id):
-        return Room.objects.filter(room_id=room_id).first().created_by  
+        return Room.objects.filter(room_id=room_id).first().created_by
+
     @database_sync_to_async
     def get_created_room(self, room_id):
         return Room.objects.filter(room_id=room_id).first()
@@ -158,27 +195,30 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return Room.objects.filter(created_by=userInstance).filter(room_id=room_id).first()
 
     async def leave_room(self):
-            print('room leaved')
-        
-            user = list(filter(lambda user: user['socketId'] == self.channel_name, connectedUsers))[0]
-            print(user)
-            if user:
-                room = list(filter(lambda room: room['id'] == user['roomID'],rooms))[0]
-                room['connectedUsers'] = list(filter(lambda user: user["socketId"] != self.channel_name, room['connectedUsers']))
-                
-                response = {
-                    'type': 'room-update',
-                    'connectedUsers': room['connectedUsers'],
-                }
-                await self.send_json_to_room(user['roomID'],response)
+        print('room leaved')
 
-                #send the socket id of the disconnected user
-                response = {
-                    "type": "user-disconnected",
-                    "socketId": self.channel_name
-                }
-                await self.send_json_to_room(user['roomID'], response)
-                await self.channel_layer.group_discard(user['roomID'], self.channel_name)
+        user = list(
+            filter(lambda user: user['socketId'] == self.channel_name, connectedUsers))[0]
+        print(user)
+        if user:
+            room = list(
+                filter(lambda room: room['id'] == user['roomID'], rooms))[0]
+            room['connectedUsers'] = list(filter(
+                lambda user: user["socketId"] != self.channel_name, room['connectedUsers']))
+
+            response = {
+                'type': 'room-update',
+                'connectedUsers': room['connectedUsers'],
+            }
+            await self.send_json_to_room(user['roomID'], response)
+
+            # send the socket id of the disconnected user
+            response = {
+                "type": "user-disconnected",
+                "socketId": self.channel_name
+            }
+            await self.send_json_to_room(user['roomID'], response)
+            await self.channel_layer.group_discard(user['roomID'], self.channel_name)
 
     async def SignallingHandler(self, data):
         signal = data['signal']
@@ -212,7 +252,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return User.objects.get(username=username)
 
     @database_sync_to_async
-    def save_room_and_user(self, room_id, room_name, created_user,joined_user):
+    def save_room_and_user(self, room_id, room_name, created_user, joined_user):
         room = Room.objects.create(
             room_id=room_id,
             name=room_name,

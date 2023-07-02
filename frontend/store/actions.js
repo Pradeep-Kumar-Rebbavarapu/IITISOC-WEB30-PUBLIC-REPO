@@ -6,6 +6,8 @@ const Actions = {
     SET_PARTICIPANTS:'SET_PARTICIPANTS',
     SET_SOCKETID:'SET_SOCKETID',
     SET_MESSAGES:'SET_MESSAGES',
+    SET_ACTIVE_CONVERSATION:'SET_ACTIVE_CONVERSATION',
+    SET_DIRECT_CHAT_HISTORY:'SET_DIRECT_CHAT_HISTORY',
   };
   
   export const setIsRoomHost = (isRoomHost) => {
@@ -52,6 +54,18 @@ const Actions = {
     return {
       type:Actions.SET_MESSAGES,
       messages
+    }
+  }
+  export const setActiveConversation = (activeConversation) =>{
+    return {
+      type:Actions.SET_ACTIVE_CONVERSATION,
+      activeConversation
+    }
+  }
+  export const setDirectChatHistotry = (directChatHistory) =>{
+    return {
+      type:Actions.SET_DIRECT_CHAT_HISTORY,
+      directChatHistory
     }
   }
   export default Actions;
