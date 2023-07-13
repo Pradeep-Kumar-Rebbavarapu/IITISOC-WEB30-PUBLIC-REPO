@@ -293,3 +293,7 @@ video {
 .smenu {
   left: 0%;
 }
+
+.toastContainer {
+  z-index: 99999999999999999 !important; /* Ensure the z-index is higher than the absolute positioned component */
+}

@@ -12,13 +12,20 @@ from rest_framework.response import Response
 from .models import User
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
-from .emails import send_otp_via_email
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from twilio.rest import Client
 import json
+from rest_framework_simplejwt.views import TokenRefreshView
+import requests
+from django.http import FileResponse
+from django.conf import settings
+import os
+from docx import Document
+from io import BytesIO
+from bs4 import BeautifulSoup
 # Create your views here.
-
+from django.core.files.storage import FileSystemStorage
 
 class VerifyOTP(APIView):  # Making a Class Based View Called Verify OTP
     def post(self, request):  # making a post reuqest
@@ -53,44 +60,74 @@ class Signup(CreateAPIView):  # making a class Based view using APIView
 class Login(APIView):  # making a class based view called Login Using APIView
     def post(self, request):  # creating a post request
         try:
-            # extracting the username from the data sent by frontend
             username = request.data['username']
-            # extracting the password from the data sent by frontend
             password = request.data['password']
-            # extracting the email from the data sent by frontend
             email = request.data['email']
-
-            # checking for errors
-            # getting the user with the given username as he must have been signed up before and stored in the database
             user = User.objects.filter(username=username).first()
-
-            if user is None:  # if the user is not found then he wasnt signed up and error is sent back to the frontend
+            if user is None:  
                 return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
-            # if the user has entered wrong password then an error is sent to the frontend
             if not user.check_password(password):
                 return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
             else:
-                if email == user.email:  # checking if the email sent by the frontend is same as the email stored in the database
-                    # providing a refresh token for the user
+                if email == user.email:  
                     refresh = RefreshToken.for_user(user)
-                    user.last_login = datetime.datetime.now()  # updating his last login time
-                    user.save()  # saving the user instance
-                    return Response({  # sending a resposne to the frontend,providing the frontend the access and refresh token along with users details without his password
-                        'id':user.id,
-                        'message': 'login successfull',
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                        'username': user.username,
-                        'last_login_date': getdate(),
-                        'last_login_time': gettime(),
-                        'email': user.email},
-                        status=status.HTTP_200_OK)
+                    user.last_login = datetime.datetime.now() 
+                    user.save()  
+                    tokens = requests.post('http://localhost:8000/api/token/', data={"username":username,"password":password})
+                    if(tokens.status_code == 401):
+                        return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
+                    if(tokens.status_code == 500):
+                        return Response({'error': 'Some Error Occured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    print(tokens.json())
+                    if(tokens.status_code == 200):
+                        access_token = tokens.json()['access']
+                        refresh_token = tokens.json()['refresh']
+                        return Response({  
+                            'id':user.id,
+                            'message': 'login successfull',
+                            'refresh':str(refresh_token),
+                            'access': str(access_token),
+                            'username': user.username,
+                            'last_login_date': getdate(),
+                            'last_login_time': gettime(),
+                            'email': user.email},
+                            status=status.HTTP_200_OK)
 
-                else:  # if the email sent by the frontend is not equal to the email of the user stored in that database then send a error to the frontend
+                else:  
                     return Response({'errors': 'email not matched'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(e)
             return Response({'errors': 'Some Error Occured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+class TokenRefresh(APIView):
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
+        if refresh_token:
+            try:
+                # Verify and decode the existing refresh token
+                token = RefreshToken(refresh_token)
+
+                # Rotate the refresh token by blacklisting the current token
+                token.blacklist()
+
+                # Generate a new refresh token and access token
+                user = token.get('user')
+                new_refresh = RefreshToken.for_user(user)
+                new_access = new_refresh.access_token
+
+                return Response({
+                    'refresh': str(new_refresh),
+                    'access': str(new_access),
+                }, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response({'error': 'Refresh token not provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class GetRoomDetails(APIView):
@@ -100,6 +137,7 @@ class GetRoomDetails(APIView):
         try:
             user = self.request.user
             room_id = request.data['roomID']
+            length_of_participants = request.data['length_of_participants']
             old_room = Room.objects.filter(room_id=room_id).filter(created_by = user).first()
             room = Room.objects.filter(room_id = room_id).first()
             if old_room is not None:
@@ -138,9 +176,7 @@ class UserStatus(APIView):
             return Response('joinroom')
         else:
             return Response('createroom')
-class CheckJoinRoomStatus(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+class CheckIfRoomExists(APIView):
     def post(self,request):
         data = request.data
         room_id = data['roomID']
@@ -149,3 +185,73 @@ class CheckJoinRoomStatus(APIView):
             return Response(True)
         else:
             return Response(False)
+        
+class CheckIfHostHasJoinedRoom(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        data = request.data
+        room_id = data['roomID']
+        user = self.request.user
+        AllRooms = Room.objects.filter(room_id = room_id)
+        totalsum = 0
+        for room in AllRooms:
+            totalsum += room.participants
+        HostCreatedRoom = Room.objects.filter(room_id = room_id).filter(created_by = user).first()
+        if totalsum >= AllRooms.first().capacity:
+            print('Room Full',Room.objects.filter(room_id = room_id).filter(is_active = True).count())
+            return Response('Room Full')
+        if AllRooms.first() is not None:
+            if AllRooms.first().is_active == True:
+                return Response(True)
+            else:
+                if HostCreatedRoom is not None:
+                    if HostCreatedRoom.is_active == False:
+                        HostCreatedRoom.is_active = True
+                        HostCreatedRoom.save()
+                        return Response(True)
+                    else:
+                        return Response(False)
+                else:
+                    return Response(False)
+                    
+    
+class GetUserDetails(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        id = request.data["id"]
+        #dont send password
+        user = User.objects.filter(id = id).first()
+        if user is not None:
+            #except for the password send everything else
+            serializer = UserSerializer(user)
+            return Response({'id':serializer.data['id'],"email":serializer.data['email'],'username':serializer.data['username']},status=status.HTTP_200_OK)
+        else:
+            return Response({'errors': 'User Not Found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class ConvertHtmlToDocx(APIView):
+    def post(self,request):
+        data=request.data['data']
+        html_content = str(BeautifulSoup(data))
+        document = Document()
+        document.add_paragraph(str(data))
+
+        # Save the Word document to a temporary file
+        temp_file_path = os.path.join(settings.MEDIA_ROOT, 'temp.docx')
+        document.save(temp_file_path)
+
+        # Upload the Word document to the media folder using Django's FileSystemStorage
+        fs = FileSystemStorage()
+        filename = fs.save('converted.docx', open(temp_file_path, 'rb'))
+
+        # Generate the download URL
+        uploaded_file_url = fs.url(filename)
+        download_url = request.build_absolute_uri(uploaded_file_url)
+
+        # Delete the temporary file
+        os.remove(temp_file_path)
+
+        # Return the download URL in a JSON response
+        return Response({'download_url': download_url})

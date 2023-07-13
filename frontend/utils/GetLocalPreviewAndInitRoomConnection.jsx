@@ -12,14 +12,14 @@ const defaultControls = {
 };
 
 
-export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoomHost, auth, roomID, setoverlay, title, IceServers, number) => {
+export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoomHost, auth,user, roomID, setoverlay, title, IceServers, RoomCapacity,length_of_participants) => {
     
 
     navigator.mediaDevices.getUserMedia(defaultControls).then((stream) => {
 
         localStream.current = stream;
         setoverlay(false)
-        isRoomHost?createNewRoom(socket,auth, roomID, isRoomHost,title):JoinRoom(socket, auth, roomID)
+        isRoomHost?createNewRoom(socket,auth,user, roomID, isRoomHost,title,RoomCapacity):JoinRoom(socket, auth,user, roomID,length_of_participants)
 
     }).catch(err => {
         if (localStream.current) {

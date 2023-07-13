@@ -1,29 +1,58 @@
-import axios from "axios"
-import { setIdentity, setRoomId } from "../store/actions"
-import { setIsRoomHost } from "../store/actions"
-import { store } from "../store/store"
-import {toast} from 'react-toastify'
-export const JoinRoom = (socket, auth, roomID) => {
-    axios.post('https://www.pradeeps-video-conferencing.store/api/v1/GetRoomDetails/', { roomID: roomID }, {
-        headers:{
-            Authorization: "Bearer " + auth.access
-        }
-    }).then((response) => {
-        store.dispatch(setIdentity(auth.username))
-        auth.username === response.data.created_by ? store.dispatch(setIsRoomHost(true)) : store.dispatch(setIsRoomHost(false))
-        store.dispatch(setRoomId(response.data.room_id))
-        const data = {
-            roomID: roomID,
-            username: auth.username,
-        }
-        socket.current.send(JSON.stringify({
-            "type": "join-room",
-            "data": data
-        }))
-    }).catch((err)=>{
-       
-        toast.error('Some Error Occured',{position: toast.POSITION.TOP_LEFT})
+import axios from "axios";
+import { setIdentity, setRoomId } from "../store/actions";
+import { setIsRoomHost } from "../store/actions";
+import { store } from "../store/store";
+import { toast } from "react-toastify";
+export const JoinRoom = (
+	socket,
+	auth,
+	user,
+	roomID,
+	length_of_participants
+) => {
+	axios
+		.post(
+			"https://www.pradeeps-video-conferencing.store/api/v1/GetRoomDetails/",
+			{ roomID: roomID, length_of_participants: length_of_participants },
+			{
+				headers: {
+					Authorization: "Bearer " + auth.access,
+				},
+			}
+		)
+		.then((response) => {
 
-    })
+			if (user.username === response.data.created_by) {
+				store.dispatch(setIdentity(user.username));
+				store.dispatch(setIsRoomHost(true));
+				store.dispatch(setRoomId(response.data.room_id));
+				const data = {
+					roomID: roomID,
+					username: user.username,
+				};
+				socket.current.send(
+					JSON.stringify({
+						type: "join-room",
+						data: data,
+					})
+				);
+			} else {
+				socket.current.send(
+					JSON.stringify({
+						type: "send-acceptance-letter",
+						data: {
+							roomID: response.data.room_id,
+							PeerUsername: user.username,
+							RoomHostUsername: response.data.created_by,
+						},
+					})
+				);
+			}
 
-}
+		})
+		.catch((err) => {
+			toast.error("Some Error Occured", {
+				position: toast.POSITION.TOP_LEFT,
+			});
+		});
+};

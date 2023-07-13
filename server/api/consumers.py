@@ -41,15 +41,52 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.SendSocketId()
         elif text_data['type'] == "direct-message":
             await self.sendDirectMessage(data)
+        elif text_data['type'] == "send-acceptance-letter":
+            await self.sendAcceptanceLetter(data)
+        elif text_data['type'] == "ask-peer-to-prepare-conn":
+            await self.askPeerToPrepareConn(data)
+    
+    async def askPeerToPrepareConn(self, data):
+        connUserSocketId = data['connUserSocketId']
+        response = {
+            "type": "ask-peer-to-prepare-conn",
+            "connUserSocketId": self.channel_name
+        }
+        await self.send_json_to_user(connUserSocketId, response)
+
+    
+    async def sendAcceptanceLetter(self, data):
+        print('data',data)
+        roomID = data['roomID']
+        PeerUsername = data['PeerUsername']
+        RoomHostUsername = data['RoomHostUsername']
+        AuthorSocketId = None
+        for user in connectedUsers:
+            if user['roomID'] == roomID and user['identity'] == RoomHostUsername and user['isRoomHost'] == True:
+                AuthorSocketId = user['socketId']
+                break
+        print('connectedUser',connectedUsers)
+        print(AuthorSocketId)
+        response = {
+            "type": "acceptance-letter",
+            "PeerUsername": PeerUsername,
+            "RoomHostUsername":RoomHostUsername,
+            "AuthorSocketId": AuthorSocketId,
+            'connUserSocketId': self.channel_name
+        }
+        await self.send_json_to_user(AuthorSocketId, response)
+                    
 
     async def sendDirectMessage(self, data):
         RecieverSocketId = data['RecieverSocketId']
         message = data['messageContent']
         AuthorIdentity = data['OurIdentity']
         File = data['File']
+        id = data['id']
         response = {
             "type": "direct-message",
             "message": message,
+            "id": id,
             "isAuthor": False,
             "File":File,
             "AuthorSocketID": self.channel_name,
@@ -61,6 +98,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             "type": "direct-message",
             "message": message,
             "isAuthor": True,
+            "id": id,
             "File":File,
             "RecieverSocketId": RecieverSocketId,
             "AuthorSocketID": self.channel_name,
@@ -87,7 +125,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             self.send_json_to_user(self.channel_name, 'join-room')
 
     async def create_new_room(self, data):
-
+        RoomCapacity = data['RoomCapacity']
         username = data['username']
         user = self.get_user(username)
         if user is not None:
@@ -124,16 +162,23 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 'type': 'room-update',
                 'connectedUsers': newRoom["connectedUsers"],
             }
-            room = await self.save_room_and_user(room_id, room_name, userInstance, userInstance)
+            room = await self.save_room_and_user(room_id, room_name, userInstance, userInstance,RoomCapacity)
             await database_sync_to_async(room.save)()
             await self.send_json_to_room(room_id, response)
+    @database_sync_to_async
+    def save_participants(self,created_room):
+        created_room.participants = created_room.participants + 1
+        return created_room
 
     async def join_user_to_room(self, data):
 
         username = data['username']
         user = self.get_user(username)
+        
         if user is not None:
             room_id = data['roomID']
+            
+
             JoineduserInstance = await self.get_user_instance(username)
             created_room = await self.get_created_room(room_id)
             CreatedUserInstance = await self.get_user_of_created_room(room_id)
@@ -146,6 +191,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "isRoomHost": True,
                     "roomID": room_id
                 }
+                #set room is active as true
+                
             else:
                 newUser = {
                     "identity": username,
@@ -155,37 +202,53 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "roomID": room_id
                 }
             room = [r for r in rooms if r['id'] == room_id][0]
-            print('room outside', room)
-            if room:
-                print('room inside', room)
+            #need to check the room capacity if room capacity is lesser than number of participants in the room then its fine else send error message
 
-                print(created_room)
-                room['connectedUsers'].append(newUser)
-                await self.join_room(room_id)
-                print(room['connectedUsers'])
-                for user in room['connectedUsers']:
-                    if user['socketId'] != self.channel_name:
-                        data = {
-                            "type": "conn-prepare",
-                            'connUserSocketId': self.channel_name,
-                            'connUserIdentity': newUser['identity'],
-                            'connUserId': newUser['id']
-                        }
-                        await self.send_json_to_user(user['socketId'], data)
-                connectedUsers.append(newUser)
-            if old_room is None:
-                new_room = await self.save_room_and_user(room_id, room_id, CreatedUserInstance, JoineduserInstance)
-                await database_sync_to_async(new_room.save)()
-            response = {
-                'type': 'room-update',
-                'connectedUsers': room["connectedUsers"],
-            }
-            await self.send_json_to_room(room_id, response)
+            
+            if room:
+                
+                
+                if len(room['connectedUsers']) >= created_room.capacity:
+                    response = {
+                        'type': 'room-full',
+                        'message': 'Room is full'
+                    }
+                    await self.send_json_to_user(self.channel_name, response)
+                else:
+                    print('room inside', room)
+                    print(created_room)
+                    room['connectedUsers'].append(newUser)
+                    await self.join_room(room_id)
+                    print(room['connectedUsers'])
+                    for user in room['connectedUsers']:
+                        if user['socketId'] != self.channel_name:
+                            data = {
+                                "type": "conn-prepare",
+                                'connUserSocketId': self.channel_name,
+                                'connUserIdentity': newUser['identity'],
+                                'connUserId': newUser['id']
+                            }
+                            await self.send_json_to_user(user['socketId'], data)
+                    connectedUsers.append(newUser)
+                if old_room is None:
+                    #update participants in host room
+                    new_room = await self.save_room_and_user(room_id, room_id, CreatedUserInstance, JoineduserInstance,created_room.capacity)
+                    await database_sync_to_async(new_room.save)()
+                else:
+                    room2 = await self.save_participants(created_room)
+                    await database_sync_to_async(room2.save)()
+                response = {
+                    'type': 'room-update',
+                    'connectedUsers': room["connectedUsers"],
+                }
+                await self.send_json_to_room(room_id, response)
 
     @database_sync_to_async
     def get_user_of_created_room(self, room_id):
         return Room.objects.filter(room_id=room_id).first().created_by
 
+    
+    
     @database_sync_to_async
     def get_created_room(self, room_id):
         return Room.objects.filter(room_id=room_id).first()
@@ -193,7 +256,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def get_old_room(self, userInstance, room_id):
         return Room.objects.filter(created_by=userInstance).filter(room_id=room_id).first()
-
+    @database_sync_to_async
+    def get_new_room(self,userInstance,room_id):
+        return Room.objects.filter(joined_by=userInstance).filter(room_id=room_id).first()
+    @database_sync_to_async
+    def remove_user_from_database(self, userInstance):
+        return Room.objects.filter(joined_by=userInstance).delete()
     async def leave_room(self):
         print('room leaved')
 
@@ -201,6 +269,20 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             filter(lambda user: user['socketId'] == self.channel_name, connectedUsers))[0]
         print(user)
         if user:
+            
+            userInstance = await self.get_user_instance(user['identity'])
+            #make the is_Active flag of that particluar user to False
+            #get the room with the help of joined_by and room id flag both
+            room = await self.get_new_room(userInstance, user['roomID'])
+            if room is not None:
+                #check if multiple same hosts are there in the room
+                if room.participants == 1:
+                    room.is_active = False
+                room.participants = room.participants - 1
+                await database_sync_to_async(room.save)()
+            #remove the user from the connected users list
+            connectedUsers.remove(user)
+            #remove the user from the room
             room = list(
                 filter(lambda room: room['id'] == user['roomID'], rooms))[0]
             room['connectedUsers'] = list(filter(
@@ -215,7 +297,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             # send the socket id of the disconnected user
             response = {
                 "type": "user-disconnected",
-                "socketId": self.channel_name
+                "socketId": self.channel_name,
+                "username": user['identity']
             }
             await self.send_json_to_room(user['roomID'], response)
             await self.channel_layer.group_discard(user['roomID'], self.channel_name)
@@ -232,9 +315,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def InitialConnectionHandler(self, data):
         connUserSocketId = data['connUserSocketId']
+        connUserIdentity = data['connUserIdentity']
         response = {
             "type": "conn-init",
-            "connUserSocketId": self.channel_name
+            "connUserSocketId": self.channel_name,
+            "connUserIdentity":connUserIdentity
         }
         await self.send_json_to_user(connUserSocketId, response)
 
@@ -252,13 +337,14 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         return User.objects.get(username=username)
 
     @database_sync_to_async
-    def save_room_and_user(self, room_id, room_name, created_user, joined_user):
+    def save_room_and_user(self, room_id, room_name, created_user, joined_user,RoomCapacity):
         room = Room.objects.create(
             room_id=room_id,
             name=room_name,
-            capacity=10,
+            capacity=RoomCapacity,
             is_active=True,
             created_by=created_user,
+            participants=1,
             joined_by=joined_user
         )
         return room

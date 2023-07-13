@@ -6,7 +6,9 @@ import { updateTranscript } from './SpokenData'
 import { toast } from 'react-toastify'
 import { handleData } from './ShareFileTwo'
 import { store } from '../store/store'
+
 import MessageToast from '../components/MessageToast'
+import { setTranscript } from '../store/actions'
 
 const getConfiguration = () => {
     return {
@@ -23,10 +25,10 @@ const getConfiguration = () => {
 
 
 
-const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingText) => {
+const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingText,BoardMap) => {
     if (peerdata.toString().includes('File')) {
         const data = JSON.parse(peerdata)
-        if (data.first) {
+        if (data.first && !data.PrivateMessaging) {
             let messageData = {
                 id: data.id,
                 File: true,
@@ -125,35 +127,36 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     }
     else if (peerdata.toString().includes('image')) {
         const data = JSON.parse(peerdata);
-        console.log(data)
-        const base64 = data.base64;
-        UpdateBoardCanvas(base64, isDrawing)
+        UpdateBoardCanvas(data, isDrawing,BoardMap)
     }
     else if (peerdata.toString().includes('SpokenData')) {
-        alert('spoken data')
-        const data = JSON.parse(peerdata);
-        console.log(data)
+        const data = JSON.parse(peerdata); 
         const transcript = data.transcript;
-        updateTranscript(transcript, Transcript)
+        const oldTranscript = store.getState().Transcript
+        store.dispatch(setTranscript(`<div>${oldTranscript} ${transcript}</div>`))
     }
 }
 
 const addStream = (stream, connUserSocketId, innerWidth, length_of_participants) => {
-    console.log('innerWidth', innerWidth)
+    
     const remoteVideo = document.createElement('video')
     remoteVideo.id = `v_${connUserSocketId}`
     const VideoGrid = document.getElementById('VideoGrid')
-    const div = document.createElement('div')
     remoteVideo.autoplay = true;
     remoteVideo.playsInline = true
     remoteVideo.srcObject = stream;
-    remoteVideo.className = 'object-cover mx-auto'
-    remoteVideo.objectFit = "cover"
+    remoteVideo.style.borderRadius = "10px";
+	remoteVideo.style.objectFit = "cover";
+    remoteVideo.style.width = "100%";
+    remoteVideo.style.height = "100%";
+    remoteVideo.style.maxWidth = "100%";
+    remoteVideo.style.maxHeight = "100%";
+    remoteVideo.style.minWidth = "100%";
+    remoteVideo.style.minHeight = "100%";
 
     remoteVideo.style.borderRadius = "10px"
-    remoteVideo.style.objectFit = "cover"
 
-    console.log('length_of_participants', localStorage.getItem('participants_length'))
+    
 
 
 
@@ -205,7 +208,7 @@ const SignalPeerData = (socket, data) => {
 }
 
 
-export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText) => {
+export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap) => {
 
     const configuration = getConfiguration()
 
@@ -218,7 +221,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
 
     peers.current[connUserSocketId] = peer
 
-    console.log(peers)
+    
     peers.current[connUserSocketId].on('signal', (data) => {
 
         const SignalData = {
@@ -234,7 +237,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         addStream(stream, connUserSocketId, innerWidth, length_of_participants);
     })
     peers.current[connUserSocketId].on('data', (peerdata) => {
-        handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers)
+        handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers,BoardMap)
     });
     peers.current[connUserSocketId].on('error', err => {
         console.error('An error occurred:', err);

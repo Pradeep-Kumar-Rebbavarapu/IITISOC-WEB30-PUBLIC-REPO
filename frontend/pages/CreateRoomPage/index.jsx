@@ -9,7 +9,7 @@ import { IoCreateSharp } from 'react-icons/io5'
 import Image from 'next/image'
 import { toast } from 'react-toastify';
 export default function index() {
-	const {setroomID,roomID,title,settitle,setjoinroom,auth,JoinRoomID,setJoinRoomID,setisHost } = useContext(Context)
+	const {setroomID,roomID,title,settitle,setjoinroom,auth,JoinRoomID,setJoinRoomID,setisHost,setRoomCapacity,RoomCapacity } = useContext(Context)
 	
 	const router = useRouter()
 	useEffect(() => {
@@ -33,23 +33,39 @@ export default function index() {
 								return;
 							}
 							else{
+								if(title === '' || title === undefined){
+									toast.warning('Please Enter The Title Of Your Room',{position: toast.POSITION.TOP_LEFT })
+									return;
+								}
+								if(RoomCapacity === '' || RoomCapacity === undefined || RoomCapacity == 0){
+									toast.warning('Please Enter The Capacity Of Your Room',{position: toast.POSITION.TOP_LEFT })
+									return;
+								}
 								setisHost(true)
 								setjoinroom(false)
 								router.push(`/RoomPage/${roomID}`)
 							}
 							
-						}} className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]'><IoCreateSharp className="w-7 h-7 mr-2"  /> Start Instant Meeting</button>
+						}} className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:w-[290px] lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full '><IoCreateSharp className="w-7 h-7 mr-2"  /> Start Instant Meeting</button>
 						<div>
 							<input onChange={(e)=>{
 								
 								localStorage.setItem('title',e.target.value)
 								settitle(e.target.value)
 								
-							}} id="title" name='title' type="text" placeholder='Title Of Your Room' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none w-full lg:w-[250px] z-1 transition-all fade-in-out duration-500' />
+							}} id="title" name='title' type="text" placeholder='Title Of Your Room' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto  outline-none   z-1 transition-all fade-in-out duration-500' />
+						</div>
+						<div>
+							<input onChange={(e)=>{
+								
+								localStorage.setItem('roomcapacity',e.target.value)
+								setRoomCapacity(e.target.value)
+								
+							}} id="RoomCapacity" name='RoomCapacity' type="number" placeholder='Room Capacity' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none   z-1 transition-all fade-in-out duration-500' />
 						</div>
 					</div>
 					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
-						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]' onClick={()=>{	
+						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full lg:w-[250px]  transition-all fade-in-out cursor-pointer hover:font-bold w-full ' onClick={()=>{	
 							setJoinRoomID(JoinRoomID)
 							setisHost(false)
 							localStorage.setItem('roomID',JoinRoomID)

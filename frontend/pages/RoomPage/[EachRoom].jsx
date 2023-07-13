@@ -8,9 +8,9 @@ import AreYouReady from '../../components/AreYouReady'
 import axios from 'axios'
 import useWindowSize from "@rooks/use-window-size"
 import { toast } from 'react-toastify'
-const EachRoom = () => {
+import { data } from 'jquery'
+const EachRoom = (props) => {
     const { auth, joinroom, localStream, setJoinRoomID } = useContext(Context);
-    const { innerWidth, innerHeight, outerHeight, outerWidth } = useWindowSize();
     const socket = useRef()
     const router = useRouter();
     useEffect(() => {
@@ -23,15 +23,20 @@ const EachRoom = () => {
         }
 
     }, [])
-
-    if (joinroom && auth) {
+    if (joinroom===true && props.data===true && auth) {
         return <AreYouReady roomID={router.query.EachRoom} localStream={localStream} socket={socket} />
     }
-    if (auth && !joinroom) {
+    if (auth && joinroom === false) {
         return <div className=''><LaptopRoom socket={socket} /></div>
     }
+    if(auth && joinroom === true && props.data === false){
+        toast.error('Room Does Not Exist',{position:toast.POSITION.TOP_LEFT})
+        router.push('/CreateRoomPage')
+        return
+    }
     else {
-        return;
+        router.push('/CreateRoomPage')
+        return
     }
 
 
@@ -40,3 +45,16 @@ const EachRoom = () => {
 
 
 export default EachRoom
+
+
+export async function getServerSideProps({req, params}) {
+    const EachRoom = params.EachRoom
+    const access = JSON.parse(req.cookies.auth).access
+    const response = await axios.post('https://www.pradeeps-video-conferencing.store/api/v1/CheckIfRoomExists/',{roomID:EachRoom})
+    const data = response.data
+    return {
+        props: {
+            data:data
+        }
+    }
+}

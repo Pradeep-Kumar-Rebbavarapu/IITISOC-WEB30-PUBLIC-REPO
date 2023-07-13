@@ -4,22 +4,7 @@ from .helpers import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('email','username','password')
-    def create(self, data):
-        user = User.objects.create(
-            email=data.get('email'),
-            password = data.get('password'),
-            username=data.get('username'),
-            )
-        user.set_password(data.get('password'))
-        user.save()
-        return user
-    def validate(seld,data):
-        user_email = User.objects.filter(email=data.get('email')).exists()
-        if user_email:
-            raise serializers.ValidationError({'error':'Email Already Exists Try With Another'})
-        else:
-            return data 
+        fields = ('id','email','first_name','last_name','password')
         
 
 class VerifyOTPSerializer(serializers.ModelSerializer):

@@ -8,6 +8,7 @@ const Actions = {
     SET_MESSAGES:'SET_MESSAGES',
     SET_ACTIVE_CONVERSATION:'SET_ACTIVE_CONVERSATION',
     SET_DIRECT_CHAT_HISTORY:'SET_DIRECT_CHAT_HISTORY',
+    SET_TRANSCRIPT:'SET_TRANSCRIPT'
   };
   
   export const setIsRoomHost = (isRoomHost) => {
@@ -66,6 +67,12 @@ const Actions = {
     return {
       type:Actions.SET_DIRECT_CHAT_HISTORY,
       directChatHistory
+    }
+  }
+  export const setTranscript = (Transcript) =>{
+    return {
+      type:Actions.SET_TRANSCRIPT,
+      Transcript
     }
   }
   export default Actions;

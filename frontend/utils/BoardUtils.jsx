@@ -10,11 +10,13 @@ export const SendImageDataToPeers = (base64,peers) =>{
 }
 
 
-export const UpdateBoardCanvas = (base64,isDrawing) =>{
+export const UpdateBoardCanvas = (data,isDrawing,BoardMap) =>{
+    const {base64,identity,PageNumber} = data
     const image = new Image()
     const canvas = document.querySelector('#canvas')
     const ctx = canvas.getContext('2d')
     image.onload = () =>{
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(image,0,0)
     }
     image.src = base64

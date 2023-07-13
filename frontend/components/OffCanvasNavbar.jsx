@@ -8,16 +8,8 @@ import Cookies from 'js-cookie'
 import {toast} from 'react-toastify'
 export default function OffCanvasNavbar() {
     const { innerWidth } = useWindowSize();
-    const {auth,setauth} = useContext(Context)
-    const Logout = () => {
-		setauth(null)
-		Cookies.remove('user_details')
-		Cookies.remove('access')
-		Cookies.remove('refreh')
-		localStorage.clear()
-		toast.success('Logged Out', { position: toast.POSITION.TOP_LEFT })
-
-	}
+    const {auth,setauth,Logout} = useContext(Context)
+    
     const handleToggleNavbar = () => {
         if (document.getElementById("offcanvas")?.offsetLeft === -1000) {
             document.querySelector("#offcanvas")?.classList.add("smenu");

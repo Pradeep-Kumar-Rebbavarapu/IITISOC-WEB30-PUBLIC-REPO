@@ -10,6 +10,7 @@ const initState = {
   messages:[],
   activeConversations:null,
   directChatHistory:[],
+  Transcript:"",
 };
 
 const reducer = (state = initState, action) => {
@@ -49,6 +50,10 @@ const reducer = (state = initState, action) => {
     case Actions.SET_DIRECT_CHAT_HISTORY:
       return {
         ...state,directChatHistory:action.directChatHistory
+      }
+    case Actions.SET_TRANSCRIPT:
+      return {
+        ...state,Transcript:action.Transcript
       }
     default:
       return state;

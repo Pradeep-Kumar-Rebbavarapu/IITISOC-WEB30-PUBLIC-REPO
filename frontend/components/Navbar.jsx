@@ -4,7 +4,7 @@ import React,{useRef,useEffect} from 'react'
 import logo from '../public/images/logo.png'
 import { BsFillPersonFill } from 'react-icons/bs'
 import { ToastContainer, toast } from 'react-toastify';
-import { Slide, Zoom, Flip, Bounce } from 'react-toastify';
+
 import Cookies from 'js-cookie'
 import Context from '@/context/Context'
 import { useContext } from 'react'
@@ -12,16 +12,7 @@ import dynamic from 'next/dynamic'
 import {HiBarsArrowDown} from 'react-icons/hi2'
 import OffCanvasNavbar from "./OffCanvasNavbar"
 const NavbarEle = () => {
-	const { auth, setauth } = useContext(Context)
-	const Logout = () => {
-		setauth(null)
-		Cookies.remove('user_details')
-		Cookies.remove('access')
-		Cookies.remove('refreh')
-		localStorage.clear()
-		toast.success('Logged Out', { position: toast.POSITION.TOP_LEFT })
-
-	}
+	const { auth, setauth,Logout } = useContext(Context)
 
 	const ref = useRef(null);
 	useEffect(() => {
@@ -83,11 +74,7 @@ const NavbarEle = () => {
 					<OffCanvasNavbar />
 				</div>
 			</div>
-			<ToastContainer
-
-				theme="colored"
-				transition={Zoom}
-			/>
+			
 		</>
 	)
 }

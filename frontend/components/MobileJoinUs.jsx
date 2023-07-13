@@ -32,12 +32,12 @@ export default function MobileJoinUs() {
 
 
             registerLink.addEventListener('click', () => {
-                wrapper.style.height = "580px"
+                wrapper.style.height = "600px"
                 Login.classList.add('translate-x-[-400px]');
                 Register.classList.remove('translate-x-[400px]');
             })
             loginLink.addEventListener('click', () => {
-                wrapper.style.height = "480px"
+                wrapper.style.height = "580px"
                 
                 Login.classList.remove('translate-x-[-400px]');
                 Register.classList.add('translate-x-[400px]');
@@ -59,7 +59,7 @@ export default function MobileJoinUs() {
                     <div className="text-sm md:text-xl sm:text-xl text-white text-center">Login and conference like never before!</div>
                 </div>
                 <div id="secondDiv" className="bg-[#E67E22] w-screen h-screen fixed inset-x-0 bottom-0 flex items-center justify-center transition-transform duration-500 transform translate-y-full">
-                    <div id='Wrapper' className="wrapper relative w-[400px] h-[480px] bg-[rgba(0,0,0,0.1)] border-2 border-[rgba(255,255,255, 0.5)] rounded-3xl backdrop-blur-sm shadow flex justify-center items-center transition-all duration-300 overflow-hidden scale-0 bg-white mx-2">
+                    <div id='Wrapper' className="wrapper relative w-[400px] h-[580px] bg-[rgba(0,0,0,0.1)] border-2 border-[rgba(255,255,255, 0.5)] rounded-3xl backdrop-blur-sm shadow flex justify-center items-center transition-all duration-300 overflow-hidden scale-0 bg-white mx-2">
                         <div className="w-full p-[40px] bg-white Login transition-all duration-500">
                             <h2 className="text-2xl text-[#154360] text-center">LOGIN</h2>
                             <LoginForm ToggleForm={ToggleForm} />

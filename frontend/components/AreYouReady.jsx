@@ -13,7 +13,7 @@ import {toast} from 'react-toastify'
 export default function AreYouReady({ socket}) {
 
     const { setJoinRoomID,JoinRoomID,localStream, auth, video, setvideo, audio, setaudio,setjoinroom } = useContext(Context)
-    console.log(auth)
+    
     const router = useRouter()
     const ReadyStream = useRef()
     const [loading,setloading] = useState(true)
@@ -56,9 +56,32 @@ export default function AreYouReady({ socket}) {
             </div>
             <div className='backdrop-blur-[1px] w-full items-center h-full flex justify-center'>
                 <button onClick={() => {
-                    setjoinroom(false)
-                    ReadyStream.current.getTracks().forEach(track => track.stop())
-                    router.push(`/RoomPage/${router.query.EachRoom}`)
+                    axios.post('https://www.pradeeps-video-conferencing.store/api/v1/CheckIfHostHasJoinedRoom/', {
+                        roomID: router.query.EachRoom
+                    }, {
+                        withCredentials: true,
+                        headers: {
+                            Authorization: 'Bearer ' + auth.access
+                        }
+                    }).then((response) => {
+                        if (response.data===true) {
+                            setjoinroom(false)
+                            ReadyStream.current.getTracks().forEach(track => track.stop())
+                            
+                        }
+                        else if(response.data === "No One Joined"){
+                            toast.info('No One Has Joined The Room Yet',{position:toast.POSITION.TOP_LEFT})
+                        }
+                        else if(response.data === "Room Full"){
+                            toast.info('Room Is Full',{position:toast.POSITION.TOP_LEFT})
+                        }
+                        else if(response.data === false){
+                            toast.info('Host Has Not Joined The Room Yet',{position:toast.POSITION.TOP_LEFT})
+                        }
+                    }).catch((err) => {
+                        toast.error('Some Error Occured',{position:toast.POSITION.TOP_LEFT})
+                    })
+
                 }} className='bg-blue-600 text-lg lg:text-2xl text-white hover:bg-blue-600/90 transition-all fade-in-out px-4 p-2 lg:p-4 rounded-full  h-fit w-fit my-5  lg:my-auto hover:scale-110'>Are You Ready To Join ??</button>
             </div>
         </div>

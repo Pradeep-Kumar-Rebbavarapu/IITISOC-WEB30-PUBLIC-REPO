@@ -16,7 +16,14 @@ export default function VideoGrid({ localStream, length }) {
 		localVideo.style.borderRadius = "10px";
 		localVideo.style.objectFit = "cover";
 		localVideo.id = "my_video";
-		
+		localVideo.autoplay = true;
+		localVideo.playsInline = true;
+		localVideo.style.width = "100%";
+		localVideo.style.height = "100%";
+		localVideo.style.maxWidth = "100%";
+		localVideo.style.maxHeight = "100%";
+		localVideo.style.minWidth = "100%";
+		localVideo.style.minHeight = "100%";
 		const VideoGrid = document.getElementById("VideoGrid");
 		VideoGrid.append(localVideo);
 

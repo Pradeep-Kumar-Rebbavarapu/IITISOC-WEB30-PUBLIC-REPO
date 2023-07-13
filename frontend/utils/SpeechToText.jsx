@@ -4,30 +4,32 @@ import { AiFillFileText, AiOutlineFileText } from 'react-icons/ai';
 import {MdRecordVoiceOver } from 'react-icons/md'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { SendYourSpokenDataToOtherPeers } from './SpokenData';
-export default function SpeechToText(transcript,peers,browserSupportsSpeechRecognition) {
-    const [speechToText, setSpeechToText] = useState(false);
+import { setTranscript } from '../store/actions';
+import { store } from '../store/store';
+import parse from 'html-react-parser';
+export default function SpeechToText({speechToText,setSpeechToText,resetTranscript,transcript,peers,browserSupportsSpeechRecognition,Transcript}) {
+   
     
     
    
 
-    const toggleSpeechToTextBtn = () => {
+    const toggleSpeechToTextBtn = async () => {
         if (!speechToText) {
+            resetTranscript()
             setSpeechToText(true);
             SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
             
         } else {
-            setSpeechToText(false);
+            await SendYourSpokenDataToOtherPeers(transcript,peers)
             SpeechRecognition.stopListening();
-            SendYourSpokenDataToOtherPeers(transcript,peers)
+            const oldTranscript = store.getState().Transcript
+            store.dispatch(setTranscript(`<div>${oldTranscript} ${transcript}</div>`))
+            resetTranscript()
+            setSpeechToText(false);
         }
     };
 
-    // Add event listener to continue listening when speech resumes
-    SpeechRecognition.onEnd = () => {
-        if (speechToText) {
-            SpeechRecognition.startListening({ continuous: true, language: 'en-IN' });
-        }
-    };
+    
     
     
 
@@ -36,10 +38,10 @@ export default function SpeechToText(transcript,peers,browserSupportsSpeechRecog
 
     return (
         <>
-        <div className='h-fit w-fit hidden lg:block'>
+        <div className='h-fit w-fit hidden lg:block '>
             <div
                 id="Left_Nav_SpeechToText_Btn"
-                className={`focus:bg-orange-500 cursor-pointer w-fit h-fit my-5 flex items-center flex-col justify-center lg:block p-3 rounded-lg ${speechToText ? 'bg-orange-500' : 'hover:bg-orange-500'
+                className={`focus:bg-orange-500 cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${speechToText ? 'bg-orange-500' : 'hover:bg-orange-500'
                     }  transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20`}
                 onClick={toggleSpeechToTextBtn}
             >
@@ -49,10 +51,10 @@ export default function SpeechToText(transcript,peers,browserSupportsSpeechRecog
             </div>
             
         </div>
-        <div className='h-full w-full block lg:hidden'>
+        <div className='h-full w-full my-auto lg:hidden'>
             <div
                 id="Left_Nav_SpeechToText_Btn"
-                className={`focus:bg-orange-500 cursor-pointer !h-full w-full lg:w-fit lg:h-fit my-0  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${speechToText ? 'bg-orange-500' : 'hover:bg-orange-500'
+                className={`focus:bg-orange-500 cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20 ${speechToText ? 'bg-orange-500' : 'hover:bg-orange-500'
                     }  transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20`}
                 onClick={toggleSpeechToTextBtn}
             >

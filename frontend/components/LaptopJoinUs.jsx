@@ -13,14 +13,14 @@ export default function LaptopJoinUsPage() {
         if (type === 'signup') {
 
 
-            wrapper.classList.add('!h-[580px]')
+            wrapper.classList.add('!h-[600px]')
             Login.classList.add('translate-x-[-500px]');
             Register.classList.remove('translate-x-[500px]');
 
         }
         else {
 
-            wrapper.classList.remove('!h-[580px]')
+            wrapper.classList.remove('!h-[600px]')
             Login.classList.remove('translate-x-[-500px]');
             Register.classList.add('translate-x-[500px]');
         }
@@ -35,15 +35,15 @@ export default function LaptopJoinUsPage() {
                 </div>
             </div>
             <div className="mx-auto my-auto ">
-                <div id="Wrapper" className="wrapper relative w-[450px] h-[580px] bg-[rgba(0,0,0,0.1)] border-2 border-[rgba(255,255,255, 0.5)] rounded-3xl backdrop-blur-sm shadow flex justify-center items-center transition-all duration-300 overflow-hidden bg-white">
+                <div id="Wrapper" className="wrapper relative w-[450px] h-[600px] bg-[rgba(0,0,0,0.1)] border-2 border-[rgba(255,255,255, 0.5)] rounded-3xl backdrop-blur-sm shadow flex justify-center items-center transition-all duration-300 overflow-hidden bg-white">
 
                     <div id="Login" className="w-full p-[40px] absolute Login transition-all duration-500 ">
-                        <h2 className="text-2xl text-[#15436 text-center">LOGIN</h2>
+                        <h2 className="text-2xl text-[#15436] text-center">LOGIN</h2>
                         <LoginForm ToggleForm={ToggleForm} />
                     </div>
 
                     <div id='Signup' className="w-full p-[40px] absolute translate-x-[500px] Register transition-all duration-500">
-                        <h2 className="text-2xl text-[#15436 text-center">REGISTER</h2>
+                        <h2 className="text-2xl text-[#15436] text-center">REGISTER</h2>
                         <SignupForm ToggleForm={ToggleForm} />
 
                     </div>

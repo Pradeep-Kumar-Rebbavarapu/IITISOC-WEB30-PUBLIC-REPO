@@ -1,10 +1,11 @@
+
 import { setMessages } from "../store/actions";
 import { store } from "../store/store";
-import { appendNewMessage, sendMessage } from "./MessageUtils";
+import { appendNewMessage, sendDirectMessage, sendMessage } from "./MessageUtils";
 import {v4 as uuidv4} from 'uuid'
 var chunkLength = 1000 * 6000, file_size, file_name;
 
-export const sendFile = (File, peers, setFile, identity, setUploadingText) => {
+export const sendFile =  (File, peers, setFile, identity,PrivateMessaging,RecieverSocketId,socket) => {
     let id = uuidv4()
     file_name = File.name;
     file_size = File.size;
@@ -15,90 +16,105 @@ export const sendFile = (File, peers, setFile, identity, setUploadingText) => {
         identity: identity,
         messageCreatedByMe: true
     }
-    appendNewMessage(localMessageData)
-    sliceandsend(File, peers, setFile, setUploadingText,id);
+    if(PrivateMessaging){
+        sendDirectMessage(file_name,socket,RecieverSocketId,identity,true,id)
+    }
+    else{
+        appendNewMessage(localMessageData)
+    }
     
+    sliceandsend(File, peers, setFile,id,PrivateMessaging,RecieverSocketId);
+    setFile(null);
 }
 
-function sliceandsend(file, peers, setFile, setUploadingText,id) {
+function sliceandsend(file, peers, setFile,id,PrivateMessaging,RecieverSocketId) {
     
     var fileSize = file.size;
     var name = file.name;
     var mime = file.type;
     var chunkSize = 64 * 1024; // bytes
     var offset = 0;
+    function readChunk(first,peer) {
+        var blob = file.slice(offset, offset + chunkSize);
+        var reader = new FileReader();
 
-    for (let socketId in peers.current) {
-       
-        let peer = peers.current[socketId];
-
-        function readChunk(first) {
-            var blob = file.slice(offset, offset + chunkSize);
-            var reader = new FileReader();
-
-            reader.onload = function (evt) {
-                if (!evt.target.error) {
-                    offset += chunkSize;
-                    
-                    document.getElementById(id).innerHTML = `${(offset / fileSize) * 100}%`
-                    if (offset >= fileSize) {
-                        var lastBlob = new Blob([evt.target.result], { type: mime });
-                        var reader = new FileReader();
-                        reader.onload = function (evt) {
-                            var data = {
-                                File: true,
-                                file_name: name,
-                                first: first,
-                                id:id,
-                                file_size: fileSize,
-                                message: Array.from(new Uint8Array(evt.target.result)),
-                                last: true,
-                                mime: mime
-                            };
-
-                            
-                            peer.write(JSON.stringify(data));
-                           
-                            document.getElementById(id).innerHTML = name + "/" + mime
-                            document.getElementById(id).disabled = false
-                        };
-                        reader.readAsArrayBuffer(lastBlob);
-                        return;
-                    } else {
-                        var chunkBlob = new Blob([evt.target.result], { type: mime });
-                        var reader = new FileReader();
-                        reader.onload = function (evt) {
-                            var data = {
-                                File: true,
-                                first: first,
-                                file_name: name,
-                                id:id,
-                                file_size: fileSize,
-                                message: Array.from(new Uint8Array(evt.target.result)),
-                                last: false,
-                                mime: mime
-                            };
-
-                            
-                            peer.write(JSON.stringify(data));
-                        };
-                        reader.readAsArrayBuffer(chunkBlob);
-                    }
-                } else {
-                    console.log("Read error: " + evt.target.error);
-                    return;
+        reader.onload = function (evt) {
+            if (!evt.target.error) {
+                offset += chunkSize;
+                if(document.getElementById(id)){
+                    document.getElementById(id).innerHTML = `${((offset / fileSize) * 100).toFixed(2)}% - ${name}}`
                 }
+                    
+                
+                
+                if (offset >= fileSize) {
+                    var lastBlob = new Blob([evt.target.result], { type: mime });
+                    var reader = new FileReader();
+                    reader.onload = function (evt) {
+                        var data = {
+                            File: true,
+                            file_name: name,
+                            first: first,
+                            id:id,
+                            file_size: fileSize,
+                            message: Array.from(new Uint8Array(evt.target.result)),
+                            last: true,
+                            mime: mime,
+                            PrivateMessaging:PrivateMessaging,
+                        };
 
-                readChunk(false);
-            };
+                        
+                        peer.write(JSON.stringify(data));
+                       if(document.getElementById(id)){
+                        document.getElementById(id).innerHTML = name 
+                        document.getElementById(id).disabled = false
+                       }
+                        
+                       
+                        
+                    };
+                    reader.readAsArrayBuffer(lastBlob);
+                    return;
+                } else {
+                    var chunkBlob = new Blob([evt.target.result], { type: mime });
+                    var reader = new FileReader();
+                    reader.onload = function (evt) {
+                        var data = {
+                            File: true,
+                            first: first,
+                            file_name: name,
+                            id:id,
+                            file_size: fileSize,
+                            message: Array.from(new Uint8Array(evt.target.result)),
+                            last: false,
+                            mime: mime,
+                            PrivateMessaging:PrivateMessaging,
+                        };
 
-            reader.readAsArrayBuffer(blob);
-        }
+                        
+                        peer.write(JSON.stringify(data));
+                    };
+                    reader.readAsArrayBuffer(chunkBlob);
+                }
+            } else {
+                console.log("Read error: " + evt.target.error);
+                return;
+            }
 
-        readChunk(true);
+            readChunk(false,peer);
+        };
+
+        reader.readAsArrayBuffer(blob);
     }
-
-    setFile(null);
+    if(PrivateMessaging){
+        readChunk(true,peers.current[RecieverSocketId]);
+    }
+    else{
+        for (let socketId in peers.current) {
+            let peer = peers.current[socketId];
+            readChunk(true,peer);
+        }
+    }
 }
 
 
@@ -106,12 +122,21 @@ function sliceandsend(file, peers, setFile, setUploadingText,id) {
 var receivedSize = 0; var recProgress = 0;
 var arrayToStoreChunks = [];
 var counterBytes = 0;
+const arrayBuffersByPeer = new Map();
+
 
 export const handleData = (data) => {
-    
+    let arrayToStoreChunks = arrayBuffersByPeer.get(data.id);
+    if (!arrayToStoreChunks) {
+        // If the array buffer doesn't exist, create a new one
+        arrayToStoreChunks = [];
+        arrayBuffersByPeer.set(data.id, arrayToStoreChunks);
+    }
     const arrayBuffer = new Uint8Array(data.message).buffer;
-
-    receivedSize += arrayBuffer.byteLength;
+    let receivedSize = arrayToStoreChunks.reduce(
+        (totalSize, chunk) => totalSize + chunk.byteLength,
+        0
+    );
     counterBytes = counterBytes + receivedSize;
 
     recProgress = (receivedSize / data.file_size) * 100;
@@ -125,7 +150,10 @@ export const handleData = (data) => {
         sdata.type = "progress_info";
         sdata.msg = recProgress;
         sdata.speed = speed;
-        document.getElementById(data.id).innerHTML = `${recProgress}% - ${speed}`
+        if(document.getElementById(data.id)){
+            document.getElementById(data.id).innerHTML = `${recProgress}% - ${data.file_name}`
+        }
+        
     }
     if (data.last) {
         setTimeout(function () {
@@ -134,8 +162,13 @@ export const handleData = (data) => {
             sdata.type = "progress_info";
             sdata.msg = 100;
             sdata.speed = 0;
-            document.getElementById(data.id).innerHTML = `${data.file_name}/${data.mime}`
-            document.getElementById(data.id).disabled = false
+            if(document.getElementById(data.id)){
+                document.getElementById(data.id).innerHTML = `${data.file_name}`
+                document.getElementById(data.id).disabled = false
+                
+            }
+            
+            arrayBuffersByPeer.delete(data.id);
             
         }, 500)
 

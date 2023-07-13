@@ -23,7 +23,7 @@ export default function Input(props1) {
 
 
                                     <input {...field} className="w-full h-full bg-transparent border-none outline-none peer font-semibold pr-8 pl-1" required name={name} id={name} type={type} />
-                                    <label htmlFor={name} className="absolute top-[30px] left-[5px] translate-y-[-50%] text-lg text-[#154360] font-semibold peer-focus:top-[-5px] peer-valid:top-[-5px] transition-all duration-500 uppercase">{name}</label>
+                                    <label htmlFor={name} className="absolute top-[30px] left-[5px] translate-y-[-50%] text-lg text-[#154360] font-semibold peer-focus:top-[-5px] peer-valid:top-[-5px] transition-all duration-500 uppercase">{label?label:name}</label>
                                     <div className='translate-y-[20px] text-red-500'>
                                         <ErrorMessage className='' name={name}>
                                             {msg => {

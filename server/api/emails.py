@@ -1,13 +1,17 @@
-from django.core.mail import send_mail
-import random
-from django.conf import settings
-from .models import User
-def send_otp_via_email(email):
-    subject = f"Your Account Verification Email"
-    otp = random.randint(1000,9999)
-    email_from = settings.EMAIL_HOST
-    message = f"Your Otp is {otp}"
-    send_mail(subject,message,email_from,[email])
-    user_obj = User.objects.get(email = email)
-    user_obj.otp = otp
-    user_obj.save()
+from djoser import email
+from djoser import utils
+from djoser.conf import settings
+from django.contrib.auth.tokens import default_token_generator
+
+
+class ActivationEmail(email.ActivationEmail):
+    def get_context_data(self):
+        # ActivationEmail can be deleted
+        context = super().get_context_data()
+        print(context)
+        user = context.get("user")
+        context["uid"] = utils.encode_uid(user.pk)
+        context["token"] = default_token_generator.make_token(user)
+        context["domain"] = "localhost:3000"
+        context["url"] = settings.ACTIVATION_URL.format(**context)
+        return context

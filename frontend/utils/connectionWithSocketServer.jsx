@@ -1,5 +1,5 @@
 import { store } from "../store/store"
-import { setSocketId, setRoomId, setParticipants } from "../store/actions"
+import { setSocketId, setRoomId, setParticipants, setIdentity, setIsRoomHost } from "../store/actions"
 import { prepareNewPeerConnection } from "./prepareNewPeerConnection"
 import { w3cwebsocket as W3CWebSocket } from "websocket"
 import axios from 'axios'
@@ -36,7 +36,7 @@ const handleSignallingData = (peers, data) => {
 
 let array = []
 
-export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth, roomID, setoverlay, title,setDownloadingText) => {
+export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth,user, roomID, setoverlay, title,setDownloadingText,BoardMap,setroomHostUsername,roomHostUsername,setPeerUsername,PeerUsername,RoomCapacity) => {
     socket.current = new WebSocket(`wss://www.pradeeps-video-conferencing.store/ws/chat/${roomID}`)
 
     socket.current.onopen = () => {
@@ -44,11 +44,11 @@ export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, l
             "type": "get-socket-id",
             data: {}
         }))
-        getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth, roomID, setoverlay, title, IceServers, 3)
+        getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth,user, roomID, setoverlay, title, IceServers, RoomCapacity,length_of_participants)
     }
 
     socket.current.onmessage = (message) => {
-        console.log(message)
+        
         const data = JSON.parse(message.data)
         const type = data['type']
         if (type === "get-socket-id") {
@@ -62,16 +62,14 @@ export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, l
             store.dispatch(setParticipants(connectedUsers))
         }
         else if (type == "conn-prepare") {
-
-
-            const { connUserSocketId } = data
-            setpeerUserID(connUserSocketId)
-
-            prepareNewPeerConnection(socket, peers, connUserSocketId, false, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText)
+            const { connUserSocketId,connUserIdentity } = data
+            toast.info(`${connUserIdentity} has joined the meeting`,{position:toast.POSITION.TOP_LEFT})
+            prepareNewPeerConnection(socket, peers, connUserSocketId, false, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText,BoardMap)
             socket.current.send(JSON.stringify({
                 "type": 'conn-init',
                 data: {
-                    connUserSocketId: connUserSocketId
+                    connUserSocketId: connUserSocketId,
+                    connUserIdentity:connUserIdentity
                 }
             }))
         }
@@ -82,36 +80,42 @@ export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, l
             handleSignallingData(peers, data)
         }
         else if (type === "conn-init") {
-
-            const { connUserSocketId } = data
-            prepareNewPeerConnection(socket, peers, connUserSocketId, true, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText)
+            const { connUserSocketId,connUserIdentity } = data
+            prepareNewPeerConnection(socket, peers, connUserSocketId, true, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText,BoardMap)
+            
         }
         else if (type === "user-disconnected") {
+            toast.warning(`${data.username} has left the meeting`,{position:toast.POSITION.TOP_LEFT})
             handleDisconnectedUser(peers, data['socketId'], length_of_participants, innerWidth)
         }
         else if (type === 'direct-message') {
             appendNewMessageToChatHistory(data)
         }
-        else if (type === "file-transfering") {
-            handleReceiveData(worker.current,data)
-            if(data.done===true){
-                toast(<MessageToast identity={data.identity} content={data.fileName}/>,{position:toast.POSITION.TOP_RIGHT})
-                console.log(data.senderSocketId)
-                socket.current.send(JSON.stringify({
-                    type:'file-transfered',
-                    data:{
-                        senderSocketId:data.senderSocketId,
-                        fileName:data.fileName
-                    }
-                }))
-            }
+        else if(type==="acceptance-letter"){
+            setroomHostUsername(data.RoomHostUsername)
+            setPeerUsername(data.PeerUsername)
+            setpeerUserID(data.connUserSocketId)
+            setIsJoinModal(true)
         }
-
-        else if(type === "file-transfered"){
-            document.getElementById(`fileMsgBox${data.fileName}`).innerHTML = data.fileName
+        else if(type === "ask-peer-to-prepare-conn"){
             
-            
+            store.dispatch(setIdentity(user.username));
+            user.username === roomHostUsername
+                ? store.dispatch(setIsRoomHost(true))
+                : store.dispatch(setIsRoomHost(false));
+              store.dispatch(setRoomId(roomID));
+              const data = {
+                roomID: roomID,
+                username: user.username,
+              };
+              socket.current.send(
+                JSON.stringify({
+                  type: "join-room",
+                  data: data,
+                })
+              );
         }
+        
 
     }
 
