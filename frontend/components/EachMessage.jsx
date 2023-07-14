@@ -137,22 +137,15 @@ export default function EachMessage({
                                                 </div>
                                             </div>
                                             <div onClick={() => {
-                                                if(TagDetails.tagged === false){
+                                                
                                                     setTagDetails({
                                                         tagged: true,
                                                         taggedTo: message.identity,
                                                         taggedMessage: message.content,
                                                         taggedBy: props.identity,
                                                     })
-                                                }
-                                                else{
-                                                    setTagDetails({
-                                                        tagged: false,
-                                                        taggedTo: null,
-                                                        taggedMessage: null,
-                                                        taggedBy:null,
-                                                    })
-                                                }
+                                                
+                                                
                                                 console.log(message.identity, message.content)
                                             }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
 
@@ -167,22 +160,15 @@ export default function EachMessage({
 
                                             </div>
                                             <div onClick={() => {
-                                                if(TagDetails.tagged === false){
+                                              
                                                     setTagDetails({
                                                         tagged: true,
                                                         taggedTo: message.identity,
                                                         taggedMessage: message.content,
                                                         taggedBy: props.identity,
                                                     })
-                                                }
-                                                else{
-                                                    setTagDetails({
-                                                        tagged: false,
-                                                        taggedTo: null,
-                                                        taggedMessage: null,
-                                                        taggedBy:null,
-                                                    })
-                                                }
+                                                
+                                                
                                                 
                                                 console.log(message.identity, message.content)
                                             }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
