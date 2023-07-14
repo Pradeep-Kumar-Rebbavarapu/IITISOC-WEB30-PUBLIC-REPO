@@ -106,7 +106,12 @@ function LaptopRoom(props) {
   const [newTranscript, setnewTranscript] = useState("");
   const [ConnUserIdentity, setConnUserIdentity] = useState(null);
   const [PeerUsername, setPeerUsername] = useState(null);
-  const [TagDetails,setTagDetails] = useState({tagged:false,taggedBy:null,taggedTo:null,taggedMessage:null})
+  const [TagDetails, setTagDetails] = useState({
+    tagged: false,
+    taggedBy: null,
+    taggedTo: null,
+    taggedMessage: null,
+  });
   const {
     transcript,
     listening,
@@ -365,13 +370,8 @@ function LaptopRoom(props) {
     const BoardSection = document.getElementById("board-section");
     const VideoSection = document.getElementById("video-section");
     const TextEditor = document.getElementById("TextEditor");
-
     BoardSection.className =
       "w-full h-full top-[0px] absolute z-[100000000]  transition-all fade-in-out duration-500";
-    VideoSection.className =
-      "w-full h-full absolute left-[2000px] z-[100] transition-all fade-in-out duration-500";
-    TextEditor.className =
-      "w-full h-full absolute left-[-2000px] z-[100] transition-all fade-in-out duration-500";
   };
 
   if (overlay) {
@@ -397,10 +397,10 @@ function LaptopRoom(props) {
     const TextEditor = document.getElementById("TextEditor");
     if (TextEditor.classList.contains("left-[-2000px]")) {
       TextEditor.className =
-        "w-full h-full absolute z-[10000000000000000] bg-white left-0 transition-all fade-in-out duration-500 border-2 border-black flex flex-col top-0";
+        "w-full h-full absolute z-[100] bg-white left-0 transition-all fade-in-out duration-500 border-2 border-black flex flex-col top-0";
     } else {
       TextEditor.className =
-        "w-full h-full absolute z-[10000000000000000] bg-white left-[-2000px] transition-all fade-in-out duration-500 border-2 border-black  top-0";
+        "w-full h-full absolute z-[100] bg-white left-[-2000px] transition-all fade-in-out duration-500 border-2 border-black  top-0";
     }
   };
 
@@ -408,10 +408,10 @@ function LaptopRoom(props) {
     const MoreBtnMenu = document.getElementById("MoreBtnMenu");
     if (MoreBtnMenu.classList.contains("bottom-[-500px]")) {
       MoreBtnMenu.className =
-        "absolute w-full lg:hidden  h-[300px]  bottom-[100px] right-0 bg-white border-0 border-blue-500 z-[1000000000]  transition-all fade-in-out duration-500";
+        "absolute w-full lg:hidden  h-[300px]  bottom-[100px] right-0 bg-white border-0 border-blue-500 z-[2]  transition-all fade-in-out duration-500";
     } else {
       MoreBtnMenu.className =
-        "absolute w-full lg:hidden  h-[300px]  bottom-[-500px] right-0 bg-white border-0 border-blue-500 z-[1000000000]  transition-all fade-in-out duration-500";
+        "absolute w-full lg:hidden  h-[300px]  bottom-[-500px] right-0 bg-white border-0 border-blue-500 z-[2]  transition-all fade-in-out duration-500";
     }
   };
 
@@ -480,30 +480,15 @@ function LaptopRoom(props) {
     const PrivateMessaging = document.getElementById("PrivateMessaging");
     if (PrivateMessaging.classList.contains("left-[-2000px]")) {
       PrivateMessaging.className =
-        "absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto]  left-[0px] z-[100000000000000000000000] transition-all fade-in-out duration-500";
+        "absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto]  left-[0px] z-[100] transition-all fade-in-out duration-500";
     } else {
       PrivateMessaging.className =
-        "absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto] left-[-2000px] z-[1000000000000000000000000] transition-all fade-in-out duration-500";
+        "absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto] left-[-2000px] z-[100] transition-all fade-in-out duration-500";
     }
   };
 
   return (
     <div>
-      <PrivateMessaing
-        message={message}
-        setmessage={setmessage}
-        sendMessage={sendMessage}
-        File={File}
-        setFile={setFile}
-        sendFile={sendFile}
-        Attachmentref={Attachmentref}
-        handleToggleFileInput={handleToggleFileInput}
-        selectFile={selectFile}
-        socket={socket}
-        props={props}
-        worker={worker}
-        peers={peers}
-      />
       <div className="w-full h-screen bg-white absolute top-0 ">
         <UserJoinModal
           auth={auth}
@@ -745,7 +730,6 @@ function LaptopRoom(props) {
                 id="otherTemplate"
                 className={`p-0 relative  border-0 border-blue-500 h-full `}
               >
-                
                 <div
                   id="video-section"
                   className="w-full h-full top-0  absolute z-[0] transition-all fade-in-out duration-500 "
@@ -755,7 +739,7 @@ function LaptopRoom(props) {
                     localStream={localStream.current}
                   />
                 </div>
-								<div
+                <div
                   id="emoji-section"
                   className="w-[50px] h-[300px] absolute  z-[10000000000000000000000000] bottom-[250px] hidden bg-white"
                 >
@@ -763,7 +747,7 @@ function LaptopRoom(props) {
                 </div>
               </div>
 
-              <div className="h-[100px] z-[1000000] bg-white flex justify-center border-t-2 absolute lg:relative w-full bottom-0 ">
+              <div className="h-[100px]  bg-white flex justify-center border-t-2 absolute lg:relative w-full bottom-0 ">
                 <div className="grid grid-cols-5 lg:grid-cols-6 text-center items-center ">
                   <div
                     onClick={() => {
@@ -944,7 +928,7 @@ function LaptopRoom(props) {
             </div>
             <div
               id="ChatParticipantsBox"
-              className="h-full z-[10000000] border-0 pt-12 lg:pt-0 absolute lg:relative w-full lg:p-5 lg:w-[550px] hidden border-l-2 rounded-lg"
+              className="h-full z-[10] border-0 pt-12 lg:pt-0 absolute lg:relative w-full lg:p-5 lg:w-[550px] hidden border-l-2 rounded-lg"
             >
               <div
                 id="CloseChatParticipantsBox"
@@ -982,8 +966,6 @@ function LaptopRoom(props) {
                   className=" h-full border-0 border-black relative  justify-center overflow-x-hidden"
                 >
                   <div id="Messages" className="h-full w-full mx-2 relative">
-                    
-                    
                     {props.messages.map((message, index) => {
                       return (
                         <div key={index}>
@@ -1018,18 +1000,24 @@ function LaptopRoom(props) {
                   className="w-full  border-0 border-black relative p-3 "
                 >
                   {TagDetails.tagged && (
-                      <div className="absolute w-full h-fit justify-between items-center  flex text-white bg-gray-500 p-2  bottom-[80px]">
-                        Tagged {TagDetails.taggedTo} On {`"${TagDetails.taggedMessage}"`}
-                        <button className="bg-white p-2 rounded-md w-fit h-fit text-black m-2" onClick={()=>{
+                    <div className="absolute w-full h-fit justify-between items-center  flex text-white bg-gray-500 p-2  bottom-[80px]">
+                      Tagged {TagDetails.taggedTo} On{" "}
+                      {`"${TagDetails.taggedMessage}"`}
+                      <button
+                        className="bg-white p-2 rounded-md w-fit h-fit text-black m-2"
+                        onClick={() => {
                           setTagDetails({
-                            tagged:false,
-                            taggedTo:null,
-                            taggedBy:null,
-                            taggedMessage:null
-                          })
-                        }}>UnTag</button>
-                      </div>
-                    )}
+                            tagged: false,
+                            taggedTo: null,
+                            taggedBy: null,
+                            taggedMessage: null,
+                          });
+                        }}
+                      >
+                        UnTag
+                      </button>
+                    </div>
+                  )}
                   <div className="bg-white rounded-lg w-full  flex justify-center ">
                     <div
                       className="border-r-2 border-gray-300 flex justify-center items-center mx-auto my-auto px-3 py-2 cursor-pointer z-[100] transition-all fade-in-out"
@@ -1067,14 +1055,19 @@ function LaptopRoom(props) {
                                 null
                               );
                             else if (!File && (message?.length > 0 || message))
-                              sendMessage(message, peers, "message",TagDetails);
+                              sendMessage(
+                                message,
+                                peers,
+                                "message",
+                                TagDetails
+                              );
                             setmessage("");
                             setTagDetails({
-                              tagged:false,
-                              taggedTo:null,
-                              taggedBy:null,
-                              taggedMessage:null
-                            })
+                              tagged: false,
+                              taggedTo: null,
+                              taggedBy: null,
+                              taggedMessage: null,
+                            });
                           }
                         }}
                         onChange={(e) => {
@@ -1098,14 +1091,14 @@ function LaptopRoom(props) {
                             null
                           );
                         else if (!File && (message?.length > 0 || message))
-                          sendMessage(message, peers, "message",TagDetails);
+                          sendMessage(message, peers, "message", TagDetails);
                         setmessage("");
                         setTagDetails({
-                          tagged:false,
-                          taggedTo:null,
-                          taggedBy:null,
-                          taggedMessage:null
-                        })
+                          tagged: false,
+                          taggedTo: null,
+                          taggedBy: null,
+                          taggedMessage: null,
+                        });
                       }}
                       className="border-l-2 flex my-auto mx-auto justify-center items-center  border-gray-300 py-2 px-2"
                     >
@@ -1144,7 +1137,23 @@ function LaptopRoom(props) {
           OpenTextEditor={OpenTextEditor}
         />
       </div>
-
+      <div className="z-[10000000000000000000000000]">
+        <PrivateMessaing
+          message={message}
+          setmessage={setmessage}
+          sendMessage={sendMessage}
+          File={File}
+          setFile={setFile}
+          sendFile={sendFile}
+          Attachmentref={Attachmentref}
+          handleToggleFileInput={handleToggleFileInput}
+          selectFile={selectFile}
+          socket={socket}
+          props={props}
+          worker={worker}
+          peers={peers}
+        />
+      </div>
       <div
         id="board-section"
         className="w-full h-full top-[-1000px] absolute z-[1000000000000000] transition-all fade-in-out duration-500"

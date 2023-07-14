@@ -63,7 +63,7 @@ export default function PrivateMessaing({
   return (
     <div
       id="PrivateMessaging"
-      className="absolute w-full  top-0 bg-white grid grid-rows-[80px_auto] !z-[100000000000000000000000] left-[-2000px] border-0 border-blue-500"
+      className="absolute w-full  top-0 bg-white grid grid-rows-[80px_auto]  left-[-2000px] border-0 border-blue-500"
     >
       <div className="h-[100px] flex w-full border-0 border-black items-center text-center">
         <button
