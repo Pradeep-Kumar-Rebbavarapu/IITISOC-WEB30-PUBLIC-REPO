@@ -37,7 +37,10 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
                 identity: store.getState().identity,
             }
             const ChatParticipantsBox = document.getElementById('ChatParticipantsBox')
-            if (ChatParticipantsBox.classList.contains('hidden')) {
+            const BoardSection = document.getElementById('board-section')
+            const TextEditor = document.getElementById("TextEditor");
+            const PrivateMessaging = document.getElementById("PrivateMessaging");
+            if (ChatParticipantsBox.classList.contains('hidden') || BoardSection.classList.contains('top-[0px]') || TextEditor.classList.contains('left-0') || PrivateMessaging.classList.contains('left-[0px]')) {
                 toast(<MessageToast identity={store.getState().identity} content={data.file_name} />, {
                     position: "top-right",
                     autoClose: 1000,
@@ -100,7 +103,10 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
         const data = JSON.parse(peerdata);
         appendNewMessage(data.messageData)
         const ChatParticipantsBox = document.getElementById('ChatParticipantsBox')
-        if (ChatParticipantsBox.classList.contains('hidden')) {
+            const BoardSection = document.getElementById('board-section')
+            const TextEditor = document.getElementById("TextEditor");
+            const PrivateMessaging = document.getElementById("PrivateMessaging");
+            if (ChatParticipantsBox.classList.contains('hidden') || BoardSection.classList.contains('top-[0px]') || TextEditor.classList.contains('left-0') || PrivateMessaging.classList.contains('left-[0px]')) {
             toast(<MessageToast identity={data.messageData.identity} content={data.messageData.content} />, {
                 position: "top-right",
                 autoClose: 1000,
