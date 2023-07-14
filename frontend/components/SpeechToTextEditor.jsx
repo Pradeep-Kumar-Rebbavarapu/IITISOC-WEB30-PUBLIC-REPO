@@ -79,7 +79,8 @@ export default function SpeechToTextEditor({
           onClick={handleSummarizeAndDownload}
           className="bg-black font-bold text-white p-2 rounded-md hover:ring-4 hover:ring-opacity-50 hover:ring-black transition-all fade-in-out text-xl"
         >
-          {loading?"Summarizing...":"Summarize & Download"}
+          {listening?"Turn Of Ai Speech To Text To Summarize":loading?"Summarizing...":"Summarize & Download"}
+          
         </button>
       </div>
     </div>

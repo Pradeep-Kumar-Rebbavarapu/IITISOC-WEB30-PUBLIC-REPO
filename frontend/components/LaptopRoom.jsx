@@ -1135,6 +1135,7 @@ function LaptopRoom(props) {
           props={props}
           transcript={transcript}
           OpenTextEditor={OpenTextEditor}
+          listening={listening}
         />
       </div>
       <div className="z-[10000000000000000000000000]">
