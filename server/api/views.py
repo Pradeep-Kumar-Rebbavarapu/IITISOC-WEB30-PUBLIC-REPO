@@ -26,6 +26,7 @@ from io import BytesIO
 from bs4 import BeautifulSoup
 # Create your views here.
 from django.core.files.storage import FileSystemStorage
+import html2text
 
 class VerifyOTP(APIView):  # Making a Class Based View Called Verify OTP
     def post(self, request):  # making a post reuqest
@@ -232,11 +233,13 @@ class GetUserDetails(APIView):
         
 
 class ConvertHtmlToDocx(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         data=request.data['data']
         html_content = str(BeautifulSoup(data))
         document = Document()
-        document.add_paragraph(str(data))
+        document.add_paragraph(html2text.html2text(str(html_content)))
 
         # Save the Word document to a temporary file
         temp_file_path = os.path.join(settings.MEDIA_ROOT, 'temp.docx')

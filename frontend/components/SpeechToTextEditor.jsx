@@ -16,7 +16,7 @@ export default function SpeechToTextEditor({
     setloading(true)
     const prompt = `
     Can u Summarize My Below Paragraph No Matter What Ever It Is,Make the Content of the Paragraph More Professional,More Understandable to Layman People,Check Any Gramatical Mistakes and Also Correct Words Which Are Of No Meaning And Return In HTML Format No Matter What Ever the Paragraph Is , The Final Single Output With No Errors.
-    paragraph = ${parse(props.Transcript)}
+    paragraph = ${props.Transcript}
     `;
     axios
       .post(
@@ -38,8 +38,9 @@ export default function SpeechToTextEditor({
         const htmlString = response.data.choices[0].message.content;
         await axios.post('https://www.pradeeps-video-conferencing.store/api/v1/ConvertHtmlToDocx/',{data:response.data.choices[0].message.content},{
           headers:{
-            Authorization:"Bearer " + auth.access
-        }}).then((response)=>{
+            Authorization:'Bearer '+auth.access,
+          }
+        }).then((response)=>{
           console.log(response.data)
           const url = response.data.download_url
           const link = document.createElement('a')

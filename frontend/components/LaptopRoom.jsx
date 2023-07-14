@@ -732,7 +732,7 @@ function LaptopRoom(props) {
               >
                 <div
                   id="video-section"
-                  className="w-full h-full top-0  absolute z-[0] transition-all fade-in-out duration-500 "
+                  className="w-full h-full top-0  absolute !z-[0] transition-all fade-in-out duration-500 "
                 >
                   <VideoGrid
                     length={props.participants.length}
