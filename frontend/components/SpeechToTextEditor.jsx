@@ -7,6 +7,7 @@ export default function SpeechToTextEditor({
   props,
   transcript,
   OpenTextEditor,
+  listening
 }) {
   const {auth} = useContext(Context)
   const [loading,setloading] = useState(false)
