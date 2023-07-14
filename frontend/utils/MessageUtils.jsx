@@ -75,10 +75,10 @@ const addMessageToChatHistory = (userSocketId, data) => {
 
 
 
-export const sendMessage = (message, peers,type) => {
+export const sendMessage = (message, peers,type,TagDetails) => {
     if (message.length > 0) {
 
-        sendMessageUsingDataChannel(message, peers,type)
+        sendMessageUsingDataChannel(message, peers,type,TagDetails)
         document.getElementById('sendInput').value = null
     }
 }
@@ -89,29 +89,29 @@ export const appendNewMessage = async (message) => {
 }
 
 
-const sendMessageUsingDataChannel = (messageContent, peers,type) => {
+const sendMessageUsingDataChannel = (messageContent, peers,type,TagDetails) => {
     
     const identity = store.getState().identity
     let localMessageData;
     let messageData;
-    if(type === "message"){
         localMessageData = {
             content: messageContent,
             identity: identity,
-            messageCreatedByMe: true
+            messageCreatedByMe: true,
+            tagged:TagDetails?.tagged,
+            taggedBy:TagDetails?.taggedBy,
+            taggedTo:TagDetails?.taggedTo,
+            taggedMessage:TagDetails?.taggedMessage,
         }
     
         messageData = {
-    
             content: messageContent,
             identity: identity,
+            tagged:TagDetails?.tagged,
+            taggedBy:TagDetails?.taggedBy,
+            taggedTo:TagDetails?.taggedTo,
+            taggedMessage:TagDetails?.taggedMessage,
         }
-    }
-    else if(type === "file"){
-        
-    }
-    
-    
     appendNewMessage(localMessageData)
     const Chat_Area = document.getElementById('Chat_Area')
     setTimeout(() => {

@@ -10,7 +10,9 @@ body {
   background: white !important;
 }
 
-
+#emoji{
+  font-size:30px;
+}
 .wave {
   position: fixed;
   bottom: 0;

@@ -32,6 +32,7 @@ specifiers:
   chrome-remote-interface: ^0.32.2
   clmtrackr: ^1.1.2
   docxtemplater: ^3.37.12
+  emoji-picker-react: ^4.4.9
   eslint: 8.42.0
   eslint-config-next: 13.4.4
   express: ^4.18.2
@@ -119,6 +120,7 @@ dependencies:
   chrome-remote-interface: 0.32.2
   clmtrackr: 1.1.2
   docxtemplater: 3.37.12
+  emoji-picker-react: 4.4.9_react@18.2.0
   eslint: 8.42.0
   eslint-config-next: 13.4.4_tizxnkcvjrb4cldxgwq5h3lj5u
   express: 4.18.2
@@ -4501,6 +4503,16 @@ packages:
 
   /emitter-component/1.1.1:
     resolution: {integrity: sha512-G+mpdiAySMuB7kesVRLuyvYRqDmshB7ReKEVuyBPkzQlmiDiLrt7hHHIy4Aff552bgknVN7B2/d3lzhGO5dvpQ==}
+    dev: false
+
+  /emoji-picker-react/4.4.9_react@18.2.0:
+    resolution: {integrity: sha512-ef9MfzSJy5xrzihLLv0e1zZmiNtcekubctTBQVfIpvKfsfu4iLBBzcHCmOC2IaUVBCZuUw+GM24BAPj1MdCQXQ==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      react: '>=16'
+    dependencies:
+      clsx: 1.2.1
+      react: 18.2.0
     dev: false
 
   /emoji-regex/8.0.0:

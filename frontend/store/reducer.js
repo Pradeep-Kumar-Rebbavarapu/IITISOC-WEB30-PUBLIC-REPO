@@ -11,6 +11,7 @@ const initState = {
   activeConversations:null,
   directChatHistory:[],
   Transcript:"",
+  Emoji:[]
 };
 
 const reducer = (state = initState, action) => {
@@ -54,6 +55,10 @@ const reducer = (state = initState, action) => {
     case Actions.SET_TRANSCRIPT:
       return {
         ...state,Transcript:action.Transcript
+      }
+    case Actions.SET_EMOJI:
+      return {
+        ...state,Emoji:action.Emoji
       }
     default:
       return state;

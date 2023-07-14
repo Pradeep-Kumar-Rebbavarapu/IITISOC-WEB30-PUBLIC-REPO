@@ -9,6 +9,7 @@ import { store } from '../store/store'
 
 import MessageToast from '../components/MessageToast'
 import { setTranscript } from '../store/actions'
+import EmojiToast from '../components/EmojiToast'
 
 const getConfiguration = () => {
     return {
@@ -135,6 +136,30 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
         const oldTranscript = store.getState().Transcript
         store.dispatch(setTranscript(`<div>${oldTranscript} ${transcript}</div>`))
     }
+    else if(peerdata.toString().includes('emoji')){
+        const data = JSON.parse(peerdata);
+        console.log(data)
+        toast(<EmojiToast emoji={data.data} name={data.identity}/>, {
+            position: "bottom-left",
+            autoClose: 800,
+            hideProgressBar: true,
+            closeOnClick: false,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "colored",
+            closeButton: false ,
+            style: {
+                maxWidth: 'fit-content',
+                maxHeight: 'fit-content',
+                backgroundColor: 'transparent',
+                left: '30%',
+                
+                bottom: '120px'
+            }
+
+        });
+    }
 }
 
 const addStream = (stream, connUserSocketId, innerWidth, length_of_participants) => {
@@ -208,7 +233,7 @@ const SignalPeerData = (socket, data) => {
 }
 
 
-export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap) => {
+export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap,) => {
 
     const configuration = getConfiguration()
 

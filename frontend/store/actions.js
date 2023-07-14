@@ -8,7 +8,8 @@ const Actions = {
     SET_MESSAGES:'SET_MESSAGES',
     SET_ACTIVE_CONVERSATION:'SET_ACTIVE_CONVERSATION',
     SET_DIRECT_CHAT_HISTORY:'SET_DIRECT_CHAT_HISTORY',
-    SET_TRANSCRIPT:'SET_TRANSCRIPT'
+    SET_TRANSCRIPT:'SET_TRANSCRIPT',
+    SET_EMOJI:'SET_EMOJI',
   };
   
   export const setIsRoomHost = (isRoomHost) => {
@@ -73,6 +74,12 @@ const Actions = {
     return {
       type:Actions.SET_TRANSCRIPT,
       Transcript
+    }
+  }
+  export const setEmoji = (Emoji) =>{
+    return {
+      type:Actions.Emoji,
+      Emoji
     }
   }
   export default Actions;
