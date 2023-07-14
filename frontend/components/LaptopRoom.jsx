@@ -371,7 +371,7 @@ function LaptopRoom(props) {
     const VideoSection = document.getElementById("video-section");
     const TextEditor = document.getElementById("TextEditor");
     BoardSection.className =
-      "w-full h-full top-[0px] absolute z-[100000000]  transition-all fade-in-out duration-500";
+      "w-full h-full top-[0px] absolute z-[100]  transition-all fade-in-out duration-500";
   };
 
   if (overlay) {
