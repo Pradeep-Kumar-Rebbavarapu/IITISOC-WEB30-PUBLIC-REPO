@@ -14,7 +14,7 @@ export default function SpeechToTextEditor({
   const handleSummarizeAndDownload = () => {
     setloading(true)
     const prompt = `
-    Can u Summarize My Below Paragraph,Make the Content of the Paragraph More Professional,More Understandable to Layman People,Check Any Gramatical Mistakes and Also Correct Words Which Are Of No Meaning And Return In HTML Format No Matter What Ever the Paragraph Is , The Final Single Output With No Errors.
+    Can u Summarize My Below Paragraph No Matter What Ever It Is,Make the Content of the Paragraph More Professional,More Understandable to Layman People,Check Any Gramatical Mistakes and Also Correct Words Which Are Of No Meaning And Return In HTML Format No Matter What Ever the Paragraph Is , The Final Single Output With No Errors.
     paragraph = ${parse(props.Transcript)}
     `;
     axios
