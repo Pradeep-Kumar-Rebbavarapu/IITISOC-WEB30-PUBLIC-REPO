@@ -240,7 +240,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
     if(IceServers.current){
         configuration = configuration.iceServers.concat(IceServers.current)
     }
-    console.log('configuration',configuration')
+    console.log('configuration',configuration)
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
