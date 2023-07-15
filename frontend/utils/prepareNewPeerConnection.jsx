@@ -240,19 +240,19 @@ const SignalPeerData = (socket, data) => {
 
 
 export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap,) => {
-
-    const configuration = getConfiguration()
-
+    
+    let configuration = getConfiguration()
+    if(IceServers.current){
+        configuration = configuration.iceServers.concat(IceServers.current)
+    }
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
-
+        trickle: true,
         stream: streamToUse,
+        config: configuration
     })
-
     peers.current[connUserSocketId] = peer
-
-    
     peers.current[connUserSocketId].on('signal', (data) => {
 
         const SignalData = {

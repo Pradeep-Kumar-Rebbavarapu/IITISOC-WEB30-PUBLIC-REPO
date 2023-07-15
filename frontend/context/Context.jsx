@@ -30,7 +30,7 @@ export const ContextProvider = ({ children }) => {
     const [PageLoading,setPageLoading] = useState(true)
     const Logout = () => {
 		setauth(null)
-		Cookies.remove('user_details')
+		Cookies.remove('user')
 		Cookies.remove('auth')
 		localStorage.clear()
 	}

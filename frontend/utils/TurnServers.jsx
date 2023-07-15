@@ -2,7 +2,7 @@ import axios from "axios";
 
 let TurnIceServers = null;
 
-export const fetchTurnCredentials = () => {
+export const fetchTurnCredentials = async () => {
     return axios.get('https://www.pradeeps-video-conferencing.store/api/v1/TurnServers/').then((response) => {
         console.log(response.data)
         TurnIceServers = response.data

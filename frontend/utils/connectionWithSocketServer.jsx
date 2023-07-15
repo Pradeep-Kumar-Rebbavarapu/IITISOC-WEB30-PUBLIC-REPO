@@ -8,6 +8,7 @@ import { getLocalPreviewAndInitRoomConnection } from "./GetLocalPreviewAndInitRo
 import { appendNewMessageToChatHistory } from "./MessageUtils"
 import { handleReceiveData } from "./ShareFileUtils"
 import MessageToast from "../components/MessageToast"
+import { fetchTurnCredentials } from "./TurnServers"
 export const handleDisconnectedUser = (peers, socketId) => {
     const VideoGrid = document.getElementById('VideoGrid')
 
@@ -36,7 +37,8 @@ const handleSignallingData = (peers, data) => {
 
 let array = []
 
-export const connectionWithSocketServer = (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth,user, roomID, setoverlay, title,setDownloadingText,BoardMap,setroomHostUsername,roomHostUsername,setPeerUsername,PeerUsername,RoomCapacity) => {
+export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth,user, roomID, setoverlay, title,setDownloadingText,BoardMap,setroomHostUsername,roomHostUsername,setPeerUsername,PeerUsername,RoomCapacity) => {
+    IceServers.current = await fetchTurnCredentials()
     socket.current = new WebSocket(`wss://www.pradeeps-video-conferencing.store/ws/chat/${roomID}`)
 
     socket.current.onopen = () => {
