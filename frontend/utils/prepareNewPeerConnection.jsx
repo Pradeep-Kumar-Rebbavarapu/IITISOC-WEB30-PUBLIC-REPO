@@ -15,11 +15,6 @@ const getConfiguration = () => {
     return {
         iceServers: [
             { url: 'stun:stun.www.pradeeps-video-conferencing.store' },
-            {
-                url: 'turn:turn.www.pradeeps-video-conferencing.store',
-                credential: '1234',
-                username: 'pradeepkumar'
-            },
         ]
     }
 }
@@ -245,6 +240,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
     if(IceServers.current){
         configuration = configuration.iceServers.concat(IceServers.current)
     }
+    console.log('configuration',configuration')
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
@@ -252,9 +248,10 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         stream: streamToUse,
         config: configuration
     })
+    console.log('peer ',peer)
     peers.current[connUserSocketId] = peer
     peers.current[connUserSocketId].on('signal', (data) => {
-
+        console.log('signal data',data)
         const SignalData = {
             signal: data,
             connUserSocketId: connUserSocketId
