@@ -39,8 +39,6 @@ let array = []
 
 export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth,user, roomID, setoverlay, title,setDownloadingText,BoardMap,setroomHostUsername,roomHostUsername,setPeerUsername,PeerUsername,RoomCapacity) => {
     IceServers.current = await fetchTurnCredentials()
-    socket.current = new WebSocket(`wss://www.pradeeps-video-conferencing.store/ws/chat/${roomID}`)
-
     socket.current.onopen = () => {
         socket.current.send(JSON.stringify({
             "type": "get-socket-id",

@@ -271,6 +271,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers,BoardMap)
     });
     peers.current[connUserSocketId].on('error', err => {
+        window.location.href = '/CreateRoomPage'
         console.error('An error occurred:', err);
     });
 }
