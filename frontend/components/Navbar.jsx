@@ -11,9 +11,10 @@ import { useContext } from 'react'
 import dynamic from 'next/dynamic'
 import {HiBarsArrowDown} from 'react-icons/hi2'
 import OffCanvasNavbar from "./OffCanvasNavbar"
+import { useRouter } from 'next/router'
 const NavbarEle = () => {
 	const { auth, setauth,Logout } = useContext(Context)
-
+	const router = useRouter()
 	const ref = useRef(null);
 	useEffect(() => {
 		const handleClicKOutsideOffcanvas = (e) => {
@@ -40,7 +41,7 @@ const NavbarEle = () => {
 	return (
 		<>
 
-			<div className='h-full w-full py-2 justify-between mb-2   items-center grid grid-cols-[auto_auto]  bg-white z-[100000000]'>
+			<div className={`h-full w-full py-2 justify-between mb-2   items-center grid grid-cols-[auto_auto]  bg-white z-[100000000] ${router.pathname.includes('/RoomPage')?"hidden":""}`}>
 
 				<div className='rounded-md w-fit ml-2 font-bold text-2xl '>
 					<span className='text-4xl'>C</span>onferoLive

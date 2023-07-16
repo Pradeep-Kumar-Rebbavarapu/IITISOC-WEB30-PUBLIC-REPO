@@ -1,7 +1,7 @@
 
 
 from django.urls import path,re_path
-from .views import Login,Signup,GetUserDetails,VerifyOTP,GetRoomDetails,TurnServers,UserStatus,CheckIfRoomExists,TokenRefresh,CheckIfHostHasJoinedRoom,ConvertHtmlToDocx
+from .views import Login,Signup,GetUserDetails,VerifyOTP,GetRoomDetails,TurnServers,UserStatus,CheckIfRoomExists,TokenRefresh,CheckIfHostHasJoinedRoom,ConvertHtmlToDocx,ChangeRoomCapacity
 from dj_rest_auth.registration.views import RegisterView, VerifyEmailView
 from dj_rest_auth.views import LoginView, LogoutView
 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('CheckIfHostHasJoinedRoom/',CheckIfHostHasJoinedRoom.as_view()),
     path('GetUserDetails/',GetUserDetails.as_view()),
     path('ConvertHtmlToDocx/',ConvertHtmlToDocx.as_view()),
+    path('ChangeRoomCapacity',ChangeRoomCapacity.as_view()),
 ]

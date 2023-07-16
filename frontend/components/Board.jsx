@@ -530,14 +530,9 @@ export default function Board({ peers, BoardMap }) {
 						}}
 						onClick={() => {
 							const boardSection = document.getElementById("board-section");
-							const videoSection = document.getElementById("video-section");
-							const textEditor = document.getElementById("TextEditor");
-							videoSection.className =
-								"w-full h-full absolute left-[0px] z-[100] transition-all fade-in-out duration-500";
+							
 							boardSection.className =
 								"w-full h-full top-[-1000px] absolute z-[100000]  transition-all fade-in-out duration-500";
-							textEditor.className =
-								"w-full h-full absolute left-[-2000px] z-[100] transition-all fade-in-out duration-500";
 						}}
 					>
 						Close Board

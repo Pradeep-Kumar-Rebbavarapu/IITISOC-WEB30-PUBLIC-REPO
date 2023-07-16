@@ -16,8 +16,10 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
     
 
     navigator.mediaDevices.getUserMedia(defaultControls).then((stream) => {
-
+        
+       
         localStream.current = stream;
+        
         setoverlay(false)
         isRoomHost?createNewRoom(socket,auth,user, roomID, isRoomHost,title,RoomCapacity):JoinRoom(socket, auth,user, roomID,length_of_participants)
 

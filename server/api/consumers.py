@@ -127,6 +127,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def create_new_room(self, data):
         RoomCapacity = data['RoomCapacity']
         username = data['username']
+        title = data['title']
         user = self.get_user(username)
         if user is not None:
             userInstance = await self.get_user_instance(username)
@@ -160,9 +161,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
             response = {
                 'type': 'room-update',
+                'RoomCapacity': RoomCapacity,
+                'title':title,
+                'roomID': room_id,
                 'connectedUsers': newRoom["connectedUsers"],
             }
-            room = await self.save_room_and_user(room_id, room_name, userInstance, userInstance,RoomCapacity)
+            room = await self.save_room_and_user(room_id,title, userInstance, userInstance,RoomCapacity)
             await database_sync_to_async(room.save)()
             await self.send_json_to_room(room_id, response)
     @database_sync_to_async
@@ -174,6 +178,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         username = data['username']
         user = self.get_user(username)
+        
         
         if user is not None:
             room_id = data['roomID']
@@ -232,13 +237,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     connectedUsers.append(newUser)
                 if old_room is None:
                     #update participants in host room
-                    new_room = await self.save_room_and_user(room_id, room_id, CreatedUserInstance, JoineduserInstance,created_room.capacity)
+                    new_room = await self.save_room_and_user(room_id,created_room.name, CreatedUserInstance, JoineduserInstance,created_room.capacity)
                     await database_sync_to_async(new_room.save)()
                 else:
                     room2 = await self.save_participants(created_room)
                     await database_sync_to_async(room2.save)()
                 response = {
                     'type': 'room-update',
+                    'RoomCapacity': created_room.capacity,
+                    'roomID': room_id,
+                    'title':created_room.name,
                     'connectedUsers': room["connectedUsers"],
                 }
                 await self.send_json_to_room(room_id, response)
@@ -306,9 +314,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def SignallingHandler(self, data):
         signal = data['signal']
         connUserSocketId = data['connUserSocketId']
+        video = data['video']
         response = {
             "type": "conn-signal",
             "signal": signal,
+            "video":video,
             "connUserSocketId": self.channel_name
         }
         await self.send_json_to_user(connUserSocketId, response)

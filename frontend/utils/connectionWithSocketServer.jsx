@@ -9,36 +9,43 @@ import { appendNewMessageToChatHistory } from "./MessageUtils"
 import { handleReceiveData } from "./ShareFileUtils"
 import MessageToast from "../components/MessageToast"
 import { fetchTurnCredentials } from "./TurnServers"
-export const handleDisconnectedUser = (peers, socketId) => {
+export const handleDisconnectedUser = async (peers, socketId) => {
+    
     const VideoGrid = document.getElementById('VideoGrid')
-
-
+    
     const remotevideo = document.getElementById(`v_${socketId}`)
+    const fakeRemoteVideo = document.getElementById(`fake_${socketId}`)
+   
     if (remotevideo) {
+        
         const tracks = remotevideo.srcObject.getTracks()
-        tracks.forEach(t => t.stop())
-
+        if(tracks.length>0){    
+            await tracks.forEach(t => t.stop())
+        }
         remotevideo.srcObject = null
         remotevideo.muted = true
+        VideoGrid.removeChild(fakeRemoteVideo)
         VideoGrid.removeChild(remotevideo)
     }
     if (peers.current[socketId]) {
-        peers.current[socketId].destroy();
+        await peers.current[socketId].destroy();
     }
+    
     delete peers.current[socketId]
-
 }
 
 
 
 const handleSignallingData = (peers, data) => {
     peers.current[data.connUserSocketId].signal(data.signal)
+    
 }
 
 let array = []
 
-export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth,user, roomID, setoverlay, title,setDownloadingText,BoardMap,setroomHostUsername,roomHostUsername,setPeerUsername,PeerUsername,RoomCapacity) => {
-    IceServers.current = await fetchTurnCredentials()
+export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth,user, roomID, setoverlay, title,setDownloadingText,BoardMap,setroomHostUsername,roomHostUsername,setPeerUsername,PeerUsername,RoomCapacity,setRoomDetails,peervideo) => {
+   
+    // IceServers.current = await fetchTurnCredentials()
     socket.current = new WebSocket(`wss://www.pradeeps-video-conferencing.store/ws/chat/${roomID}`)
 
     socket.current.onopen = () => {
@@ -57,16 +64,21 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
             store.dispatch(setSocketId(data.socketId))
         }
         else if (type === "room-update") {
-
-            const { connectedUsers } = data;
-
+            
+            const { connectedUsers,roomID,title,roomCapacity } = data;
+            setRoomDetails({
+                roomID:roomID,
+                title:title,
+                roomCapacity:roomCapacity
+            })
+            
             localStorage.setItem('participants_length', connectedUsers.length)
             store.dispatch(setParticipants(connectedUsers))
         }
         else if (type == "conn-prepare") {
-            const { connUserSocketId,connUserIdentity } = data
+            const { connUserSocketId,connUserIdentity,PeerAudio,PeerVideo } = data
             toast.info(`${connUserIdentity} has joined the meeting`,{position:toast.POSITION.TOP_LEFT})
-            prepareNewPeerConnection(socket, peers, connUserSocketId, false, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText,BoardMap)
+            prepareNewPeerConnection(socket, peers, connUserSocketId, false, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText,BoardMap,localStream.current.getVideoTracks()[0].enabled,peervideo)
             socket.current.send(JSON.stringify({
                 "type": 'conn-init',
                 data: {
@@ -76,14 +88,17 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
             }))
         }
         else if (type == "conn-signal") {
+            
 
-
-            const { signal, connUserSocketId } = data
+            const { signal, connUserSocketId,video } = data
+            peervideo.current = video
+            console.log('data',data)
             handleSignallingData(peers, data)
         }
         else if (type === "conn-init") {
             const { connUserSocketId,connUserIdentity } = data
-            prepareNewPeerConnection(socket, peers, connUserSocketId, true, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText,BoardMap)
+            
+            prepareNewPeerConnection(socket, peers, connUserSocketId, true, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants,setDownloadingText,BoardMap,localStream.current.getVideoTracks()[0].enabled,peervideo)
             
         }
         else if (type === "user-disconnected") {

@@ -258,3 +258,20 @@ class ConvertHtmlToDocx(APIView):
 
         # Return the download URL in a JSON response
         return Response({'download_url': download_url})
+    
+
+class ChangeRoomCapacity(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        data = request.data
+        user = request.user
+        room_id = data['roomID']
+        capacity = data['capacity']
+        room = Room.objects.filter(room_id = room_id).filter(user = user).first()
+        if room is not None:
+            room.capacity = capacity
+            room.save()
+            return Response({capacity:capacity},status=status.HTTP_200_OK)
+        else:
+            return Response('Room Not Found',status=status.HTTP_500_INTERNAL_SERVER_ERROR)

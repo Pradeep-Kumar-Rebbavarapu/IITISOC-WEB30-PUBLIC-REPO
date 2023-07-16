@@ -163,11 +163,37 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     }
 }
 
-const addStream = (stream, connUserSocketId, innerWidth, length_of_participants) => {
+const addStream = (stream, connUserSocketId, innerWidth, length_of_participants,video,peervideo) => {
     
+    console.log('peervideo',peervideo.current)
+    const fakevideo = document.createElement('video')
+    const div = document.createElement('div')
+    div.id = `div_${connUserSocketId}`
+    div.style.width = "100%"
+    div.style.height = "100%"
+    div.style.maxWidth = "100%"
+    div.style.maxHeight = "100%"
+    div.style.minWidth = "100%"
+    div.style.minHeight = "100%"
+    div.style.backgroundColor = "#D3D3D3"
+    div.style.borderRadius = "10px"
+    div.append(fakevideo)
+    
+    fakevideo.id = `fake_${connUserSocketId}`
+    fakevideo.style.width = "100%"
+    fakevideo.style.height = "100%"
+    fakevideo.style.maxWidth = "100%"
+    fakevideo.style.maxHeight = "100%"
+    fakevideo.style.minWidth = "100%"
+    fakevideo.style.minHeight = "100%"
+    fakevideo.style.backgroundColor = "#D3D3D3"
+    fakevideo.style.borderRadius = "10px"
+    fakevideo.style.display = 'none'
+    fakevideo.style.objectFit = "cover"
+
     const remoteVideo = document.createElement('video')
+    div.append(remoteVideo)
     remoteVideo.id = `v_${connUserSocketId}`
-    const VideoGrid = document.getElementById('VideoGrid')
     remoteVideo.autoplay = true;
     remoteVideo.playsInline = true
     remoteVideo.srcObject = stream;
@@ -179,40 +205,19 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants)
     remoteVideo.style.maxHeight = "100%";
     remoteVideo.style.minWidth = "100%";
     remoteVideo.style.minHeight = "100%";
-
     remoteVideo.style.borderRadius = "10px"
 
-    
+    if(peervideo.current === false){
+        remoteVideo.style.display = 'none'
+        fakevideo.style.display = 'block'
+    }
+    else{
+        remoteVideo.style.display = 'block'
+        fakevideo.style.display = 'none'
+    }
+    const VideoGrid = document.getElementById('VideoGrid')
+    VideoGrid.append(div)
 
-
-
-    const numVideos = localStorage.getItem('participants_length');
-
-
-    // if (innerWidth < 1000) {
-
-    //     let columns = 1;
-    //     if (numVideos <= 2) columns = 1
-    //     if (numVideos > 2 && numVideos <= 4) columns = 2;
-    //     else if (numVideos > 4 && numVideos <= 8) columns = 3;
-    //     else if (numVideos > 8 && numVideos <= 16) columns = 3;
-    //     else if (numVideos > 16 && numVideos <= 35) columns = 4;
-    //     VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-    // }
-    // else if (innerWidth > 1000) {
-
-    //     let columns = 1;
-    //     if (numVideos === 1) columns = 1
-    //     else if (numVideos > 1 && numVideos <= 4) columns = 2;
-    //     else if (numVideos > 4 && numVideos <= 9) columns = 3;
-    //     else if (numVideos > 9 && numVideos <= 16) columns = 4;
-    //     else if (numVideos > 16 && numVideos <= 25) columns = 5;
-    //     VideoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-    // }
-
-
-
-    VideoGrid.append(remoteVideo)
 
     remoteVideo.onloadedmetadata = () => {
         remoteVideo.play()
@@ -234,7 +239,7 @@ const SignalPeerData = (socket, data) => {
 }
 
 
-export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap,) => {
+export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap,video,peervideo) => {
     
     let configuration = getConfiguration()
     if(IceServers.current){
@@ -248,27 +253,28 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         stream: streamToUse,
         config: configuration
     })
-    console.log('peer ',peer)
+    console.log('peer before transfer',peer)
     peers.current[connUserSocketId] = peer
     peers.current[connUserSocketId].on('signal', (data) => {
+       
         console.log('signal data',data)
         const SignalData = {
             signal: data,
-            connUserSocketId: connUserSocketId
+            connUserSocketId: connUserSocketId,
+            video:video
         }
         SignalPeerData(socket, SignalData)
     })
-
+    console.log('peer after transfer',peer)
 
     peers.current[connUserSocketId].on('stream', (stream) => {
-
-        addStream(stream, connUserSocketId, innerWidth, length_of_participants);
+        console.log(stream)
+        addStream(stream, connUserSocketId, innerWidth, length_of_participants,video,peervideo);
     })
     peers.current[connUserSocketId].on('data', (peerdata) => {
         handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers,BoardMap)
     });
     peers.current[connUserSocketId].on('error', err => {
-        window.location.href = '/CreateRoomPage'
         console.error('An error occurred:', err);
     });
 }
