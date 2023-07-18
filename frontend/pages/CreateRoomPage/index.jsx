@@ -61,6 +61,13 @@ export default function index() {
 								localStorage.setItem('roomcapacity',e.target.value)
 								setRoomCapacity(e.target.value)
 								
+							}} onKeyDown={(e)=>{
+								const charCode = e.charCode;
+
+								if (charCode < 48 || charCode > 57) {
+									e.preventDefault();
+									
+								}
 							}} id="RoomCapacity" name='RoomCapacity' type="number" placeholder='Room Capacity' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none   z-1 transition-all fade-in-out duration-500' />
 						</div>
 					</div>
@@ -75,7 +82,7 @@ export default function index() {
 						<div>
 							<input onChange={(e)=>{
 								setJoinRoomID(e.target.value)
-							}} id="roomID" name="roomID" type="text" placeholder='Enter The Room ID' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none z-1 w-full lg:w-[250px] transition-all fade-in-out duration-500' />
+							}} id="roomID" name="roomID" type="text" placeholder='Enter The Room ID' className=' h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none z-1 w-full lg:w-[250px] transition-all fade-in-out duration-500' />
 						</div>
 					</div>
 					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>

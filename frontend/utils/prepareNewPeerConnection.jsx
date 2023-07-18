@@ -22,6 +22,7 @@ const getConfiguration = () => {
     return {
         iceServers: [
             { url: 'stun:stun.www.pradeeps-video-conferencing.store' },
+            
         ]
     }
 }
@@ -172,10 +173,12 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     else if (peerdata.toString().includes('micon')) {
         const data = JSON.parse(peerdata);
         document.getElementById('MicSymbol_' + data.socketId).className = 'absolute w-full h-full  rounded-full ring-8 ring-opacity-50 border-2 border-black ring-orange-500 animate-ping'
+        document.getElementById('Mic_Symbol_Real_' + data.socketId).className = 'absolute w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white ring-4  ring-opacity-50 ring-orange-500 border-2 border-black animate-ping'
     }
     else if (peerdata.toString().includes('micoff')) {
         const data = JSON.parse(peerdata);
         document.getElementById('MicSymbol_' + data.socketId).className = 'absolute w-full h-full  rounded-full'
+        document.getElementById('Mic_Symbol_Real_' + data.socketId).className = 'absolute w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white'
     }
     else if(peerdata.toString().includes('screen-share-on')){
         const data = JSON.parse(peerdata);
@@ -284,7 +287,9 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants,
     div.id = `${connUserSocketId}_div`
     const htmlString = `<div id='video_container_${connUserSocketId}' class="rounded-md relative">
                     <div class="top-0 absolute w-full  text-center h-full  hover:bg-opacity-50 transition-all fade-in-out group  z-[10000]">
-                    <div class="font-bold p-2">${connUserIdentity}</div>
+                    <div id="Mic_Symbol_Real_${connUserSocketId}" className="font-bold w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white">
+                    <div className="absolute w-full px-10 py-4  h-full rounded-b-full top-0 left-0"></div>
+                    ${connUserIdentity}</div>
                         <div class="">
                                 <div id="PinBtn_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
                                 <div id="Full_Screen_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>

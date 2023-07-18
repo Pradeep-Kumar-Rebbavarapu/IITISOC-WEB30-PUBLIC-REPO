@@ -1,0 +1,11 @@
+curl -X POST -d "grant_type=convert_token&client_id=bLLg55ulISdpUxFSHRotTTULnAImgudzwrw58d3t&client_secret=ZbWRKruARtWEAXGh0sNciF8HIkMiZY7KVC1tO0GxMKQRYG512I1IiAjwsPpe9I5iqHIBvfT6fT7pplO3vAxiN6NYepQ6bT3T5TRV2tYwAWvMyv8CzcAaDqdJwoyLrRpb&backend=facebook&token=EAAILf8mecyoBAAq3DYAUDZArj974ZBV4KKEy9AOYZBzvEOWEdOfObpVl43IXJzhc4AeTDiXUPt8liBScsYnT6WeXDPzGMJZBUhGGNmTaV77EYpvIsJdN6G06gwvNJYv2vGgTBntV0vXe1iLtXkVXqkt2X8sb62cINKC73HlHCVnBljF42HzI9GVFZBDNs3DgZD" http://localhost:8000/auth/convert-token
+
+
+
+curl -X POST -d "grant_type=convert_token&client_id=bLLg55ulISdpUxFSHRotTTULnAImgudzwrw58d3t&client_secret=ZbWRKruARtWEAXGh0sNciF8HIkMiZY7KVC1tO0GxMKQRYG512I1IiAjwsPpe9I5iqHIBvfT6fT7pplO3vAxiN6NYepQ6bT3T5TRV2tYwAWvMyv8CzcAaDqdJwoyLrRpb&backend=google-oauth2&token=4/0AZEOvhUoNjOOPZJTy8E7h3UHjjRxWMIvVdsQAGEfYuLYxKsNZhcd-10Q8XGHBeDEN6KOMQ" http://localhost:8000/auth/convert-token
+
+
+https://accounts.google.com/o/oauth2/auth?client_id=106702296957-om2ja3dqros1vprnuqc2ua3a7rieuhs5.apps.googleusercontent.com&redirect_uri=http://localhost:3000/google&state=fQpShXa1qN4DSkonnwkr0ohom3OJRBf8&response_type=code&scope=https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid+openid+email+profile
+
+
+

@@ -58,10 +58,12 @@ export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pi
 			className={`h-full w-full px-2 !z-[10]  py-2 rounded-md my-auto justify-center mx-auto items-center grid gap-2 grid-cols-1 ${length === 1 || length===0 ? "grid-cols-1" : "lg:grid-cols-2"} `}
 			ref={videoGridRef}
 		>
-			<div id="my_div" className="h-full w-full flex items-center justify-center rounded-md ">
-				<div id='my_video_container' className=" rounded-md relative">
+			<div id="my_div" className="h-full w-full flex items-center justify-center rounded-md overflow-hidden">
+				<div id='my_video_container' className=" rounded-md relative overflow-hidden">
 					<div className="absolute z-[10000] rounded-md top-0 text-center  w-full h-full transition-all fade-in-out group">
-						<div className={`p-2 font-bold border-2 border-red-500`}>{props.identity}</div>
+						<div className={` font-bold w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white `}>
+							<div className={`absolute w-full px-10 py-4  h-full ${MicOn?"ring-4  ring-opacity-50 ring-orange-500 border-2 border-black animate-ping":""} rounded-b-full top-0 left-0`}></div>
+							{props.identity}</div>
 						<div className="">
 							<div className="group-hover:flex hidden w-full h-full  " >
 								<AiFillPushpin onClick={() => {
