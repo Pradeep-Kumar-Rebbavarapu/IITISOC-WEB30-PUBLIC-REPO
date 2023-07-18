@@ -56,17 +56,16 @@ export default function index() {
 							}} id="title" name='title' type="text" placeholder='Title Of Your Room' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto  outline-none   z-1 transition-all fade-in-out duration-500' />
 						</div>
 						<div>
-							<input onChange={(e)=>{
+							<input min="0" onChange={(e)=>{
 								
 								localStorage.setItem('roomcapacity',e.target.value)
 								setRoomCapacity(e.target.value)
 								
-							}} onKeyDown={(e)=>{
-								const charCode = e.charCode;
+							}} onKeyPress={(event) => {
+								const charCode = event.charCode;
 
 								if (charCode < 48 || charCode > 57) {
-									e.preventDefault();
-									
+									event.preventDefault();
 								}
 							}} id="RoomCapacity" name='RoomCapacity' type="number" placeholder='Room Capacity' className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none   z-1 transition-all fade-in-out duration-500' />
 						</div>

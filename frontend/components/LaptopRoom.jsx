@@ -760,7 +760,7 @@ function LaptopRoom(props) {
 							<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-1000px] transition-all fade-in-out">
 								<div className="my-5">Room Id : {RoomDetails.roomID}</div>
 								<div className="my-5">Current Room Capacity : {RoomDetails.roomCapacity}</div>
-								<div className="my-5">Share Room : <span className="text-white border-2 bg-black p-2 rounded-md">{`http://localhost:3000/${router.asPath}`}</span></div>
+								<div className="my-5">Share Room : <span className="text-white border-2 bg-black p-2 rounded-md">{`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app/${router.asPath}`}</span></div>
 								<input min="0" onKeyPress={(event) => {
 									const charCode = event.charCode;
 
