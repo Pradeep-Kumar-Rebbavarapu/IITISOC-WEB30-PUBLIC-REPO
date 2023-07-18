@@ -6,11 +6,18 @@ import { updateTranscript } from './SpokenData'
 import { toast } from 'react-toastify'
 import { handleData } from './ShareFileTwo'
 import { store } from '../store/store'
-
+import { AiFillPushpin, AiOutlineFullscreen } from 'react-icons/ai'
 import MessageToast from '../components/MessageToast'
 import { setTranscript } from '../store/actions'
 import EmojiToast from '../components/EmojiToast'
-
+import reactElementToJSXString from 'react-element-to-jsx-string';
+import React from 'react'
+import ReactDOM from "react-dom";
+export default function PrePare() {
+    return (
+        <></>
+    )
+}
 const getConfiguration = () => {
     return {
         iceServers: [
@@ -21,7 +28,7 @@ const getConfiguration = () => {
 
 
 
-const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingText,BoardMap) => {
+const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingText, BoardMap) => {
     if (peerdata.toString().includes('File')) {
         const data = JSON.parse(peerdata)
         if (data.first && !data.PrivateMessaging) {
@@ -61,14 +68,14 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     }
     else if (peerdata.toString().includes('videostarted')) {
         const data = JSON.parse(peerdata)
-        const RemoteVideo = document.getElementById(`v_${data.socketId}`);
+        const RemoteVideo = document.getElementById(`video_container_${data.socketId}`);
         const fakeRemoteVideo = document.getElementById(`fake_${data.socketId}`)
         fakeRemoteVideo.style.display = 'none'
         RemoteVideo.style.display = 'block'
     }
     else if (peerdata.toString().includes('videostopped')) {
         const data = JSON.parse(peerdata)
-        const RemoteVideo = document.getElementById(`v_${data.socketId}`);
+        const RemoteVideo = document.getElementById(`video_container_${data.socketId}`);
         const fakeRemoteVideo = document.getElementById(`fake_${data.socketId}`)
         fakeRemoteVideo.style.display = 'block'
         RemoteVideo.style.display = 'none'
@@ -86,10 +93,12 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
             draggable: false,
             theme: "colored",
 
-            style: {
+            style:{
+                maxWidth: 'fit-content',
+                maxHeight: 'fit-content',
                 backgroundColor: '#ff6f00',
                 color: 'white',
-                bottom: '120px'
+                top: '-120px'
             }
 
         });
@@ -98,10 +107,10 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
         const data = JSON.parse(peerdata);
         appendNewMessage(data.messageData)
         const ChatParticipantsBox = document.getElementById('ChatParticipantsBox')
-            const BoardSection = document.getElementById('board-section')
-            const TextEditor = document.getElementById("TextEditor");
-            const PrivateMessaging = document.getElementById("PrivateMessaging");
-            if (ChatParticipantsBox.classList.contains('hidden') || BoardSection.classList.contains('top-[0px]') || TextEditor.classList.contains('left-0') || PrivateMessaging.classList.contains('left-[0px]')) {
+        const BoardSection = document.getElementById('board-section')
+        const TextEditor = document.getElementById("TextEditor");
+        const PrivateMessaging = document.getElementById("PrivateMessaging");
+        if (ChatParticipantsBox.classList.contains('hidden') || BoardSection.classList.contains('top-[0px]') || TextEditor.classList.contains('left-0') || PrivateMessaging.classList.contains('left-[0px]')) {
             toast(<MessageToast identity={data.messageData.identity} content={data.messageData.content} />, {
                 position: "top-right",
                 autoClose: 1000,
@@ -129,18 +138,18 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     }
     else if (peerdata.toString().includes('image')) {
         const data = JSON.parse(peerdata);
-        UpdateBoardCanvas(data, isDrawing,BoardMap)
+        UpdateBoardCanvas(data, isDrawing, BoardMap)
     }
     else if (peerdata.toString().includes('SpokenData')) {
-        const data = JSON.parse(peerdata); 
+        const data = JSON.parse(peerdata);
         const transcript = data.transcript;
         const oldTranscript = store.getState().Transcript
         store.dispatch(setTranscript(`<div>${oldTranscript} ${transcript}</div>`))
     }
-    else if(peerdata.toString().includes('emoji')){
+    else if (peerdata.toString().includes('emoji')) {
         const data = JSON.parse(peerdata);
         console.log(data)
-        toast(<EmojiToast emoji={data.data} name={data.identity}/>, {
+        toast(<EmojiToast emoji={data.data} name={data.identity} />, {
             position: "bottom-left",
             autoClose: 800,
             hideProgressBar: true,
@@ -149,87 +158,207 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
             draggable: false,
             progress: undefined,
             theme: "colored",
-            closeButton: false ,
+            closeButton: false,
             style: {
                 maxWidth: 'fit-content',
                 maxHeight: 'fit-content',
                 backgroundColor: 'transparent',
                 left: '30%',
-                
                 bottom: '120px'
             }
 
         });
     }
+    else if (peerdata.toString().includes('micon')) {
+        const data = JSON.parse(peerdata);
+        document.getElementById('MicSymbol_' + data.socketId).className = 'absolute w-full h-full  rounded-full ring-8 ring-opacity-50 border-2 border-black ring-orange-500 animate-ping'
+    }
+    else if (peerdata.toString().includes('micoff')) {
+        const data = JSON.parse(peerdata);
+        document.getElementById('MicSymbol_' + data.socketId).className = 'absolute w-full h-full  rounded-full'
+    }
+    else if(peerdata.toString().includes('screen-share-on')){
+        const data = JSON.parse(peerdata);
+        toast(`${data.identity} has started screen sharing`, {
+            position: "bottom-center",
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: false,
+            draggable: true,
+            theme: "colored",
+            style:{
+                maxWidth: 'fit-content',
+                maxHeight: 'fit-content',
+                backgroundColor: '#ff6f00',
+                color: 'white',
+                top: '-120px'
+            }
+        })
+    }
+    else if(peerdata.toString().includes('screen-share-off')){
+        const data = JSON.parse(peerdata);
+        toast(`${data.identity} has stopped screen sharing`, {
+            position: "bottom-center",
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: false,
+            draggable: true,
+            theme: "colored",
+            style:{
+                maxWidth: 'fit-content',
+                maxHeight: 'fit-content',
+                backgroundColor: '#ff6f00',
+                color: 'white',
+                top: '-120px'
+            }
+        })
+    }
 }
 
-const addStream = (stream, connUserSocketId, innerWidth, length_of_participants,video,peervideo) => {
-    
-    console.log('peervideo',peervideo.current)
-    const fakevideo = document.createElement('video')
-    const div = document.createElement('div')
-    div.id = `div_${connUserSocketId}`
-    div.style.width = "100%"
-    div.style.height = "100%"
-    div.style.maxWidth = "100%"
-    div.style.maxHeight = "100%"
-    div.style.minWidth = "100%"
-    div.style.minHeight = "100%"
-    div.style.backgroundColor = "#D3D3D3"
-    div.style.borderRadius = "10px"
-    div.append(fakevideo)
-    
-    fakevideo.id = `fake_${connUserSocketId}`
-    fakevideo.style.width = "100%"
-    fakevideo.style.height = "100%"
-    fakevideo.style.maxWidth = "100%"
-    fakevideo.style.maxHeight = "100%"
-    fakevideo.style.minWidth = "100%"
-    fakevideo.style.minHeight = "100%"
-    fakevideo.style.backgroundColor = "#D3D3D3"
-    fakevideo.style.borderRadius = "10px"
-    fakevideo.style.display = 'none'
-    fakevideo.style.objectFit = "cover"
+export const handlePinnedUser = (connUserIdentity, connUserSocketId) => {
+    const videoContainer = document.getElementById(`${connUserSocketId}_div`);
+    const videoGrid = document.getElementById('VideoGrid');
+    const firstVideo = videoGrid.children[0];
+    videoContainer.classList.add('pinned');
+    videoGrid.insertBefore(videoContainer, firstVideo);
+};
 
-    const remoteVideo = document.createElement('video')
-    div.append(remoteVideo)
-    remoteVideo.id = `v_${connUserSocketId}`
+
+export const handleFullScreen = (connUserIdentity, connUserSocketId) => {
+    const videoContainer = document.getElementById(`${connUserSocketId}_div`);
+    const fakeVideo = videoContainer.children[1];
+    const video = videoContainer.children[0];
+    if (videoContainer.classList.contains('full-screen')) {
+        videoContainer.classList.remove('full-screen');
+        fakeVideo.classList.remove('fullscreen-fake');
+        video.children[1].classList.remove('fullscreen-video');
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    } else {
+        videoContainer.classList.add('full-screen');
+        fakeVideo.classList.add('fullscreen-fake');
+        video.children[1].classList.add('fullscreen-video');
+        if (videoContainer.requestFullscreen) {
+            videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+            videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+            videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) {
+            videoContainer.msRequestFullscreen();
+        }
+    }
+
+
+
+
+}
+
+
+const PinBtn = () => {
+    return (
+        <AiFillPushpin className="w-10 text-white h-10 my-4 mx-2 p-2 -translate-y-9 bg-black/20  rounded-full hover:bg-black/50   transition-all fade-in-out duration-500" />
+    )
+}
+
+const FullScreenBtn = () => {
+    return (
+        <AiOutlineFullscreen className="w-10 text-white h-10 my-4 mx-2 p-2 -translate-y-9 bg-black/20  rounded-full hover:bg-black/50   transition-all fade-in-out duration-500" />
+    )
+}
+
+
+
+const addStream = (stream, connUserSocketId, innerWidth, length_of_participants, video, peervideo) => {
+    const participants = store.getState().participants
+    const connUserIdentity = participants.filter(participant => participant.socketId === connUserSocketId)[0].identity
+    const div = document.createElement('div')
+    const VideoGrid = document.getElementById('VideoGrid')
+    div.id = `${connUserSocketId}_div`
+    const htmlString = `<div id='video_container_${connUserSocketId}' class="rounded-md relative">
+                    <div class="top-0 absolute w-full  text-center h-full  hover:bg-opacity-50 transition-all fade-in-out group  z-[10000]">
+                    <div class="font-bold p-2">${connUserIdentity}</div>
+                        <div class="">
+                                <div id="PinBtn_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
+                                <div id="Full_Screen_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
+                            </div>
+                        </div>
+                    <video id="v_${connUserSocketId}" class="h-[400px] my-auto rounded-md"></video>
+                    <video id='${connUserSocketId}_ss_video' class="h-[400px] my-auto rounded-md hidden"></video>
+                </div>
+                <div id='fake_${connUserSocketId}' class="h-full w-full rounded-md flex justify-center relative items-center my-auto mx-auto">
+                    <div class="top-0 absolute w-full  text-center h-full  hover:bg-opacity-50 transition-all fade-in-out group  z-[10000]">
+                    <div class="font-bold p-2">${connUserIdentity}</div>
+                    <div class="">
+							<div id="PinBtn_${connUserSocketId}_fake" class="group-hover:flex hidden w-fit h-fit"></div>
+							<div id="Full_Screen_${connUserSocketId}_fake" class="group-hover:flex hidden w-fit h-fit"></div>
+						</div>
+                    </div>
+                    <div class="w-[100px] h-[100px] border-2 border-orange-500 bg-orange-500 rounded-full relative mx-auto my-auto  text-center flex justify-center items-center pb-2  text-white font-bold text-xl md:text-3xl top-[36%]">${connUserIdentity.slice(0, 1)}
+                    
+                        <div id="MicSymbol_${connUserSocketId}" class="absolute w-full h-full rounded-full"></div>
+                        
+                    </div>
+                </div>`;
+    div.innerHTML = htmlString
+
+    VideoGrid.append(div)
+    div.className = "h-full w-full flex items-center justify-center rounded-md"
+
+    const remoteVideoContainer = document.getElementById(`video_container_${connUserSocketId}`)
+    const remoteVideo = document.getElementById('v_' + connUserSocketId)
+    const fakevideo = document.getElementById('fake_' + connUserSocketId)
+    fakevideo.style.backgroundColor = "#D3D3D3"
+    fakevideo.style.width = `530px`
+    fakevideo.style.height = `400px`;
     remoteVideo.autoplay = true;
     remoteVideo.playsInline = true
     remoteVideo.srcObject = stream;
-    remoteVideo.style.borderRadius = "10px";
-	remoteVideo.style.objectFit = "cover";
-    remoteVideo.style.width = "100%";
-    remoteVideo.style.height = "100%";
-    remoteVideo.style.maxWidth = "100%";
-    remoteVideo.style.maxHeight = "100%";
-    remoteVideo.style.minWidth = "100%";
-    remoteVideo.style.minHeight = "100%";
-    remoteVideo.style.borderRadius = "10px"
 
-    if(peervideo.current === false){
-        remoteVideo.style.display = 'none'
+
+    if (peervideo.current === false) {
+        remoteVideoContainer.style.display = 'none'
         fakevideo.style.display = 'block'
     }
-    else{
-        remoteVideo.style.display = 'block'
+    else {
+        remoteVideoContainer.style.display = 'block'
         fakevideo.style.display = 'none'
     }
-    const VideoGrid = document.getElementById('VideoGrid')
-    VideoGrid.append(div)
 
 
+    const pinBtnFakeElement = document.getElementById(`PinBtn_${connUserSocketId}_fake`);
+    const fullScreenBtnFakeElement = document.getElementById(`Full_Screen_${connUserSocketId}_fake`);
+    const pinBtnElement = document.getElementById(`PinBtn_${connUserSocketId}`);
+    const fullScreenBtnElement = document.getElementById(`Full_Screen_${connUserSocketId}`);
+    ReactDOM.render(PinBtn(), pinBtnElement);
+    ReactDOM.render(FullScreenBtn(), fullScreenBtnElement);
+    ReactDOM.render(PinBtn(), pinBtnFakeElement);
+    ReactDOM.render(FullScreenBtn(), fullScreenBtnFakeElement);
     remoteVideo.onloadedmetadata = () => {
         remoteVideo.play()
     }
-    remoteVideo.addEventListener('click', () => {
-        if (remoteVideo.classList.contains("full_screen")) {
-            remoteVideo.classList.remove("full_screen")
-        }
-        else {
-            remoteVideo.classList.add("full_screen")
-        }
+
+    document.getElementById('Full_Screen_' + connUserSocketId + "_fake").addEventListener('click', () => {
+        handleFullScreen(connUserIdentity, connUserSocketId)
     })
+    document.getElementById('PinBtn_' + connUserSocketId + "_fake").addEventListener('click', () => {
+        handlePinnedUser(connUserIdentity, connUserSocketId)
+    })
+    document.getElementById('Full_Screen_' + connUserSocketId).addEventListener('click', () => {
+        handleFullScreen(connUserIdentity, connUserSocketId)
+    })
+    document.getElementById('PinBtn_' + connUserSocketId).addEventListener('click', () => {
+        handlePinnedUser(connUserIdentity, connUserSocketId)
+    })
+
+
 }
 
 
@@ -239,13 +368,13 @@ const SignalPeerData = (socket, data) => {
 }
 
 
-export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText,BoardMap,video,peervideo) => {
-    
+export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInitiator, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText, BoardMap, video, peervideo) => {
+
     let configuration = getConfiguration()
-    if(IceServers.current){
+    if (IceServers.current) {
         configuration = configuration.iceServers.concat(IceServers.current)
     }
-    console.log('configuration',configuration)
+    console.log('configuration', configuration)
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
@@ -253,26 +382,26 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         stream: streamToUse,
         config: configuration
     })
-    console.log('peer before transfer',peer)
+    console.log('peer before transfer', peer)
     peers.current[connUserSocketId] = peer
     peers.current[connUserSocketId].on('signal', (data) => {
-       
-        console.log('signal data',data)
+
+        console.log('signal data', data)
         const SignalData = {
             signal: data,
             connUserSocketId: connUserSocketId,
-            video:video
+            video: video
         }
         SignalPeerData(socket, SignalData)
     })
-    console.log('peer after transfer',peer)
+    console.log('peer after transfer', peer)
 
     peers.current[connUserSocketId].on('stream', (stream) => {
         console.log(stream)
-        addStream(stream, connUserSocketId, innerWidth, length_of_participants,video,peervideo);
+        addStream(stream, connUserSocketId, innerWidth, length_of_participants, video, peervideo);
     })
     peers.current[connUserSocketId].on('data', (peerdata) => {
-        handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers,BoardMap)
+        handleOnPeerData(peerdata, isDrawing, Transcript, setDownloadingText, peers, BoardMap)
     });
     peers.current[connUserSocketId].on('error', err => {
         console.error('An error occurred:', err);

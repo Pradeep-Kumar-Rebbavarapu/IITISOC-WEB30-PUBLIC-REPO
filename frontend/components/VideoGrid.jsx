@@ -1,124 +1,125 @@
 import useWindowSize from "@rooks/use-window-size";
 import React, { useContext, useEffect, useRef } from "react";
 import Context from "../context/Context";
+import { handleFullScreen, handlePinnedUser } from "../utils/prepareNewPeerConnection";
+import { AiFillPushpin, AiOutlineFullscreen } from 'react-icons/ai'
+export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pinned, setPinned }) {
+	const { roomID, number, audio, video } = useContext(Context);
 
-export default function VideoGrid({ localStream, length }) {
-  const { roomID, number, audio, video } = useContext(Context);
-  const { innerWidth } = useWindowSize();
-  const videoGridRef = useRef(null);
+	const { innerWidth } = useWindowSize();
+	const videoGridRef = useRef(null);
 
-  useEffect(() => {
-    const localVideo = document.createElement("video");
-    const fakeVideo = document.createElement('video')
-	fakeVideo.id = "my_fakevideo";
-	const div = document.createElement("div");
-	div.id = "my_div";
-	div.append(localVideo)
-	div.append(fakeVideo)
-	const videoGrid = document.getElementById("VideoGrid");
-	videoGrid.append(div)
-	localVideo.id = "my_video";
-	localVideo.muted = true;
-	localVideo.autoplay = true;
-	localVideo.playsInline = true;
-    if (video === false) {
-      localVideo.style.display = "none";
-      fakeVideo.style.display = "block";
-    } else {
-      localVideo.style.display = "block";
-      fakeVideo.style.display = "none";
-    }
+	useEffect(() => {
+		const videoGrid = document.getElementById("VideoGrid");
+		const div = document.getElementById("my_div");
+		const localVideo = document.getElementById('my_video');
+		const fakeVideo = document.getElementById('my_fakevideo');
+		const localDiv = document.getElementById('my_video_container')
 
-    localStream.getAudioTracks()[0].enabled = audio;
-    localStream.getVideoTracks()[0].enabled = video;
 
-    localVideo.srcObject = localStream;
-    fakeVideo.style.width = "100%";
-    fakeVideo.style.height = "100%";
-    fakeVideo.style.maxWidth = "100%";
-    fakeVideo.style.maxHeight = "100%";
-    fakeVideo.style.minWidth = "100%";
-    fakeVideo.style.minHeight = "100%";
-    fakeVideo.style.backgroundColor = "#D3D3D3";
-    fakeVideo.style.objectFit = "cover";
-    fakeVideo.style.borderRadius = "10px";
+		localVideo.srcObject = localStream;
 
-    localVideo.style.borderRadius = "10px";
-    localVideo.style.objectFit = "cover";
-    localVideo.autoplay = true;
-    localVideo.playsInline = true;
-    localVideo.style.width = "100%";
-    localVideo.style.height = "100%";
-    localVideo.style.maxWidth = "100%";
-    localVideo.style.backgroundColor = "#D3D3D3";
-    localVideo.style.maxHeight = "100%";
-    localVideo.style.minWidth = "100%";
-    localVideo.style.minHeight = "100%";
+		localStream.getAudioTracks()[0].enabled = audio;
+		localStream.getVideoTracks()[0].enabled = video;
 
-    localVideo.onloadedmetadata = () => {
-      localVideo.play();
-    };
-  }, [localStream]);
 
-  useEffect(() => {
-    // Your logic here for handling length
-  }, [length]);
 
-  return (
-    <div
-      id="VideoGrid"
-      className={`h-full w-full rounded-md my-auto justify-center mx-auto items-center grid gap-4 overflow-x-scroll ${
-        length === 1 ? "grid-cols-1" : length === 2 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-2"
-      }`}
-      ref={videoGridRef}
-    >
-      
-      
-	  
+		if (video === false) {
+			localDiv.style.display = "none";
+			fakeVideo.style.display = "block";
 
-      <style jsx>
-        {`
-          /* Additional styles for video container */
-          #my_video {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            min-width: 100%;
-            min-height: 100%;
-            border-radius: 10px;
-            object-fit: cover;
-            background-color: #d3d3d3;
-          }
+		} else {
+			localDiv.style.display = "block";
+			fakeVideo.style.display = "none";
 
-          /* Additional styles for fake video container */
-          #my_fakevideo {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            min-width: 100%;
-            min-height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-          }
+		}
 
-          /* Additional styles for photo element (video) */
-          #photo {
-            width: 100%;
-            height: 100%;
-            max-width: 100%;
-            max-height: 100%;
-            min-width: 100%;
-            min-height: 100%;
-            border: 2px solid black;
-            border-radius: 50%;
-            margin: auto;
-            padding: 32px;
-          }
-        `}
-      </style>
-    </div>
-  );
+
+		localVideo.muted = true;
+		localVideo.autoplay = true;
+		localVideo.playsInline = true;
+		localVideo.controls = false;
+		localVideo.style.objectFit = "cover";
+
+
+		
+		
+
+		//set fake video height and width
+
+
+	}, [localStream]);
+
+
+
+	return (
+		<div
+			id="VideoGrid"
+			className={`h-full w-full px-2 !z-[10]  py-2 rounded-md my-auto justify-center mx-auto items-center grid gap-2 grid-cols-1 ${length === 1 || length===0 ? "grid-cols-1" : "lg:grid-cols-2"} `}
+			ref={videoGridRef}
+		>
+			<div id="my_div" className="h-full w-full flex items-center justify-center rounded-md ">
+				<div id='my_video_container' className=" rounded-md relative">
+					<div className="absolute z-[10000] rounded-md top-0 text-center  w-full h-full transition-all fade-in-out group">
+						<div className={`p-2 font-bold border-2 border-red-500`}>{props.identity}</div>
+						<div className="">
+							<div className="group-hover:flex hidden w-full h-full  " >
+								<AiFillPushpin onClick={() => {
+								handlePinnedUser(props.identity, 'my')
+							}} className="w-10 text-white h-10 my-4 mx-2 p-2 -translate-y-9 bg-black/20  rounded-full hover:bg-black/50   transition-all fade-in-out duration-500" />
+
+							</div>
+							<div className="group-hover:flex hidden w-full h-full  " >
+								<AiOutlineFullscreen onClick={() => {
+								handleFullScreen(props.identity,"my")
+							}} className="w-10 text-white h-10 my-4 mx-2 p-2 -translate-y-9 bg-black/20  rounded-full hover:bg-black/50   transition-all fade-in-out duration-500" />
+
+							</div>
+						</div>
+					</div>
+					<video id="my_video" className="h-[400px] my-auto rounded-md"></video>
+					<video id='my_ss_video' className="h-[400px] my-auto rounded-md hidden"></video>
+				</div>
+				<div id='my_fakevideo' className="h-[400px] w-[530px] bg-[#D3D3D3] rounded-md flex justify-center relative items-center   my-auto mx-auto ">
+					<div className="top-0 absolute w-full  text-center h-full  hover:bg-opacity-50 transition-all fade-in-out group  z-[10000]">
+						<div className="font-bold p-2">{props.identity}</div>
+						<div className="">
+							<div className="group-hover:flex hidden w-fit h-fit  " >
+								<AiFillPushpin onClick={() => {
+								handlePinnedUser(props.identity, 'my')
+							}} className="w-10 text-white h-10 my-4 mx-2 p-2 -translate-y-9 bg-black/20  rounded-full hover:bg-black/50   transition-all fade-in-out duration-500" />
+
+							</div>
+							<div className="group-hover:flex hidden w-full h-full  " >
+								<AiOutlineFullscreen onClick={() => {
+								handleFullScreen(props.identity,"my")
+							}} className="w-10 text-white h-10 my-4 mx-2 p-2 -translate-y-9 bg-black/20  rounded-full hover:bg-black/50   transition-all fade-in-out duration-500" />
+
+							</div>
+						</div>
+					</div>
+					<div className="w-[100px] h-[100px] border-2 border-orange-500 bg-orange-500 rounded-full relative mx-auto my-auto  text-center flex justify-center b items-center pb-2  text-white font-bold text-xl md:text-3xl top-[36%]">{props.identity.slice(0, 1)}
+
+						<div className={`absolute w-full h-full  rounded-full  ${MicOn && "ring-8 ring-opacity-50 border-2 border-black ring-orange-500 animate-ping"}`}>
+
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+			<style jsx>
+				{`
+          //hide scroll bar
+		  #VideoGrid::-webkit-scrollbar {
+			display: none;
+		  }
+		  video{
+			  object-fit: cover;
+
+		  }
+       `}
+			</style>
+		</div>
+	);
 }

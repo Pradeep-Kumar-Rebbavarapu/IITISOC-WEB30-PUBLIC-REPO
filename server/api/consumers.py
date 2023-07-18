@@ -45,6 +45,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.sendAcceptanceLetter(data)
         elif text_data['type'] == "ask-peer-to-prepare-conn":
             await self.askPeerToPrepareConn(data)
+        elif text_data['type'] == "reject-join-request":
+            await self.rejectJoinRequest(data)
+
+    async def rejectJoinRequest(self, data):
+        connUserSocketId = data['connUserSocketId']
+        response = {
+            "type": "reject-join-request",
+            "connUserSocketId": self.channel_name
+        }
+        await self.send_json_to_user(connUserSocketId, response)
     
     async def askPeerToPrepareConn(self, data):
         connUserSocketId = data['connUserSocketId']

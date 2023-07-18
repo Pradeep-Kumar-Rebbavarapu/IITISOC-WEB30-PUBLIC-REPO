@@ -63,7 +63,7 @@ export default function PrivateMessaing({
   return (
     <div
       id="PrivateMessaging"
-      className="absolute w-full  top-0 bg-white grid grid-rows-[80px_auto]  left-[-2000px] border-0 border-blue-500"
+      className="absolute w-full text-center top-0 bg-white grid grid-rows-[80px_auto]  left-[-2000px] border-0 border-blue-500"
     >
       <div className="h-[100px] flex w-full border-0 border-black items-center text-center">
         <button
@@ -83,12 +83,12 @@ export default function PrivateMessaing({
       </div>
       <div className="lg:grid lg:grid-cols-2 h-full w-full border-0 border-red-500 overflow-y-scroll">
       <div className="p-5 grid grid-rows-[60px_auto]">
-          <div className="bg-gray-300 p-2  text-center">
+          <div className="bg-[#D3D3D3] p-2  text-center">
             <div className="border-0 border-black p-2 rounded-t-md rounded-md bg-white h-fit font-bold">
               Select A Participant
             </div>
           </div>
-          <div className="border-0 flex flex-wrap border-black h-full w-full p-2 bg-gray-300 rounded-b-md">
+          <div className="border-0 flex flex-wrap border-black h-full w-full p-2 bg-[#D3D3D3] rounded-b-md">
             {props.participants.map((ele, index) => {
               return (
                 <React.Fragment key={index}>
@@ -105,7 +105,7 @@ export default function PrivateMessaing({
                   )}
                   {ele.identity === props.identity &&
                     props.participants.length == 1 && (
-                      <div className="flex items-center justify-center mx-auto my-auto text-xl font-bold  h-full w-full py-20 lg;py-auto">
+                      <div className="flex items-center justify-center mx-auto my-auto text-xl font-bold  h-full w-full py-20 lg;py-auto text-center">
                         No Other Participant Has Joined The Meeting Yet
                       </div>
                     )}
@@ -115,13 +115,13 @@ export default function PrivateMessaing({
           </div>
         </div>
         <div className="border-0 border-black h-full w-full p-5 overflow-y-scroll">
-          <div className="h-full w-full p-2 rounded-md bg-gray-300 grid grid-rows-[40px_auto_60px] overflow-y-scroll">
+          <div className="h-full w-full p-2 rounded-md bg-[#D3D3D3] grid grid-rows-[40px_auto_60px] overflow-y-scroll">
             <div className="bg-white rounded-md  font-bold text-center flex items-center justify-center">
               Sending Message To {username}
             </div>
             <div className="h-full overflow-y-scroll">
               {!username && !RecieverSocketId ? (
-                <div className="flex items-center justify-center mx-auto my-auto text-xl font-bold  h-full w-full">
+                <div className="flex items-center text-center justify-center mx-auto my-auto text-xl font-bold  h-full w-full">
                   Select A Participant To Start A Private Chat
                 </div>
               ) : (

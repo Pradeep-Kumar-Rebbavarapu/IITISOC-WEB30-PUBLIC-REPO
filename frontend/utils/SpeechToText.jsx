@@ -41,8 +41,8 @@ export default function SpeechToText({speechToText,setSpeechToText,resetTranscri
         <div className='h-fit w-fit hidden lg:block '>
             <div
                 id="Left_Nav_SpeechToText_Btn"
-                className={`focus:bg-orange-500 cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${speechToText ? 'bg-orange-500' : 'hover:bg-orange-500'
-                    }  transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20`}
+                className={`focus:bg-white cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${speechToText ? 'bg-white' : 'hover:bg-white'
+                    }  transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100`}
                 onClick={toggleSpeechToTextBtn}
             >
                 
@@ -54,8 +54,8 @@ export default function SpeechToText({speechToText,setSpeechToText,resetTranscri
         <div className='h-full w-full my-auto lg:hidden'>
             <div
                 id="Left_Nav_SpeechToText_Btn"
-                className={`focus:bg-orange-500 cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-orange-500 transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-20 ${speechToText ? 'bg-orange-500' : 'hover:bg-orange-500'
-                    }  transition-all text-orange-600 bg-opacity-20 hover:bg-opacity-20`}
+                className={`focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100 ${speechToText ? 'bg-white' : 'hover:bg-white'
+                    }  transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100`}
                 onClick={toggleSpeechToTextBtn}
             >
                 
