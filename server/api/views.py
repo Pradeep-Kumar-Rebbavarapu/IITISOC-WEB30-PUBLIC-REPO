@@ -268,7 +268,7 @@ class ChangeRoomCapacity(APIView):
         user = request.user
         room_id = data['roomID']
         capacity = data['capacity']
-        room = Room.objects.filter(room_id = room_id).filter(user = user).first()
+        room = Room.objects.filter(room_id = room_id).filter(created_by = user).first()
         if room is not None:
             room.capacity = capacity
             room.save()

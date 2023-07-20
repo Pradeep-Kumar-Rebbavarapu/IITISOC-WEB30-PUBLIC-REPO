@@ -21,8 +21,8 @@ export default function Board({ peers, BoardMap }) {
 	const snapshotRef = useRef(null);
 	const [PolygonSides, setPolygonSides] = useState(3);
 	const [LineWidth, setLineWidth] = useState(3);
-	const [FillColor, setFillColor] = useState("#000000");
-	const [StrokeColor, setStokeColor] = useState("#000000");
+	const [FillColor, setFillColor] = useState("black");
+	const [StrokeColor, setStokeColor] = useState("black");
 	const historyRef = useRef([]);
 	const historyIndexRef = useRef(-1);
 	const [EraserSize, setEraserSize] = useState(5);
@@ -295,8 +295,8 @@ export default function Board({ peers, BoardMap }) {
 			if (timeout !== undefined) clearTimeout(timeout);
 			timeout = setTimeout(() => {
 				const base64ImageData = canvas.toDataURL("image/webp");
-				alert(getImageSizeInKB(base64ImageData))
-				if(getImageSizeInKB(base64ImageData)>=10){
+				
+				if(getImageSizeInKB(base64ImageData)>=180){
 					toast.info("Image size is too large",{
 						style: {
 							zIndex: 1000000,
@@ -514,8 +514,9 @@ export default function Board({ peers, BoardMap }) {
 	//logic for adding new page
 	// when a person clicks on go to next page he will eventually create a new page and a clear canvas will be called but before that the data which was on the previous page will be a map where key value is page number and value is the image data
 	return (
-		<div className={`w-full h-full  relative bg-white`}>
+		<div id='Board' className={`w-full h-full  relative bg-white`}>
 			<div
+			id="TopBar"
 				className={`absolute  top-0 w-full h-[100px] bg-white lg:flex items-center shadow-[${StrokeColor}] shadow-2xl`}
 				style={{ boxShadow: `0px 2px 12px 0px ${StrokeColor}` }}
 			>
@@ -763,7 +764,7 @@ export default function Board({ peers, BoardMap }) {
 			</div>
 			<canvas
 				id={`canvas`}
-				className="border-2 border-blue-500 w-full h-full"
+				className=" border-blue-500 w-full h-full"
 				ref={canvasRef}
 			></canvas>
 			{store.getState().isRoomHost === true ? (

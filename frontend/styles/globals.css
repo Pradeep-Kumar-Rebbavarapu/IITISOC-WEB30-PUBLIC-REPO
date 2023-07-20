@@ -3,12 +3,23 @@
 @tailwind utilities;
 
 
-
-body {
-  overflow-x: hidden;
-  color: black;
-  background: white !important;
+@layer base{
+  :root {
+    overflow-x: hidden;
+    background-color: white;
+    color:black;
+  }
+  
+  @media (prefers-color-scheme: dark) {
+    :root{
+      
+    }
+    
+  }
+  
 }
+
+
 
 #emoji{
   font-size:30px;
@@ -251,6 +262,7 @@ video {
   width: 7px;
   background-color: transparent;
   border-radius: 40px;
+  display:none;
 }
 
 ::-webkit-scrollbar-track-piece {

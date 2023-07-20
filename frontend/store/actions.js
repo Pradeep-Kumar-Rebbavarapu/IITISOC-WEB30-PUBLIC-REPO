@@ -10,6 +10,8 @@ const Actions = {
     SET_DIRECT_CHAT_HISTORY:'SET_DIRECT_CHAT_HISTORY',
     SET_TRANSCRIPT:'SET_TRANSCRIPT',
     SET_EMOJI:'SET_EMOJI',
+    SET_TITLE:'SET_TITLE',
+    SET_ROOM_CAPACITY:'SET_ROOM_CAPACITY'
   };
   
   export const setIsRoomHost = (isRoomHost) => {
@@ -80,6 +82,18 @@ const Actions = {
     return {
       type:Actions.Emoji,
       Emoji
+    }
+  }
+  export const setTitle = (title) =>{
+    return {
+      type:Actions.SET_TITLE,
+      title
+    }
+  }
+  export const setRoomCapacity = (RoomCapacity) =>{
+    return {
+      type:Actions.SET_ROOM_CAPACITY,
+      RoomCapacity
     }
   }
   export default Actions;

@@ -250,7 +250,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     new_room = await self.save_room_and_user(room_id,created_room.name, CreatedUserInstance, JoineduserInstance,created_room.capacity)
                     await database_sync_to_async(new_room.save)()
                 else:
-                    room2 = await self.save_participants(created_room)
+                    room2 = await self.save_participants(old_room)
                     await database_sync_to_async(room2.save)()
                 response = {
                     'type': 'room-update',
@@ -273,7 +273,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     @database_sync_to_async
     def get_old_room(self, userInstance, room_id):
-        return Room.objects.filter(created_by=userInstance).filter(room_id=room_id).first()
+        return Room.objects.filter(room_id=room_id).filter(joined_by=userInstance).first()
     @database_sync_to_async
     def get_new_room(self,userInstance,room_id):
         return Room.objects.filter(joined_by=userInstance).filter(room_id=room_id).first()

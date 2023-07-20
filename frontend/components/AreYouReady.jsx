@@ -38,7 +38,7 @@ export default function AreYouReady({ socket}) {
     
     return (
 
-        <div className='grid md:grid-cols-2 h-full z-[1]  w-full  bg-[url("/images/AreYouReady2.png")] bg-cover bg-no-repeat lg:px-32  lg:my-auto'>
+        <div id="AreYouReady" className='grid md:grid-cols-2 h-full z-[1]  w-full  bg-[url("/images/AreYouReady2.png")] bg-cover bg-no-repeat lg:px-32  lg:my-auto'>
             <div className='flex flex-col justify-center items-center my-auto h-full w-full backdrop-blur-[1px]'>
                 <video muted id="my_video" className='mt-28 md:mt-10 w-[300px] lg:w-full ' />
                 <div className=''>

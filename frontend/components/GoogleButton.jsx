@@ -39,7 +39,7 @@ export default function GoogleButton() {
 		onError: (err) => console.error('Failed to login with google', err),
 	});
 	return (
-		<div className="border-2" onClick={() => {
+		<div id="GoogleButton" className="border-2" onClick={() => {
 			login()
 		}}>
 			<button type="button" className="google-button">

@@ -25,10 +25,11 @@ export default function Emoji({peers,props}) {
   return (
     <div>
       
-      <div className="">
+      <div className="dark:invert f;ex justify-center items-center ">
         <EmojiPicker
           onEmojiClick={onClick}
-        autoFocusSearch={false} emojiStyle={EmojiStyle.NATIVE} />
+          
+        autoFocusSearch={false} emojiStyle={EmojiStyle.NATIVE} theme="dark" />
       </div>
     </div>
   );

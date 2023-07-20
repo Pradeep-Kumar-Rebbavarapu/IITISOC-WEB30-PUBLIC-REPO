@@ -13,7 +13,35 @@ import {
 	BsFillEmojiSmileFill,
 	BsFillRecordBtnFill,
 } from "react-icons/bs";
-
+import {
+	EmailShareButton,
+	FacebookShareButton,
+	InstapaperShareButton,
+	LinkedinShareButton,
+	TwitterShareButton,
+	WhatsappShareButton,
+	EmailIcon,
+	FacebookIcon,
+	FacebookMessengerIcon,
+	HatenaIcon,
+	InstapaperIcon,
+	LineIcon,
+	LinkedinIcon,
+	LivejournalIcon,
+	MailruIcon,
+	OKIcon,
+	PinterestIcon,
+	PocketIcon,
+	RedditIcon,
+	TelegramIcon,
+	TumblrIcon,
+	TwitterIcon,
+	ViberIcon,
+	VKIcon,
+	WeiboIcon,
+	WhatsappIcon,
+	WorkplaceIcon
+} from "react-share";
 import { TbListDetails } from 'react-icons/tb'
 import parse from "html-react-parser";
 import Stack from "@mui/material/Stack";
@@ -61,9 +89,10 @@ import { BiMessageAltError } from "react-icons/bi";
 import PrivateMessaing from "./PrivateMessaing";
 import SpeechToTextEditor from "./SpeechToTextEditor";
 import Link from "next/link";
-import { setActiveConversation, setDirectChatHistotry, setIdentity, setIsRoomHost, setMessages, setParticipants, setRoomId, setSocketId, setTranscript } from "../store/actions";
+import { setActiveConversation, setDirectChatHistotry, setIdentity, setIsRoomHost, setMessages, setParticipants, setRoomCapacity, setRoomId, setSocketId, setTranscript } from "../store/actions";
 import { store } from "../store/store";
 import NewLaptopRoom from "./NewLaptomRoom";
+import EmailBody from "./EmailBody";
 
 function LaptopRoom(props) {
 	const { socket } = props;
@@ -85,6 +114,7 @@ function LaptopRoom(props) {
 		audio,
 		user,
 		RoomCapacity,
+		setjoinroom,
 		setvideo,
 	} = useContext(Context);
 	const [MicOn, setMicOn] = useState(audio);
@@ -130,8 +160,8 @@ function LaptopRoom(props) {
 		browserSupportsSpeechRecognition,
 	} = useSpeechRecognition();
 	let Transcript = useRef("");
-	
-		
+
+
 	const handleToggleLeftNav = () => {
 		if (document.getElementById("Left_Nav").classList.contains("lg:flex")) {
 
@@ -223,17 +253,37 @@ function LaptopRoom(props) {
 				}
 			}
 		};
+
+		const handleClickOutsideEmojiButton = (e) => {
+			if(document.getElementById("emoji-section").contains(e.target)){
+				return
+			}
+			else if (document.getElementById("EmojiBtn").contains(e.target)) {
+				const EmojiSection =
+					document.getElementById("emoji-section");
+				if (EmojiSection.classList.contains("top-[-1000px]")) {
+					EmojiSection.className =
+						" absolute  z-[100] top-0 h-fit w-fit  md:left-auto md:bottom-auto  bg-white  transition-all fade-in-out  ";
+				} else {
+					EmojiSection.className =
+						"absolute  z-[100] top-[-1000px]  h-fit w-fit  md:left-auto md:bottom-auto  bg-white  transition-all fade-in-out  ";
+				}
+			}
+			else {
+				const EmojiSection = document.getElementById("emoji-section");
+				EmojiSection.className =
+					"absolute  z-[100] top-[-1000px]   h-fit w-fit  md:left-auto md:bottom-auto  bg-white  transition-all fade-in-out  ";
+			}
+		}
 		document.addEventListener("click", handleClickOutsideMoreBtn, true);
 		document.addEventListener("click", handleClickOutsideAttachmentBtn, true);
+		document.addEventListener("click", handleClickOutsideEmojiButton, true);
 		return () => {
 			document.removeEventListener("click", handleClickOutsideMoreBtn, true);
-			document.removeEventListener(
-				"click",
-				handleClickOutsideAttachmentBtn,
-				true
-			);
+			document.removeEventListener("click", handleClickOutsideAttachmentBtn, true);
+			document.removeEventListener("click", handleClickOutsideEmojiButton, true);
 			worker.current?.terminate();
-			handleDisconnectedUser(peers, props.socketId, localStream);
+			handleDisconnectedUser(peers, props.socketId, setjoinroom);
 		};
 	}, []);
 
@@ -553,22 +603,22 @@ function LaptopRoom(props) {
 			<div className="!overflow-hidden">
 
 				<div className="flex h-screen w-full !overflow-hidden relative">
-				<UserJoinModal
-				auth={auth}
-				roomID={roomID}
-				user={user}
-				PeerUsername={PeerUsername}
-				peerUserID={peerUserID}
-				socket={socket}
-				JoinModal={JoinModal}
-				setIsJoinModal={setIsJoinModal}
-				ConnUserIdentity={ConnUserIdentity}
-			/>
+					<UserJoinModal
+						auth={auth}
+						roomID={roomID}
+						user={user}
+						PeerUsername={PeerUsername}
+						peerUserID={peerUserID}
+						socket={socket}
+						JoinModal={JoinModal}
+						setIsJoinModal={setIsJoinModal}
+						ConnUserIdentity={ConnUserIdentity}
+					/>
 					<div
 						id="MoreBtnMenu"
 						className="absolute w-full lg:hidden  h-[300px] bottom-[-500px] right-0 bg-white  !z-[1000] transition-all fade-in-out duration-500"
 					>
-						
+
 						<div className="w-full h-full grid grid-cols-4 justify-between items-center">
 							<div
 								id="Left_Nav_Message_Btn"
@@ -757,47 +807,91 @@ function LaptopRoom(props) {
 							>
 								<BiMessageAltError className="w-7 h-7" />
 							</div>
-							<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-1000px] transition-all fade-in-out">
-								<div className="my-5">Room Id : {RoomDetails.roomID}</div>
-								<div className="my-5">Current Room Capacity : {RoomDetails.roomCapacity}</div>
-								<div className="my-5">Share Room : <span className="text-white border-2 bg-black p-2 rounded-md">{`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app/${router.asPath}`}</span></div>
-								<input min="0" onKeyPress={(event) => {
-									const charCode = event.charCode;
+							<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-2000px] transition-all fade-in-out">
+								<div className="my-5">Room Id : {props.roomId}</div>
+								<div className="my-5">Current Room Capacity : {props.RoomCapacity}</div>
+								<div className="flex dark:invert">
+									<div className="mx-2 mb-5">
+										<EmailShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} subject={`Invitation For A Video Call On ConferoLive`} body={`${props.identity} has invited you to join a meeting`} ><EmailIcon separator="-" size={50} round={true} /></EmailShareButton>
+									</div>
+									<div className="mx-2 mb-5">
+										<WhatsappShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} title={`${props.identity} has Invited You To Join A Meeting`} >
+											<WhatsappIcon size={50} round={true} />
+										</WhatsappShareButton>
+									</div>
+									<div className="mx-2 mb-5">
+										<FacebookShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`}>
+											<FacebookIcon quote="Join A Meet" hanging={`by #${props.identity}`} size={50} round={true} />
+										</FacebookShareButton>
+									</div>
+									<div className="mx-2 mb-5">
+										<TwitterShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`}  >
+											<TwitterIcon title={'Wanna Join A Meet'} via={`${props.identity}`} size={50} round={true} />
+										</TwitterShareButton>
+									</div>
+									<div>
 
-									if (charCode < 48 || charCode > 57) {
-										event.preventDefault();
-									}
-								}} type="number" className="p-2 border-2  border-black text-black outline-none" placeholder='Change Room Capacity' /><button className="p-2 bg-black hover:ring-4 text-white hover:ring-opacity-50 hover:ring-black transition-all fade-in-out" onClick={() => {
-									axios.post('https://www.pradeeps-video-conferencing.store/api/v1/ChangeRoomCapacity', {
-										roomID: RoomDetails.roomID,
-										capacity: document.querySelector('input[type="number"]').value
-									}, {
-										headers: {
-											Authorization: 'Bearer ' + auth.access
-										}
-									}).then((response) => {
-										console.log(response.data)
-										setRoomDetails({ ...RoomDetails, roomCapacity: response.data.capacity })
-										toast.success('Room Capacity Changed')
-									}).catch((err) => {
-										console.log(err)
-										toast.error('Some Error Occured')
-									})
-								}}>Change</button>
+									</div>
+									<div>
+
+									</div>
+								</div>
+								{props.isRoomHost && (
+									<>
+										<input min="0" onKeyPress={(event) => {
+											const charCode = event.charCode;
+
+											if (charCode < 48 || charCode > 57) {
+												event.preventDefault();
+											}
+										}} type="number" className="p-2 border-2  border-black text-black outline-none" placeholder='Change Room Capacity' /><button className="p-2 bg-black hover:ring-4 text-white hover:ring-opacity-50 hover:ring-black transition-all fade-in-out" onClick={() => {
+											if (props.isRoomHost && document.querySelector('input[type="number"]').value > 0) {
+												axios.post('https://www.pradeeps-video-conferencing.store/api/v1/ChangeRoomCapacity', {
+													roomID: RoomDetails.roomID,
+													capacity: document.querySelector('input[type="number"]').value
+												}, {
+													headers: {
+														Authorization: 'Bearer ' + auth.access
+													}
+												}).then((response) => {
+													console.log(response.data)
+													store.dispatch(setRoomCapacity(response.data.capacity))
+													toast.success('Room Capacity Changed')
+												}).catch((err) => {
+													console.log(err)
+													toast.error('Some Error Occured')
+												})
+											}
+											else {
+												toast.error('You Cannot Change Room Capacity')
+											}
+
+										}}>Change</button>
+									</>
+								)}
+
 							</div>
 							<div className="w-[60px] h-[60px] rounded-full bg-white border-2 border-black bottom-0 mt-auto mb-5 flex justify-center items-center " onClick={() => {
-								if (document.getElementById('MeetingDetails').classList.contains('left-[-1000px]')) {
+								if (document.getElementById('MeetingDetails').classList.contains('left-[-2000px]')) {
 									document.getElementById('MeetingDetails').className = 'absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[100px] transition-all fade-in-out opacity-20 hover:opacity-100'
 								}
 								else {
-									document.getElementById('MeetingDetails').className = 'absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-1000px] transition-all fade-in-out opacity-20 hover:opacity-100'
+									document.getElementById('MeetingDetails').className = 'absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-2000px] transition-all fade-in-out opacity-20 hover:opacity-100'
 								}
 							}}>
 								<TbListDetails className="w-7 h-7" />
 							</div>
 						</div>
 					</div>
-					<div className="flex-1 flex flex-col  overflow-y-hidden w-full ">
+					<div className="flex-1 flex flex-col relative  overflow-y-hidden w-full  ">
+						<div className="flex justify-center items-center">
+							<div
+								id="emoji-section"
+								className="w-[50px] h-[300px] absolute mx-auto  z-[1000000] top-[-1000px] transition-all fade-in-out  bg-white "
+							>
+								<Emoji peers={peers} props={props} />
+							</div>
+						</div>
 						<div className="h-[60px] md:block hidden px-3 border-b-2">
 							{/* First row in the second column */}
 							<div className="h-[60px] hidden lg:flex w-full py-3 ">
@@ -812,11 +906,11 @@ function LaptopRoom(props) {
 									)}
 								</div>
 								<div className=" text-center font-bold items-center flex text-xl ml-4">
-									{title}
+									{props.title}
 								</div>
 							</div>
 						</div>
-						<div id="" className="flex-1  overflow-y-scroll overflow-x-overlay video-section !z-[10]">
+						<div id="" className="flex-1   overflow-y-scroll overflow-x-overlay video-section !z-[10] mx-auto">
 
 							<VideoGrid
 								length={props.participants.length}
@@ -828,12 +922,7 @@ function LaptopRoom(props) {
 								setPinned={setPinned}
 							/>
 
-							<div
-								id="emoji-section"
-								className="w-[50px] h-[300px] absolute  z-[10000000000000000000000000] bottom-[250px] hidden bg-white "
-							>
-								<Emoji peers={peers} props={props} />
-							</div>
+
 
 						</div>
 						<div className="h-[100px]  !overflow-hidden ">
@@ -842,17 +931,9 @@ function LaptopRoom(props) {
 							<div className="h-[100px]  bg-white flex justify-center border-t-2 absolute lg:relative w-full bottom-0 !overflow-hidden ">
 								<div className="grid grid-cols-5 lg:grid-cols-6 text-center items-center ">
 									<div
-										onClick={() => {
-											const EmojiSection =
-												document.getElementById("emoji-section");
-											if (EmojiSection.classList.contains("hidden")) {
-												EmojiSection.className =
-													" absolute  z-[10] -right-5 h-fit w-fit -bottom-5 md:left-auto md:bottom-auto md:right-[20px] md:top-[110px]  bg-white";
-											} else {
-												EmojiSection.className =
-													"absolute  z-[10] -right-5 h-fit w-fit -bottom-5 md:left-auto md:bottom-auto  md:right-[20px] md:top-[110px] hidden bg-white";
-											}
-										}}
+										id="EmojiBtn"
+
+
 										className="group transition-all fade-in-out mx-5 "
 									>
 										<div
@@ -860,7 +941,7 @@ function LaptopRoom(props) {
 											id="ToggleMicBtn"
 											className="border-0 rounded-lg p-2 w-[50px] mx-auto group-hover:bg-white group-hover:bg-opacity-100 transition-all fade-in-out group-hover:text-orange-500 "
 										>
-											<BsFillEmojiSmileFill />
+											<BsFillEmojiSmileFill className="mx-auto" />
 										</div>
 										<div className="hidden md:block lg:text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500">
 											Emoji
@@ -1006,7 +1087,7 @@ function LaptopRoom(props) {
 										</div>
 									</div>
 								</div>
-								<div className="flex justify-center items-center !overflow-hidden !z-[10]">
+								<div id="LeaveCallBtn" className="flex justify-center items-center !overflow-hidden !z-[10]">
 									<div className="group transition-all fade-in-out mx-5 !z-[0]" onClick={() => {
 										console.log('clicked')
 										localStream.current.getTracks().forEach((track) => {
@@ -1031,6 +1112,7 @@ function LaptopRoom(props) {
 											roomCapacity: null,
 											title: null
 										})
+										setjoinroom(true)
 
 									}}>
 										<div className="border-0 rounded-lg text-white p-2 w-fit mx-auto bg-red-500 hover:bg-red-600 transition-all fade-in-out ">

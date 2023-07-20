@@ -50,6 +50,7 @@ specifiers:
   jszip: ^3.10.1
   jwt-decode: ^3.1.2
   next: 13.4.4
+  next-themes: ^0.2.1
   node-summary: ^1.2.0
   openai: ^3.3.0
   p5: ^1.6.0
@@ -70,6 +71,7 @@ specifiers:
   react-p5-wrapper: ^4.1.2
   react-redux: ^8.0.7
   react-reveal: ^1.2.2
+  react-share: ^4.4.1
   react-sketch: ^0.5.1
   react-sketch-whiteboard: ^3.9.3
   react-sketchpad: ^0.0.3
@@ -139,6 +141,7 @@ dependencies:
   jszip: 3.10.1
   jwt-decode: 3.1.2
   next: 13.4.4_biqbaboplfbrettd7655fr4n2y
+  next-themes: 0.2.1_z4pol2qj2yv3um3jqqobs4b3eu
   node-summary: 1.2.0
   openai: 3.3.0
   p5: 1.6.0
@@ -158,6 +161,7 @@ dependencies:
   react-p5-wrapper: 4.1.2_biqbaboplfbrettd7655fr4n2y
   react-redux: 8.0.7_nwi3xlk233aiuojbhb7nbpwlty
   react-reveal: 1.2.2_react@18.2.0
+  react-share: 4.4.1_react@18.2.0
   react-sketch: 0.5.1
   react-sketch-whiteboard: 3.9.3_eveahbx3r3okkkxu7l44ces2q4
   react-sketchpad: 0.0.3
@@ -3902,6 +3906,10 @@ packages:
       mitt: 3.0.0
     dev: false
 
+  /classnames/2.3.2:
+    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
+    dev: false
+
   /clean-stack/2.2.0:
     resolution: {integrity: sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==}
     engines: {node: '>=6'}
@@ -6413,6 +6421,14 @@ packages:
       graceful-fs: 4.2.11
     dev: false
 
+  /jsonp/0.2.1:
+    resolution: {integrity: sha512-pfog5gdDxPdV4eP7Kg87M8/bHgshlZ5pybl+yKxAnCZ5O7lCIn7Ixydj03wOlnDQesky2BPyA91SQ+5Y/mNwzw==}
+    dependencies:
+      debug: 2.6.9
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /jspdf/2.5.1:
     resolution: {integrity: sha512-hXObxz7ZqoyhxET78+XR34Xu2qFGrJJ2I2bE5w4SM8eFaFEkW2xcGRVUss360fYelwRSid/jT078kbNvmoW0QA==}
     dependencies:
@@ -6991,6 +7007,18 @@ packages:
 
   /new-array/1.0.0:
     resolution: {integrity: sha512-K5AyFYbuHZ4e/ti52y7k18q8UHsS78FlRd85w2Fmsd6AkuLipDihPflKC0p3PN5i8II7+uHxo+CtkLiJDfmS5A==}
+    dev: false
+
+  /next-themes/0.2.1_z4pol2qj2yv3um3jqqobs4b3eu:
+    resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
+    peerDependencies:
+      next: '*'
+      react: '*'
+      react-dom: '*'
+    dependencies:
+      next: 13.4.4_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /next-tick/0.2.2:
@@ -8091,6 +8119,19 @@ packages:
     dependencies:
       prop-types: 15.8.1
       react: 18.2.0
+    dev: false
+
+  /react-share/4.4.1_react@18.2.0:
+    resolution: {integrity: sha512-AJ9m9RiJssqvYg7MoJUc9J0D7b/liWrsfQ99ndKc5vJ4oVHHd4Fy87jBlKEQPibT40oYA3AQ/a9/oQY6/yaigw==}
+    engines: {node: '>=6.9.0', npm: '>=5.0.0'}
+    peerDependencies:
+      react: ^16.3.0 || ^17 || ^18
+    dependencies:
+      classnames: 2.3.2
+      jsonp: 0.2.1
+      react: 18.2.0
+    transitivePeerDependencies:
+      - supports-color
     dev: false
 
   /react-sketch-whiteboard/3.9.3_eveahbx3r3okkkxu7l44ces2q4:

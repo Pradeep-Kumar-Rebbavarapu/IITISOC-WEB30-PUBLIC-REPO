@@ -184,6 +184,12 @@ const CreateUser = async (user) => {
         });
 };
 
+const ResendEmail = async (email) =>{
+    return axios.post('https://www.pradeeps-video-conferencing.store/dj-rest-auth/registration/resend-email/',{email:email}).then((response)=>{
+        console.log(response.data)
+    })
+}
+
 const useCreateUser = () => {
     const router = useRouter();
     return useMutation(CreateUser, {
@@ -195,26 +201,29 @@ const useCreateUser = () => {
             });
         },
         onError: (error) => {
+            const email = JSON.parse(error.config.data).email
             const newerror = error.response.data;
-
+            console.log(newerror)
             if (error.message == "Network Error") {
                 toast.error("Network Error Please Try After Some Time", {
                     position: toast.POSITION.TOP_LEFT,
                 });
             }
-            if (newerror.username || newerror.error) {
-                toast.error(
-                    newerror.username ? newerror.username[0] : newerror.error[0],
-                    { position: toast.POSITION.TOP_LEFT }
-                );
+            else if (newerror.non_field_errors) {
+                if(newerror.non_field_errors[0] == "Resent Email"){
+                    ResendEmail(email)
+                    toast.success('Resent Email , Your New Password Has Been Saved', { position: toast.POSITION.TOP_LEFT })
+                }
+                else{
+                    toast.error(newerror.non_field_errors[0], { position: toast.POSITION.TOP_LEFT });
+                } 
             }
-            if (newerror.email) {
-                toast.error(newerror.email[0], { position: toast.POSITION.TOP_LEFT });
-            } else {
+            else {
                 toast.error("Signup Unsuccesful Retry Again Later", {
                     position: toast.POSITION.TOP_LEFT,
-                });
+            });
             }
         },
     });
 };
+//Gangsta@11519

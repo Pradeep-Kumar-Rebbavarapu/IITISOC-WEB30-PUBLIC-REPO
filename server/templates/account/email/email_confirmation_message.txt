@@ -1,7 +1,0 @@
-{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=curr>
-You're receiving this e-mail because user {{ user_display }} has given your e-mail address to register an account on "ConferoLive" Supported By https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app
-To confirm this is correct, https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app/activate/{{ key }}
-{% endblocktrans %}
-{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}Thank you from "ConferoLive"!
-https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app {% endblocktrans %}
-{% endautoescape %}

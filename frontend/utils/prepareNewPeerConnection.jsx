@@ -21,7 +21,7 @@ export default function PrePare() {
 const getConfiguration = () => {
     return {
         iceServers: [
-            { url: 'stun:stun.www.pradeeps-video-conferencing.store' },
+            { urls: 'stun:stun.www.pradeeps-video-conferencing.store' },
             
         ]
     }
@@ -172,13 +172,16 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     }
     else if (peerdata.toString().includes('micon')) {
         const data = JSON.parse(peerdata);
-        document.getElementById('MicSymbol_' + data.socketId).className = 'absolute w-full h-full  rounded-full ring-8 ring-opacity-50 border-2 border-black ring-orange-500 animate-ping'
-        document.getElementById('Mic_Symbol_Real_' + data.socketId).className = 'absolute w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white ring-4  ring-opacity-50 ring-orange-500 border-2 border-black animate-ping'
+  
+            document.getElementById('MicSymbol_' + data.socketId).className = "absolute w-full h-full  rounded-full ring-8 ring-opacity-50 border-2 border-black ring-orange-500 animate-ping"
+            document.getElementById('Mic_Symbol_Real_' + data.socketId).className = 'absolute w-full px-10 py-4  h-full ring-4  ring-opacity-50 ring-orange-500 border-2 border-black animate-ping rounded-b-full top-0 left-0 '
+        
+        
     }
     else if (peerdata.toString().includes('micoff')) {
         const data = JSON.parse(peerdata);
         document.getElementById('MicSymbol_' + data.socketId).className = 'absolute w-full h-full  rounded-full'
-        document.getElementById('Mic_Symbol_Real_' + data.socketId).className = 'absolute w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white'
+        document.getElementById('Mic_Symbol_Real_' + data.socketId).className = 'absolute w-full px-10 py-4  h-full rounded-b-full top-0 left-0'
     }
     else if(peerdata.toString().includes('screen-share-on')){
         const data = JSON.parse(peerdata);
@@ -230,7 +233,9 @@ export const handlePinnedUser = (connUserIdentity, connUserSocketId) => {
 export const handleFullScreen = (connUserIdentity, connUserSocketId) => {
     const videoContainer = document.getElementById(`${connUserSocketId}_div`);
     const fakeVideo = videoContainer.children[1];
+   
     const video = videoContainer.children[0];
+    
     if (videoContainer.classList.contains('full-screen')) {
         videoContainer.classList.remove('full-screen');
         fakeVideo.classList.remove('fullscreen-fake');
@@ -244,6 +249,7 @@ export const handleFullScreen = (connUserIdentity, connUserSocketId) => {
         } else if (document.msExitFullscreen) {
             document.msExitFullscreen();
         }
+        
     } else {
         videoContainer.classList.add('full-screen');
         fakeVideo.classList.add('fullscreen-fake');
@@ -257,6 +263,7 @@ export const handleFullScreen = (connUserIdentity, connUserSocketId) => {
         } else if (videoContainer.msRequestFullscreen) {
             videoContainer.msRequestFullscreen();
         }
+        
     }
 
 
@@ -286,19 +293,20 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants,
     const VideoGrid = document.getElementById('VideoGrid')
     div.id = `${connUserSocketId}_div`
     const htmlString = `<div id='video_container_${connUserSocketId}' class="rounded-md relative">
-                    <div class="top-0 absolute w-full  text-center h-full  hover:bg-opacity-50 transition-all fade-in-out group  z-[10000]">
-                    <div id="Mic_Symbol_Real_${connUserSocketId}" className="font-bold w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white">
-                    <div className="absolute w-full px-10 py-4  h-full rounded-b-full top-0 left-0"></div>
-                    ${connUserIdentity}</div>
-                        <div class="">
-                                <div id="PinBtn_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
-                                <div id="Full_Screen_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
+                        <div class="absolute z-[10000] rounded-md top-0 text-center  w-full h-full transition-all fade-in-out group overflow-hidden">
+                            <div class="font-bold w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white">
+                                <div id="Mic_Symbol_Real_${connUserSocketId}" class="absolute w-full px-10 py-4  h-full rounded-b-full top-0 left-0 micsymbol"></div>
+                                ${connUserIdentity}
+                            </div>
+                            <div class="">
+                                    <div id="PinBtn_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
+                                    <div id="Full_Screen_${connUserSocketId}" class="group-hover:flex hidden w-fit h-fit"></div>
                             </div>
                         </div>
                     <video id="v_${connUserSocketId}" class="h-[400px] my-auto rounded-md"></video>
                     <video id='${connUserSocketId}_ss_video' class="h-[400px] my-auto rounded-md hidden"></video>
                 </div>
-                <div id='fake_${connUserSocketId}' class="h-full w-full rounded-md flex justify-center relative items-center my-auto mx-auto">
+                <div id='fake_${connUserSocketId}' class="h-full w-full rounded-md flex justify-center relative items-center my-auto mx-auto fake">
                     <div class="top-0 absolute w-full  text-center h-full  hover:bg-opacity-50 transition-all fade-in-out group  z-[10000]">
                     <div class="font-bold p-2">${connUserIdentity}</div>
                     <div class="">
@@ -315,7 +323,7 @@ const addStream = (stream, connUserSocketId, innerWidth, length_of_participants,
     div.innerHTML = htmlString
 
     VideoGrid.append(div)
-    div.className = "h-full w-full flex items-center justify-center rounded-md"
+    div.className = "h-full w-full flex items-center justify-center rounded-md "
 
     const remoteVideoContainer = document.getElementById(`video_container_${connUserSocketId}`)
     const remoteVideo = document.getElementById('v_' + connUserSocketId)

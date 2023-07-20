@@ -9,7 +9,7 @@ import { appendNewMessageToChatHistory } from "./MessageUtils"
 import { handleReceiveData } from "./ShareFileUtils"
 import MessageToast from "../components/MessageToast"
 import { fetchTurnCredentials } from "./TurnServers"
-export const handleDisconnectedUser = async (peers, socketId) => {
+export const handleDisconnectedUser = async (peers, socketId,setjoinroom) => {
 
     const VideoGrid = document.getElementById('VideoGrid')
 
@@ -32,6 +32,7 @@ export const handleDisconnectedUser = async (peers, socketId) => {
     }
 
     delete peers.current[socketId]
+    setjoinroom(true)
 }
 
 
@@ -45,7 +46,7 @@ let array = []
 
 export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth, user, roomID, setoverlay, title, setDownloadingText, BoardMap, setroomHostUsername, roomHostUsername, setPeerUsername, PeerUsername, RoomCapacity, setRoomDetails, peervideo) => {
 
-    IceServers.current = await fetchTurnCredentials()
+    // IceServers.current = await fetchTurnCredentials()
     socket.current = new WebSocket(`wss://www.pradeeps-video-conferencing.store/ws/chat/${roomID}`)
 
     socket.current.onopen = () => {
@@ -53,7 +54,7 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
             "type": "get-socket-id",
             data: {}
         }))
-        getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth, user, roomID, setoverlay, title, IceServers, RoomCapacity, length_of_participants)
+        getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth, user, roomID, setoverlay, title, IceServers, RoomCapacity, length_of_participants,setRoomDetails)
     }
 
     socket.current.onmessage = (message) => {
@@ -66,11 +67,7 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
         else if (type === "room-update") {
 
             const { connectedUsers, roomID, title, roomCapacity } = data;
-            setRoomDetails({
-                roomID: roomID,
-                title: title,
-                roomCapacity: roomCapacity
-            })
+            
 
             localStorage.setItem('participants_length', connectedUsers.length)
             store.dispatch(setParticipants(connectedUsers))

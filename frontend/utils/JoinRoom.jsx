@@ -1,6 +1,6 @@
 import axios from "axios";
-import { setIdentity, setRoomId } from "../store/actions";
-import { setIsRoomHost } from "../store/actions";
+import { setIdentity, setRoomCapacity, setRoomId } from "../store/actions";
+import { setIsRoomHost,setTitle } from "../store/actions";
 import { store } from "../store/store";
 import { toast } from "react-toastify";
 export const JoinRoom = (
@@ -26,6 +26,8 @@ export const JoinRoom = (
 				store.dispatch(setIdentity(user.username));
 				store.dispatch(setIsRoomHost(true));
 				store.dispatch(setRoomId(response.data.room_id));
+				store.dispatch(setTitle(response.data.name))
+				store.dispatch(setRoomCapacity(response.data.capacity))
 				const data = {
 					roomID: roomID,
 					username: user.username,
@@ -52,6 +54,7 @@ export const JoinRoom = (
 
 		})
 		.catch((err) => {
+			console.log(err)
 			toast.error("Some Error Occured", {
 				position: toast.POSITION.TOP_LEFT,
 			});

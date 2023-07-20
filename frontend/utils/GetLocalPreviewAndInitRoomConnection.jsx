@@ -12,7 +12,7 @@ const defaultControls = {
 };
 
 
-export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoomHost, auth,user, roomID, setoverlay, title, IceServers, RoomCapacity,length_of_participants) => {
+export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoomHost, auth,user, roomID, setoverlay, title, IceServers, RoomCapacity,length_of_participants,setRoomDetails) => {
     
 
     navigator.mediaDevices.getUserMedia(defaultControls).then((stream) => {

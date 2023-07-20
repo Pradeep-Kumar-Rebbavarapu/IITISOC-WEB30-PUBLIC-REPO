@@ -3,6 +3,8 @@ import Actions from "./actions";
 const initState = {
   identity: "",
   isRoomHost: false,
+  title:"",
+  RoomCapacity:0,
   connectOnlyWithAudio: false,
   roomId: null,
   participants : [],
@@ -60,6 +62,15 @@ const reducer = (state = initState, action) => {
       return {
         ...state,Emoji:action.Emoji
       }
+    case Actions.SET_TITLE:
+      return {
+        ...state,title:action.title
+      }
+    case Actions.SET_ROOM_CAPACITY:
+      return {
+        ...state,RoomCapacity:action.RoomCapacity
+      }
+
     default:
       return state;
   }

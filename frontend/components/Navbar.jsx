@@ -4,7 +4,7 @@ import React,{useRef,useEffect} from 'react'
 import logo from '../public/images/logo.png'
 import { BsFillPersonFill } from 'react-icons/bs'
 import { ToastContainer, toast } from 'react-toastify';
-
+import Logo from '../public/images/Logo.png'
 import Cookies from 'js-cookie'
 import Context from '@/context/Context'
 import { useContext } from 'react'
@@ -41,12 +41,14 @@ const NavbarEle = () => {
 	return (
 		<>
 
-			<div className={`h-full w-full py-2 justify-between mb-2   items-center grid grid-cols-[auto_auto]  bg-white z-[100000000] ${router.pathname.includes('/RoomPage')?"hidden":""}`}>
-
-				<div className='rounded-md w-fit ml-2 font-bold text-2xl '>
-					<span className='text-4xl'>C</span>onferoLive
+			<div className={`h-full w-full py-2 justify-between mb-2   items-center grid grid-cols-[auto_auto_auto]  bg-white z-[100000000] ${router.pathname.includes('/RoomPage')?"hidden":""}`}>
+				<div>
+					<Image src={logo} alt="logo" className='w-[80px] h-[80px] ml-2 rounded-md' />
 				</div>
-				<div className='lg:flex hidden items-center !w-full'>
+				<div className='rounded-md w-fit ml-2 font-bold text-2xl '>
+				<span className='text-4xl'>W</span>ELCOME <span className='text-4xl'>T</span>O <span className='text-4xl'>C</span>ONFEROLIVE
+				</div>
+				<div className='lg:flex hidden items-center !w-full justify-center'>
 					<div className='flex  items-center   h-full'>
 						<Link className='text-xl font-bold mx-5 hover:border-t-2 border-orange-600' href="/">Home</Link>
 						{auth ? (
@@ -57,12 +59,9 @@ const NavbarEle = () => {
 						)}
 
 						<Link className='text-xl font-bold mx-5 hover:border-t-2 border-orange-600' href="/CreateRoomPage">Meet Live</Link>
-						<Link className='text-xl font-bold mx-5 hover:border-t-2 border-orange-600' href="/">Recordings</Link>
+						
 					</div>
-					<div className=' group transition-all fade-in-out'>
-						<div className='w-[50px] h-[50px] mx-5 rounded-full bg-orange-600 flex justify-center items-center'><BsFillPersonFill className='w-8 h-8 mx-auto my-auto' /></div>
-						<div className=' h-[300px] w-[300px] absolute left-[-300px]  group-hover:left-0 z-[100]  transition-all fade-in-out bg-black'></div>
-					</div>
+					
 				</div>
 				<button
 					onClick={OpenOffCanvas}
