@@ -10,13 +10,49 @@
     color:black;
   }
   
+  
   @media (prefers-color-scheme: dark) {
     :root{
-      
+      @apply invert;
+    }
+    #AreYouReady > div > video{
+      @apply invert;
+    }
+    #VideoGrid{
+      @apply invert;
+    }
+    #VideoGrid > div > .fake{
+      @apply invert;
+    }
+    #VideoGrid > div > div > div > div > .micsymbol{
+      @apply invert;
+    }
+    img{
+      @apply invert;
+    }
+    #GoogleButton{
+      @apply invert;
+    }
+    #title,#RoomCapacity,#roomID,#calender{
+      @apply bg-black text-white;
+
+    }
+    input{
+      @apply bg-white text-black;
+    }
+    #Board{
+      @apply  invert ;
     }
     
+    
+    #LeaveCallBtn{
+      @apply invert;
+    }
+    
+    
+    
+    
   }
-  
 }
 
 
