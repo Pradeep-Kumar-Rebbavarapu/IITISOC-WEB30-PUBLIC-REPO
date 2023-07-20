@@ -4,7 +4,7 @@ import React,{useRef,useEffect} from 'react'
 import logo from '../public/images/logo.png'
 import { BsFillPersonFill } from 'react-icons/bs'
 import { ToastContainer, toast } from 'react-toastify';
-import Logo from '../public/images/Logo.png'
+import Logo from '../public/images/logo.png'
 import Cookies from 'js-cookie'
 import Context from '@/context/Context'
 import { useContext } from 'react'
