@@ -599,10 +599,7 @@ function LaptopRoom(props) {
 
 	return (
 		<div>
-<NextSeo
-      title="ConferoLive - Room"
-      description="Best One Stop Solution for Video Conferencing Apps"
-    />
+
 			<div className="!overflow-hidden">
 
 				<div className="flex h-screen w-full !overflow-hidden relative">
