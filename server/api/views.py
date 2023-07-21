@@ -199,6 +199,10 @@ class CheckIfHostHasJoinedRoom(APIView):
         for room in AllRooms:
             totalsum += room.participants
         HostCreatedRoom = Room.objects.filter(room_id = room_id).filter(created_by = user).first()
+        UserCreatedRoom = Room.objects.filter(room_id = room_id).filter(joined_by = user).first()
+        if UserCreatedRoom is not None:
+            if UserCreatedRoom.blocked == True:
+                return Response('Blocked')
         if totalsum >= AllRooms.first().capacity:
             print('Room Full',Room.objects.filter(room_id = room_id).filter(is_active = True).count())
             return Response('Room Full')

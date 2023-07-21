@@ -80,6 +80,9 @@ export default function AreYouReady({ socket}) {
                         else if(response.data === false){
                             toast.info('Host Has Not Joined The Room Yet',{position:toast.POSITION.TOP_LEFT})
                         }
+                        else if(response.data === "Blocked"){
+                            toast.info('You Have Been Blocked By The Host',{position:toast.POSITION.TOP_LEFT})
+                        }
                     }).catch((err) => {
                         toast.error('Some Error Occured',{position:toast.POSITION.TOP_LEFT})
                     })
