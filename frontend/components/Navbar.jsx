@@ -41,13 +41,11 @@ const NavbarEle = () => {
 	return (
 		<>
 
-			<div className={`h-full w-full py-2 justify-between mb-2   items-center grid grid-cols-[auto_auto_auto]  bg-white z-[100000000] ${router.pathname.includes('/RoomPage')?"hidden":""}`}>
-				<div>
-					<Image src={logo} alt="logo" className='w-[80px] h-[80px] ml-2 rounded-md' />
+			<div className={`h-full w-full py-2 justify-between mb-2   items-center grid grid-cols-[auto_auto]  bg-white z-[100000000] ${router.pathname.includes('/RoomPage')?"hidden":""}`}>
+				<div id="logo">
+					<Image  src={logo} alt="logo" className='w-[80px] h-[80px] ml-2 rounded-md' />
 				</div>
-				<div className='rounded-md w-fit ml-2 font-bold text-2xl '>
-				<span className='text-4xl'>W</span>ELCOME <span className='text-4xl'>T</span>O <span className='text-4xl'>C</span>ONFEROLIVE
-				</div>
+				
 				<div className='lg:flex hidden items-center !w-full justify-center'>
 					<div className='flex  items-center   h-full'>
 						<Link className='text-xl font-bold mx-5 hover:border-t-2 border-orange-600' href="/">Home</Link>

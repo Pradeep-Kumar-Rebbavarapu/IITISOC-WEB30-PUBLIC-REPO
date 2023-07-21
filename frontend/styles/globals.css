@@ -30,6 +30,9 @@
     img{
       @apply invert;
     }
+    #logo{
+      @apply invert;
+    }
     #GoogleButton{
       @apply invert;
     }

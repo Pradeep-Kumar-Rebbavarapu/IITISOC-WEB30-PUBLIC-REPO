@@ -616,7 +616,7 @@ function LaptopRoom(props) {
 					/>
 					<div
 						id="MoreBtnMenu"
-						className="absolute w-full lg:hidden  h-[300px] bottom-[-500px] right-0 bg-white  !z-[1000] transition-all fade-in-out duration-500"
+						className="absolute w-full lg:hidden  h-[300px] bottom-[-500px] right-0 bg-white  !z-[10] transition-all fade-in-out duration-500"
 					>
 
 						<div className="w-full h-full grid grid-cols-4 justify-between items-center">
