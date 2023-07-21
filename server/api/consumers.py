@@ -93,6 +93,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         AuthorIdentity = data['OurIdentity']
         File = data['File']
         id = data['id']
+        
         response = {
             "type": "direct-message",
             "message": message,
@@ -101,7 +102,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             "File":File,
             "AuthorSocketID": self.channel_name,
             "RecieverSocketId": RecieverSocketId,
-            "AuthorIdentity": AuthorIdentity
+            "AuthorIdentity": AuthorIdentity,
+            
         }
         await self.send_json_to_user(RecieverSocketId, response)
         AuthorData = {
@@ -112,7 +114,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             "File":File,
             "RecieverSocketId": RecieverSocketId,
             "AuthorSocketID": self.channel_name,
-            "AuthorIdentity": AuthorIdentity
+            "AuthorIdentity": AuthorIdentity,
+            
         }
         await self.send_json({
             "type": "direct-message",

@@ -1,7 +1,7 @@
 import { setDirectChatHistotry, setMessages } from "../store/actions"
 import { store } from "../store/store"
 
-export const sendDirectMessage = (message,socket, RecieverSocketId, OurIdentity,File,id) => {
+export const sendDirectMessage = (message,socket, RecieverSocketId, OurIdentity,File,id,TagDetails) => {
     
         socket.current.send(JSON.stringify({
             type: 'direct-message',
@@ -11,6 +11,7 @@ export const sendDirectMessage = (message,socket, RecieverSocketId, OurIdentity,
                 RecieverSocketId: RecieverSocketId,
                 OurIdentity: OurIdentity,
                 messageContent: message,
+                
             }
     
         }))
@@ -42,6 +43,7 @@ const addMessageToChatHistory = (userSocketId, data) => {
             content: data.message,
             identity: data.AuthorIdentity,
             File:data.File,
+            privateChat:true,
         }
 
         const newUserChatHistory = {
@@ -65,6 +67,7 @@ const addMessageToChatHistory = (userSocketId, data) => {
                 content: data.message,
                 identity: data.AuthorIdentity,
                 File:data.File,
+                privateChat:true,
             }]
         }
 

@@ -99,19 +99,7 @@ export default function OffCanvasNavbar() {
                                 </li>
                             </Link>
 
-                            <Link
-                                onClick={() => {
-                                    setTimeout(() => {
-                                        handleToggleNavbar();
-                                    }, 200);
-                                }}
-                                className=""
-                                href="/"
-                            >
-                                <li className="my-2 mx-auto border-2 hover:invert transition-all fade-in-out focus:invert p-2 rounded-md text-center w-[200px] bg-black text-white">
-                                    Recordings
-                                </li>
-                            </Link>
+                            
 
 
                         </ul>

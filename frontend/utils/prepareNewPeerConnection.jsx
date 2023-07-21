@@ -165,7 +165,9 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
                 maxHeight: 'fit-content',
                 backgroundColor: 'transparent',
                 left: '30%',
-                bottom: '120px'
+                bottom: '120px',
+                border: 'none',
+                boxShadow: 'none',
             }
 
         });

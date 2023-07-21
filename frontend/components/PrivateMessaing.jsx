@@ -14,6 +14,7 @@ export default function PrivateMessaing({
   props,
   worker,
   peers,
+  TagDetails,
 }) {
   const [username, setusername] = useState(null);
   const [RecieverSocketId, setRecieverSocketId] = useState(null);
@@ -63,7 +64,7 @@ export default function PrivateMessaing({
   return (
     <div
       id="PrivateMessaging"
-      className="absolute w-full text-center top-0 bg-white grid grid-rows-[80px_auto]  left-[-2000px] border-0 border-blue-500"
+      className="absolute w-full h-screen text-center top-0 bg-white grid grid-rows-[80px_auto]  left-[-2000px] border-0 border-blue-500"
     >
       <div className="h-[100px] flex w-full border-0 border-black items-center text-center">
         <button

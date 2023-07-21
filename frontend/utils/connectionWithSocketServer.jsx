@@ -32,7 +32,7 @@ export const handleDisconnectedUser = async (peers, socketId,setjoinroom) => {
     }
 
     delete peers.current[socketId]
-    setjoinroom(true)
+    
 }
 
 

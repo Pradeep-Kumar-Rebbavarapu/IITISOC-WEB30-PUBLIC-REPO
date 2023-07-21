@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Emoji from "./Emoji";
+import { NextSeo } from 'next-seo';
 import {
 	BsCameraVideoFill,
 	BsFillCameraVideoOffFill,
@@ -224,7 +225,8 @@ function LaptopRoom(props) {
 		};
 
 		const handleClickOutsideMoreBtn = (e) => {
-			if (document.getElementById("MoreBtnMenu").contains(e.target)) {
+			const MoreBtnMenu = document.getElementById("MoreBtnMenu");
+			if (document.getElementById("MoreBtnMenu")?.contains(e.target)) {
 				if (MoreBtnMenu.classList.contains("bottom-[-500px]")) {
 					MoreBtnMenu.className =
 						"absolute w-full lg:hidden  h-[300px] bottom-[100px] right-0 bg-white  !z-[1000] transition-all fade-in-out duration-500";
@@ -237,13 +239,10 @@ function LaptopRoom(props) {
 				return;
 			}
 			if (
-				document
-					.getElementById("MoreBtnMenu")
-					.classList.contains("bottom-[-500px]")
+				document.getElementById("MoreBtnMenu").classList.contains("bottom-[-500px]")
 			) {
 				return;
 			} else {
-				const MoreBtnMenu = document.getElementById("MoreBtnMenu");
 				if (MoreBtnMenu.classList.contains("bottom-[-500px]")) {
 					MoreBtnMenu.className =
 						"absolute w-full lg:hidden  h-[300px] bottom-[100px] right-0 bg-white  !z-[1000] transition-all fade-in-out duration-500";
@@ -284,6 +283,7 @@ function LaptopRoom(props) {
 			document.removeEventListener("click", handleClickOutsideEmojiButton, true);
 			worker.current?.terminate();
 			handleDisconnectedUser(peers, props.socketId, setjoinroom);
+			setjoinroom(true)
 		};
 	}, []);
 
@@ -507,10 +507,10 @@ function LaptopRoom(props) {
 		const TextEditor = document.getElementById("TextEditor");
 		if (TextEditor.classList.contains("left-[-2000px]")) {
 			TextEditor.className =
-				"w-full h-full absolute z-[100] bg-white left-0 transition-all fade-in-out duration-500 border-2 border-black flex flex-col top-0";
+				"w-full h-screen absolute z-[100] bg-white left-0 transition-all fade-in-out duration-500 border-0 border-black flex flex-col top-0";
 		} else {
 			TextEditor.className =
-				"w-full h-full absolute z-[100] bg-white left-[-2000px] transition-all fade-in-out duration-500 border-2 border-black  top-0";
+				"w-full h-screen absolute z-[100] bg-white left-[-2000px] transition-all fade-in-out duration-500 border-0 border-black  top-0";
 		}
 	};
 
@@ -590,16 +590,19 @@ function LaptopRoom(props) {
 		const PrivateMessaging = document.getElementById("PrivateMessaging");
 		if (PrivateMessaging.classList.contains("left-[-2000px]")) {
 			PrivateMessaging.className =
-				"absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto]  left-[0px] z-[100000] transition-all fade-in-out duration-500";
+				"absolute w-full h-screen  top-0 bg-white grid grid-rows-[80px_auto]  left-[0px] z-[100000] transition-all fade-in-out duration-500";
 		} else {
 			PrivateMessaging.className =
-				"absolute w-full h-full top-0 bg-white grid grid-rows-[80px_auto] left-[-2000px] z-[100000] transition-all fade-in-out duration-500";
+				"absolute w-full h-screen  top-0 bg-white grid grid-rows-[80px_auto] left-[-2000px] z-[100000] transition-all fade-in-out duration-500";
 		}
 	};
 
 	return (
 		<div>
-
+<NextSeo
+      title="ConferoLive - Room"
+      description="Best One Stop Solution for Video Conferencing Apps"
+    />
 			<div className="!overflow-hidden">
 
 				<div className="flex h-screen w-full !overflow-hidden relative">
@@ -645,18 +648,6 @@ function LaptopRoom(props) {
 								</div>
 							</div>
 
-							<SpeechToText
-								Transcript={Transcript}
-								speechToText={speechToText}
-								setSpeechToText={setSpeechToText}
-								resetTranscript={resetTranscript}
-								peers={peers}
-								transcript={transcript}
-								browserSupportsSpeechRecognition={
-									browserSupportsSpeechRecognition
-								}
-							/>
-
 							<div
 								id="Left_Nav_Editor_Btn"
 								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100"
@@ -669,33 +660,7 @@ function LaptopRoom(props) {
 									{"Text Editor"}
 								</div>
 							</div>
-							<div
-								onClick={() => {
-									handleScreenShare(
-										ScreenShareOn,
-										ScreenSharingStream,
-										setScreenShareOn,
-										peers,
-										props,
-										localStream,
-										socket,
-										auth,
-										roomID
-									);
-								}}
-								className="group transition-all hover:bg-white flex flex-col text-center h-full w-full p-2 rounded-md justify-center mx-auto lg:hidden fade-in-out hover:bg-opacity-100"
-							>
-								<div className="border-0 rounded-lg p-2  mx-auto text-orange-500  transition-all fade-in-out  ">
-									{ScreenShareOn ? (
-										<LuScreenShareOff className="w-4 h-4 lg:w-5 lg:h-5 mx-auto" />
-									) : (
-										<LuScreenShare className="w-4 h-4 lg:w-5 lg:h-5 mx-auto" />
-									)}
-								</div>
-								<div className="text-md transition-all fade-in-out text-gray-400 mt-2  text-center">
-									{!ScreenShareOn ? "Start Sharing" : "Stop Sharing"}
-								</div>
-							</div>
+							
 
 							<div
 								onClick={() => {
@@ -710,15 +675,17 @@ function LaptopRoom(props) {
 									Open Board
 								</div>
 							</div>
+							
 							<div
+								id="Left_Nav_Editor_Btn"
 								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100"
 								onClick={() => {
-									handleRecording();
+									OpenPrivateMessaging();
 								}}
 							>
-								<BsFillRecordBtnFill className="w-7 h-7 mx-auto" />
+								<BiMessageAltError className="w-7 h-7 mx-auto" />
 								<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">
-									{RecordingOn ? "Stop Recording" : "Start Recording"}
+									{"Private Chat"}
 								</div>
 							</div>
 							<div
@@ -810,7 +777,7 @@ function LaptopRoom(props) {
 							<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-2000px] transition-all fade-in-out">
 								<div className="my-5">Room Id : {props.roomId}</div>
 								<div className="my-5">Current Room Capacity : {props.RoomCapacity}</div>
-								<div className="flex dark:invert">
+								<div className="flex .share-icons">
 									<div className="mx-2 mb-5">
 										<EmailShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} subject={`Invitation For A Video Call On ConferoLive`} body={`${props.identity} has invited you to join a meeting`} ><EmailIcon separator="-" size={50} round={true} /></EmailShareButton>
 									</div>
@@ -1352,7 +1319,7 @@ function LaptopRoom(props) {
 			</div>
 
 
-			<div className="z-[10000000000000000000000000]">
+			<div className="z-[10000]">
 				<PrivateMessaing
 					message={message}
 					setmessage={setmessage}
@@ -1367,6 +1334,7 @@ function LaptopRoom(props) {
 					props={props}
 					worker={worker}
 					peers={peers}
+					setTagDetails={setTagDetails}
 				/>
 			</div>
 

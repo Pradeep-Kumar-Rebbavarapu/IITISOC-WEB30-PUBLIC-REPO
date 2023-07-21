@@ -9,6 +9,7 @@ import axios from 'axios'
 import useWindowSize from "@rooks/use-window-size"
 import { toast } from 'react-toastify'
 import { data } from 'jquery'
+import { NextSeo } from 'next-seo';
 const EachRoom = (props) => {
     const { auth, joinroom, localStream, setJoinRoomID } = useContext(Context);
     const socket = useRef()

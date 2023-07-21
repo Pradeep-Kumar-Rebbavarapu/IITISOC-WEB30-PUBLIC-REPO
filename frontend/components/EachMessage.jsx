@@ -137,15 +137,15 @@ export default function EachMessage({
                                                 </div>
                                             </div>
                                             <div onClick={() => {
-                                                
-                                                    setTagDetails({
-                                                        tagged: true,
-                                                        taggedTo: message.identity,
-                                                        taggedMessage: message.content,
-                                                        taggedBy: props.identity,
-                                                    })
-                                                
-                                                
+
+                                                setTagDetails({
+                                                    tagged: true,
+                                                    taggedTo: message.identity,
+                                                    taggedMessage: message.content,
+                                                    taggedBy: props.identity,
+                                                })
+
+
                                                 console.log(message.identity, message.content)
                                             }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
 
@@ -159,19 +159,22 @@ export default function EachMessage({
                                                 {message.content}
 
                                             </div>
-                                            <div onClick={() => {
-                                              
+                                            {!message.privateChat && (
+                                                <div onClick={() => {
+
                                                     setTagDetails({
                                                         tagged: true,
                                                         taggedTo: message.identity,
                                                         taggedMessage: message.content,
                                                         taggedBy: props.identity,
                                                     })
-                                                
-                                                
-                                                
-                                                console.log(message.identity, message.content)
-                                            }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
+
+
+
+                                                    console.log(message.identity, message.content)
+                                                }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
+                                            )}
+
                                         </div>
                                     )}
 

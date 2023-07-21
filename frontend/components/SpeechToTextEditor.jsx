@@ -54,7 +54,7 @@ export default function SpeechToTextEditor({
   };
   return (
     <div className="flex flex-col w-full h-full px-10">
-      <div className="md:grid md:grid-cols-[100px_auto] h-fit md:py-4 md:border-b-2  px-">
+      <div className="md:grid md:grid-cols-[100px_auto] h-fit md:py-4   px-">
         <div className="w-full h-full md:flex hidden justify-center items-center ">
           <button
             className="bg-black p-2 rounded-md mx-auto my-auto text-white uppercase hover:ring-4 hover:ring-opacity-50 hover:ring-black transition-all fade-in-out"

@@ -51,7 +51,15 @@
     #LeaveCallBtn{
       @apply invert;
     }
-    
+    #firstDiv{
+      @apply invert;
+    }
+    .share-icons{
+      @apply invert;
+    }
+    #emoji{
+      @apply invert;
+    }
     
     
     

@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { Slide, Zoom, Flip, Bounce } from "react-toastify";
 import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
-
+import Footer from "../components/Footer";
 import { ThemeProvider, useTheme } from 'next-themes'
 export default function App({ Component, pageProps }) {
   const queryClient = new QueryClient();
@@ -61,6 +61,7 @@ export default function App({ Component, pageProps }) {
               <div className="z-0 ">
                 <Component {...pageProps} />
               </div>
+                <Footer/>
             </div>
           </Provider>
         </ContextProvider>

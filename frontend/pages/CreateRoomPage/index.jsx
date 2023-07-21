@@ -8,6 +8,7 @@ import CreateRoomPage1 from '../../public/images/CreateRoomPage1.png'
 import { IoCreateSharp } from 'react-icons/io5'
 import Image from 'next/image'
 import { toast } from 'react-toastify';
+import { NextSeo } from 'next-seo';
 export default function index() {
 	const {setroomID,roomID,title,settitle,setjoinroom,auth,JoinRoomID,setJoinRoomID,setisHost,setRoomCapacity,RoomCapacity } = useContext(Context)
 	
@@ -18,6 +19,10 @@ export default function index() {
 	}, [])
 	return (
 		<div>
+			<NextSeo
+      title="ConferoLive - Create Room"
+      description="Best One Stop Solution for Video Conferencing Apps"
+    />
 			<div className='  lg:grid md:grid-cols-2 tracking-wide'>
 			<div className='mx-10 my-20 flex lg:hidden  justify-center items-center '>
 					<Image src={CreateRoomPage1}  placeholder="blur mx-auto " />

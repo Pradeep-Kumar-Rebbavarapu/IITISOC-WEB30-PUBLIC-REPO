@@ -10,6 +10,7 @@ import Context from '../context/Context'
 import { JoinRoom } from '../utils/JoinRoom'
 import axios from 'axios'
 import {toast} from 'react-toastify'
+import { NextSeo } from 'next-seo';
 export default function AreYouReady({ socket}) {
 
     const { setJoinRoomID,JoinRoomID,localStream, auth, video, setvideo, audio, setaudio,setjoinroom } = useContext(Context)
@@ -39,6 +40,10 @@ export default function AreYouReady({ socket}) {
     return (
 
         <div id="AreYouReady" className='grid md:grid-cols-2 h-full z-[1]  w-full  bg-[url("/images/AreYouReady2.png")] bg-cover bg-no-repeat lg:px-32  lg:my-auto'>
+            <NextSeo
+      title="ConferoLive - Get Ready"
+      description="Best One Stop Solution for Video Conferencing Apps"
+    />
             <div className='flex flex-col justify-center items-center my-auto h-full w-full backdrop-blur-[1px]'>
                 <video muted id="my_video" className='mt-28 md:mt-10 w-[300px] lg:w-full ' />
                 <div className=''>

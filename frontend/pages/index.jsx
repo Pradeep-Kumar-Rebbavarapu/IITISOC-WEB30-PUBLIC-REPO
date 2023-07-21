@@ -3,12 +3,16 @@ import Modal from '../components/Modal'
 import BlobText from '../components/BlobText'
 import HomePage2 from '../components/HomePage2'
 import Link from 'next/link'
-
+import { NextSeo } from 'next-seo';
 
 export default function index() {
   
   return (
     <div className='h-full w-full'>
+      <NextSeo
+      title="ConferoLive"
+      description="Best One Stop Solution for Video Conferencing Apps"
+    />
       <div className='lg:grid lg:grid-cols-[30px_auto_auto] w-screen h-full   bg-white '>
         <div id='side-btn' className='w-[30px] h-screen hidden lg:block mx-auto my-auto  rounded-r-full bg-transparent'></div>
         <div className='flex justify-center items-center  lg:items-start flex-col text absolute lg:relative  z-[100] top-[50%] lg:top-0 mx-auto w-full lg:pl-10 text-center  lg:text-start  lg:translate-x-[50px] bg-transparent'>
