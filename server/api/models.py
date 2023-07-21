@@ -31,4 +31,5 @@ class Room(models.Model):
     joined_by = models.ForeignKey(User,to_field="username",on_delete=models.CASCADE,related_name="joiner",default=None)
     created_at = models.CharField(max_length=100,default = getdate)
     participants = models.IntegerField(default=0)
+    blocked = models.BooleanField(default=False)
 
