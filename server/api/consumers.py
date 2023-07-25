@@ -6,8 +6,6 @@ from channels.db import database_sync_to_async
 from asgiref.sync import sync_to_async
 from .models import Room, User
 from uuid import uuid4
-import io
-import base64
 import json
 connectedUsers = []
 rooms = []
@@ -47,7 +45,34 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             await self.askPeerToPrepareConn(data)
         elif text_data['type'] == "reject-join-request":
             await self.rejectJoinRequest(data)
+        elif text_data['type'] == "block-user":
+            await self.BlockUser(data)
 
+    async def BlockUser(self, data):
+        connUserSocketId = data['connUserSocketId']
+        roomID = data['roomID']
+        connUserIdentity = data['connUserIdentity']
+        #get the room associated with the above user and block him
+        #get old room
+        userInstance = await self.get_user_instance(connUserIdentity)
+        room = await self.get_old_room(userInstance, roomID)
+        if room is not None:
+            room.blocked = True
+            await database_sync_to_async(room.save)()
+        response = {
+            "username": connUserIdentity,
+            "type": "user-disconnected",
+            "socketId": connUserSocketId,
+            "blocked":True
+        }
+        await self.send_json_to_room(roomID, response)
+        response = {
+            "type": "user-blocked",
+            "socketId": connUserSocketId,
+            "blocked":True
+        }
+        await self.send_json_to_user(connUserSocketId, response)
+        
     async def rejectJoinRequest(self, data):
         connUserSocketId = data['connUserSocketId']
         response = {
