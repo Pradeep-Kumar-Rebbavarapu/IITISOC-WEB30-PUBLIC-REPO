@@ -54,7 +54,7 @@
     #firstDiv{
       @apply invert;
     }
-    .share-icons{
+    #MeetingDetails > #shareicons{
       @apply invert;
     }
     #emoji{

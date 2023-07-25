@@ -154,6 +154,7 @@ function LaptopRoom(props) {
 		taggedTo: null,
 		taggedMessage: null,
 	});
+	const Toasts = useRef(new Map())
 	const {
 		transcript,
 		listening,
@@ -175,7 +176,7 @@ function LaptopRoom(props) {
 			setLeftNavOpen(false);
 		}
 	};
-
+	const [OpenModals, setOpenModals] = useState(new Map());
 	useEffect(() => {
 		worker.current = new Worker("/worker.js");
 		connectionWithSocketServer(
@@ -209,9 +210,12 @@ function LaptopRoom(props) {
 			PeerUsername,
 			RoomCapacity,
 			setRoomDetails,
-			peervideo
+			peervideo,
+			setOpenModals,
+			Toasts,
+			
 		);
-
+			
 		const handleClickOutsideAttachmentBtn = (e) => {
 			if (
 				Attachmentref.current &&
@@ -254,7 +258,7 @@ function LaptopRoom(props) {
 		};
 
 		const handleClickOutsideEmojiButton = (e) => {
-			if(document.getElementById("emoji-section").contains(e.target)){
+			if (document.getElementById("emoji-section").contains(e.target)) {
 				return
 			}
 			else if (document.getElementById("EmojiBtn").contains(e.target)) {
@@ -597,32 +601,31 @@ function LaptopRoom(props) {
 		}
 	};
 
+	const ToggleMeetingsDetails = () => {
+		if (document.getElementById('MeetingDetails').classList.contains('left-[-2000px]')) {
+			document.getElementById('MeetingDetails').className = 'absolute w-full lg:w-fit p-4 h-screen lg:h-fit bg-white font-bold text-black border-2 bottom-0 lg:bottom-[100px]  z-[100] left-0 md:left-[100px] transition-all fade-in-out lg:opacity-20 lg:hover:opacity-100 text-center lg:text-start flex  lg:justify-start  items-center flex-col lg:block'
+		}
+		else {
+			document.getElementById('MeetingDetails').className = 'absolute w-full lg:w-fit p-4 h-screen lg:h-fit bg-white font-bold text-black border-2 bottom-0 lg:bottom-[100px]  z-[100]  left-[-2000px] transition-all fade-in-out lg:opacity-20 lg:hover:opacity-100 text-center lg:text-start flex lg:justify-start items-center flex-col lg:block'
+		}
+	}
+	
 	return (
 		<div>
 
 			<div className="!overflow-hidden">
 
-				<div className="flex h-screen w-full !overflow-hidden relative">
-					<UserJoinModal
-						auth={auth}
-						roomID={roomID}
-						user={user}
-						PeerUsername={PeerUsername}
-						peerUserID={peerUserID}
-						socket={socket}
-						JoinModal={JoinModal}
-						setIsJoinModal={setIsJoinModal}
-						ConnUserIdentity={ConnUserIdentity}
-					/>
+				<div id="JoinModal" className="flex h-screen w-full !overflow-hidden relative">
+					
 					<div
 						id="MoreBtnMenu"
 						className="absolute w-full lg:hidden  h-[300px] bottom-[-500px] right-0 bg-white  !z-[10] transition-all fade-in-out duration-500"
 					>
 
-						<div className="w-full h-full grid grid-cols-4 justify-between items-center">
+						<div className="w-full h-full grid grid-cols-3 justify-between items-center">
 							<div
 								id="Left_Nav_Message_Btn"
-								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600  hover:bg-opacity-100"
+								className=" cursor-pointer h-full w-full  p-3 rounded-lg  transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 hover:bg-orange-500 focus:bg-orange-500 bg-opacity-0 hover:bg-opacity-20"
 								onClick={() => {
 									handleToggleChatParticipantsArea("Chat");
 								}}
@@ -634,7 +637,7 @@ function LaptopRoom(props) {
 							</div>
 							<div
 								id="Left_Nav_Participants_Btn"
-								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100"
+								className=" cursor-pointer h-full w-full  p-3 rounded-lg  transition-all flex flex-col text-center justify-center mx-auto text-orange-600 hover:bg-orange-500 focus:bg-orange-500 bg-opacity-0 hover:bg-opacity-20"
 								onClick={() => {
 									handleToggleChatParticipantsArea("Participants");
 								}}
@@ -647,7 +650,7 @@ function LaptopRoom(props) {
 
 							<div
 								id="Left_Nav_Editor_Btn"
-								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100"
+								className=" cursor-pointer h-full w-full  p-3 rounded-lg  transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 hover:bg-orange-500 focus:bg-orange-500 bg-opacity-0 hover:bg-opacity-20"
 								onClick={() => {
 									OpenTextEditor();
 								}}
@@ -657,13 +660,13 @@ function LaptopRoom(props) {
 									{"Text Editor"}
 								</div>
 							</div>
-							
+
 
 							<div
 								onClick={() => {
 									ToggleBoard();
 								}}
-								className="group transition-all hover:bg-white flex flex-col text-center h-full w-full p-2 rounded-md justify-center mx-auto lg:hidden fade-in-out hover:bg-opacity-100"
+								className="group transition-all flex flex-col text-center h-full w-full p-2 rounded-md justify-center mx-auto lg:hidden fade-in-out  hover:bg-orange-500 focus:bg-orange-500 bg-opacity-0 cursor-pointer hover:bg-opacity-20"
 							>
 								<div className="border-0 rounded-lg p-2 w-fit mx-auto text-orange-500  transition-all fade-in-out ">
 									<BsClipboard2Fill className="w-4 h-4 lg:w-5 lg:h-5" />
@@ -672,10 +675,10 @@ function LaptopRoom(props) {
 									Open Board
 								</div>
 							</div>
-							
+
 							<div
 								id="Left_Nav_Editor_Btn"
-								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100"
+								className=" cursor-pointer h-full w-full  p-3 rounded-lg  transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 hover:bg-orange-500 focus:bg-orange-500 bg-opacity-0 hover:bg-opacity-20"
 								onClick={() => {
 									OpenPrivateMessaging();
 								}}
@@ -686,15 +689,15 @@ function LaptopRoom(props) {
 								</div>
 							</div>
 							<div
-								id="Left_Nav_Editor_Btn"
-								className="focus:bg-white cursor-pointer h-full w-full  p-3 rounded-lg hover:bg-white transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 bg-opa-20 hover:bg-opacity-100"
+								id="Left_Nav_Meetings_Btn"
+								className=" cursor-pointer h-full w-full  p-3 rounded-lg  transition-all flex flex-col text-center  justify-center mx-auto text-orange-600 hover:bg-orange-500 focus:bg-orange-500 bg-opacity-0 hover:bg-opacity-20"
 								onClick={() => {
-									OpenPrivateMessaging();
+									ToggleMeetingsDetails()
 								}}
 							>
-								<BiMessageAltError className="w-7 h-7 mx-auto" />
+								<TbListDetails className="w-7 h-7 mx-auto" />
 								<div className="text-md transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">
-									{"Private Chat"}
+									{"Meeting Details"}
 								</div>
 							</div>
 						</div>
@@ -771,80 +774,74 @@ function LaptopRoom(props) {
 							>
 								<BiMessageAltError className="w-7 h-7" />
 							</div>
-							<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-2000px] transition-all fade-in-out">
-								<div className="my-5">Room Id : {props.roomId}</div>
-								<div className="my-5">Current Room Capacity : {props.RoomCapacity}</div>
-								<div className="flex .share-icons">
-									<div className="mx-2 mb-5">
-										<EmailShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} subject={`Invitation For A Video Call On ConferoLive`} body={`${props.identity} has invited you to join a meeting`} ><EmailIcon separator="-" size={50} round={true} /></EmailShareButton>
-									</div>
-									<div className="mx-2 mb-5">
-										<WhatsappShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} title={`${props.identity} has Invited You To Join A Meeting`} >
-											<WhatsappIcon size={50} round={true} />
-										</WhatsappShareButton>
-									</div>
-									<div className="mx-2 mb-5">
-										<FacebookShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`}>
-											<FacebookIcon quote="Join A Meet" hanging={`by #${props.identity}`} size={50} round={true} />
-										</FacebookShareButton>
-									</div>
-									<div className="mx-2 mb-5">
-										<TwitterShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`}  >
-											<TwitterIcon title={'Wanna Join A Meet'} via={`${props.identity}`} size={50} round={true} />
-										</TwitterShareButton>
-									</div>
-									<div>
 
-									</div>
-									<div>
-
-									</div>
-								</div>
-								{props.isRoomHost && (
-									<>
-										<input min="0" onKeyPress={(event) => {
-											const charCode = event.charCode;
-
-											if (charCode < 48 || charCode > 57) {
-												event.preventDefault();
-											}
-										}} type="number" className="p-2 border-2  border-black text-black outline-none" placeholder='Change Room Capacity' /><button className="p-2 bg-black hover:ring-4 text-white hover:ring-opacity-50 hover:ring-black transition-all fade-in-out" onClick={() => {
-											if (props.isRoomHost && document.querySelector('input[type="number"]').value > 0) {
-												axios.post('https://www.pradeeps-video-conferencing.store/api/v1/ChangeRoomCapacity', {
-													roomID: RoomDetails.roomID,
-													capacity: document.querySelector('input[type="number"]').value
-												}, {
-													headers: {
-														Authorization: 'Bearer ' + auth.access
-													}
-												}).then((response) => {
-													console.log(response.data)
-													store.dispatch(setRoomCapacity(response.data.capacity))
-													toast.success('Room Capacity Changed')
-												}).catch((err) => {
-													console.log(err)
-													toast.error('Some Error Occured')
-												})
-											}
-											else {
-												toast.error('You Cannot Change Room Capacity')
-											}
-
-										}}>Change</button>
-									</>
-								)}
-
-							</div>
 							<div className="w-[60px] h-[60px] rounded-full bg-white border-2 border-black bottom-0 mt-auto mb-5 flex justify-center items-center " onClick={() => {
-								if (document.getElementById('MeetingDetails').classList.contains('left-[-2000px]')) {
-									document.getElementById('MeetingDetails').className = 'absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[100px] transition-all fade-in-out opacity-20 hover:opacity-100'
-								}
-								else {
-									document.getElementById('MeetingDetails').className = 'absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]  z-[100] left-[-2000px] transition-all fade-in-out opacity-20 hover:opacity-100'
-								}
+								ToggleMeetingsDetails()
 							}}>
 								<TbListDetails className="w-7 h-7" />
 							</div>
+						</div>
+						<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]   z-[100] left-[-2000px] transition-all fade-in-out">
+							<div className="p-2 cursor-pointer bg-white  text-xl lg:hidden w-fit rounded-md" onClick={()=>{
+								ToggleMeetingsDetails()
+							}}>Close</div>
+							<div className="my-5 ">Room Id : {props.roomId}</div>
+							<div className="my-5">Current Room Capacity : {props.RoomCapacity}</div>
+							<div id="#shareicons" className="flex .share-icons ">
+								<div className="mx-2 mb-5 .shareicons">
+									<EmailShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} subject={`Invitation For A Video Call On ConferoLive`} body={`${props.identity} has invited you to join a meeting`} ><EmailIcon separator="-" size={50} round={true} /></EmailShareButton>
+								</div>
+								<div className="mx-2 mb-5">
+									<WhatsappShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`} title={`${props.identity} has Invited You To Join A Meeting`} >
+										<WhatsappIcon size={50} round={true} />
+									</WhatsappShareButton>
+								</div>
+								<div className="mx-2 mb-5">
+									<FacebookShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`}>
+										<FacebookIcon quote="Join A Meet" hanging={`by #${props.identity}`} size={50} round={true} />
+									</FacebookShareButton>
+								</div>
+								<div className="mx-2 mb-5">
+									<TwitterShareButton url={`https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app${router.asPath}`}  >
+										<TwitterIcon title={'Wanna Join A Meet'} via={`${props.identity}`} size={50} round={true} />
+									</TwitterShareButton>
+								</div>
+
+							</div>
+							{props.isRoomHost && (
+								<>
+									<input min="0" onKeyPress={(event) => {
+										const charCode = event.charCode;
+
+										if (charCode < 48 || charCode > 57) {
+											event.preventDefault();
+										}
+									}} type="number" className="p-2 border-2  border-black text-black outline-none" placeholder='Change Room Capacity w-full lg:w-fit my-2 lg:my-auto' /><button className="p-2 bg-black hover:ring-4 text-white hover:ring-opacity-50 hover:ring-black transition-all fade-in-out my-2 lg:my-auto" onClick={() => {
+										if (props.isRoomHost && document.querySelector('input[type="number"]').value > 0) {
+											axios.post('https://www.pradeeps-video-conferencing.store/api/v1/ChangeRoomCapacity', {
+												roomID: RoomDetails.roomID,
+												capacity: document.querySelector('input[type="number"]').value
+											}, {
+												headers: {
+													Authorization: 'Bearer ' + auth.access
+												}
+											}).then((response) => {
+												console.log(response.data)
+												store.dispatch(setRoomCapacity(response.data.capacity))
+												toast.success('Room Capacity Changed')
+											}).catch((err) => {
+												console.log(err)
+												toast.error('Some Error Occured')
+											})
+										}
+										else {
+											toast.error('You Cannot Change Room Capacity')
+										}
+
+									}}>Change</button>
+								</>
+							)}
+
 						</div>
 					</div>
 					<div className="flex-1 flex flex-col relative  overflow-y-hidden w-full  ">
@@ -898,7 +895,7 @@ function LaptopRoom(props) {
 										id="EmojiBtn"
 
 
-										className="group transition-all fade-in-out mx-5 "
+										className="group transition-all fade-in-out mx-5 cursor-pointer"
 									>
 										<div
 											onClick={() => { }}
@@ -912,7 +909,7 @@ function LaptopRoom(props) {
 										</div>
 									</div>
 
-									<div className="group transition-all fade-in-out mx-5">
+									<div className="group transition-all fade-in-out mx-5 cursor-pointer">
 										<div
 											onClick={() => {
 												ToggleMic(MicOn);
@@ -931,7 +928,7 @@ function LaptopRoom(props) {
 										</div>
 									</div>
 
-									<div className="group transition-all fade-in-out mx-5">
+									<div className="group transition-all fade-in-out mx-5 cursor-pointer">
 										<div
 											onClick={() => {
 												ToggleCamera(CamOn);
@@ -950,7 +947,7 @@ function LaptopRoom(props) {
 										</div>
 									</div>
 
-									<div className="group transition-all hidden lg:block fade-in-out mx-5">
+									<div className="group transition-all hidden lg:block fade-in-out mx-5 cursor-pointer">
 										<div
 											onClick={() => {
 												handleScreenShare(
@@ -978,7 +975,7 @@ function LaptopRoom(props) {
 										</div>
 									</div>
 
-									<div className="group transition-all hidden lg:block fade-in-out mx-5">
+									<div className="group transition-all hidden lg:block fade-in-out mx-5 cursor-pointer">
 										<div
 											onClick={() => {
 												ToggleBoard();
@@ -995,7 +992,7 @@ function LaptopRoom(props) {
 
 									<div
 										id="HandRaise"
-										className="group transition-all fade-in-out mx-5"
+										className="group transition-all fade-in-out mx-5 cursor-pointer"
 									>
 										<div
 											onClick={() => {
@@ -1035,7 +1032,7 @@ function LaptopRoom(props) {
 
 									<div
 										id="MoreBtn"
-										className="group lg:hidden transition-all fade-in-out mx-5"
+										className="group lg:hidden transition-all fade-in-out mx-5 cursor-pointer"
 									>
 										<div
 											onClick={() => {
@@ -1051,7 +1048,7 @@ function LaptopRoom(props) {
 										</div>
 									</div>
 								</div>
-								<div id="LeaveCallBtn" className="flex justify-center items-center !overflow-hidden !z-[10]">
+								<div id="LeaveCallBtn" className="flex justify-center items-center !overflow-hidden !z-[10] cursor-pointer">
 									<div className="group transition-all fade-in-out mx-5 !z-[0]" onClick={() => {
 										console.log('clicked')
 										localStream.current.getTracks().forEach((track) => {
@@ -1154,6 +1151,10 @@ function LaptopRoom(props) {
 								</div>
 								<div id="Participants" className="p-3 w-full h-full">
 									<ParticipantsList
+										props={props}
+										peers={peers}
+										socket={socket}
+										roomID={roomID}
 										isRoomHost={props.isRoomHost}
 										participants={props.participants}
 									/>
