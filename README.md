@@ -18,15 +18,13 @@ The task is to build an online video conferencing web application for real-time 
 
 # Running the App locally
 
-> Prerequisites: <a href = "https://nodejs.org/en/" target = "blank"> Node.js </a>, <a href = "https://git-scm.com/" target = "blank"> Git </a> and npm installed.
+> Prerequisites: <a href = "https://nodejs.org/en/" target = "blank"> Node.js </a>, <a href = "https://git-scm.com/" target = "blank"> Git </a>, [Django](https://djangoproject.com/) and [Python](https://python.org/downloads/) installed.
 
 - Clone this repository using the following command:
     ```git clone https://github.com/kr-2003/IITISoC-23-Web-30-Video_conferencing.git```
 
-## Setting up Backend
+## Setting up the Backend
 
-  * ```pip install django```
-  * ```django-admin startproject server```
   * ```cd server```
   * ```python -m venv venv```
   * ```venv\Scripts\activate```
@@ -40,6 +38,10 @@ The task is to build an online video conferencing web application for real-time 
   * ```pnpm i --force``` or ```npm install --force```
   * ```npm run dev``` or ```pnpm dev```
   * Open ```https://localhost:8000``` or the link that appears in the terminal in any web browser. Local deployment complete.
+
+# Solution Explanation
+
+ <!-- TBD by Pradeep -->
 
 # Features
 
