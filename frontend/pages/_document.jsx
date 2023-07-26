@@ -1,9 +1,9 @@
 import { store } from '@/store/store'
 import { Html, Head, Main, NextScript } from 'next/document'
 import { useEffect } from 'react'
-import imageDirectURL from '../public/images/logo.png'
-export default function Document() {
 
+export default function Document() {
+  const imageDirectURL = `${process.env.SITE_URL}/images/logo.png`
   return (
     <Html lang="en">
       <head>
