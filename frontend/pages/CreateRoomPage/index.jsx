@@ -24,7 +24,7 @@ export default function index() {
 
 		if(error){
 			toast.error('Error Signing In',{position: toast.POSITION.TOP_LEFT })
-			console.log(Error)
+			
 		}
 	}
 	const router = useRouter()

@@ -56,7 +56,7 @@ export const ContextProvider = ({ children }) => {
             setauth(response.data)
             Cookies.set('auth',JSON.stringify(response.data),{expires: 365,path:"/"})
         }).catch((err)=>{
-            console.log(err)
+            
             Logout()
         })
 

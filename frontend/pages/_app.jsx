@@ -25,7 +25,7 @@ export default function App({ Component, pageProps }) {
   const {theme,setTheme} = useTheme('light')
   const [mounted,setmounted] = useState(false)
   const currentTheme = theme === 'system' ? (theme === 'dark' ? 'dark' : 'light') : theme
-  console.log(currentTheme)
+  
   React.useEffect(() => {
     
     router.events.on("routeChangeStart", () => {

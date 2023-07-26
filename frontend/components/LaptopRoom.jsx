@@ -357,7 +357,7 @@ function LaptopRoom(props) {
 		const localVideo = document.getElementById('my_video_container');
 		const fakeVideo = document.getElementById('my_fakevideo');
 
-		console.log(fakeVideo)
+		
 		if (localStream.current.getVideoTracks()[0].enabled) {
 
 			localVideo.style.display = "none"
@@ -842,11 +842,11 @@ function LaptopRoom(props) {
 													Authorization: 'Bearer ' + auth.access
 												}
 											}).then((response) => {
-												console.log(response.data)
+												
 												store.dispatch(setRoomCapacity(response.data.capacity))
 												toast.success('Room Capacity Changed')
 											}).catch((err) => {
-												console.log(err)
+												
 												toast.error('Some Error Occured')
 											})
 										}
@@ -1069,7 +1069,7 @@ function LaptopRoom(props) {
 								</div>
 								<div id="LeaveCallBtn" className="flex justify-center items-center !overflow-hidden !z-[10] cursor-pointer">
 									<div className="group transition-all fade-in-out mx-5 !z-[0]" onClick={() => {
-										console.log('clicked')
+										
 										localStream.current.getTracks().forEach((track) => {
 											track.stop();
 										});

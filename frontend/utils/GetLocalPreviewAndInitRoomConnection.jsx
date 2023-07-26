@@ -27,7 +27,7 @@ export const getLocalPreviewAndInitRoomConnection = (socket, localStream, isRoom
             localStream.current.getTracks().forEach(t => t.stop())
         }
         
-        console.log(err)
+        
         alert(err)
     })
 }

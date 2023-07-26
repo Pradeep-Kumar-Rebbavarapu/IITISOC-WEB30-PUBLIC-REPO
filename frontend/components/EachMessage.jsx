@@ -146,7 +146,7 @@ export default function EachMessage({
                                                 })
 
 
-                                                console.log(message.identity, message.content)
+                                                
                                             }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
 
                                         </div>
@@ -171,7 +171,7 @@ export default function EachMessage({
 
 
 
-                                                    console.log(message.identity, message.content)
+                                                    
                                                 }} className="bg-gray-500 hover:ring-4 hover:ring-gray-500 hover:ring-opacity-50 transition-all fade-in-out cursor-pointer h-full rounded-r-md flex items-center text-white p-2"><AiFillTags className=" w-5 h-5" /></div>
                                             )}
 

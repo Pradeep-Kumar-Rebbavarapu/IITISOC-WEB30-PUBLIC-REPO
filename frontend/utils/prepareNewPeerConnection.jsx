@@ -149,7 +149,7 @@ const handleOnPeerData = async (peerdata, isDrawing, Transcript, setDownloadingT
     }
     else if (peerdata.toString().includes('emoji')) {
         const data = JSON.parse(peerdata);
-        console.log(data)
+        
         toast(<EmojiToast emoji={data.data} name={data.identity} />, {
             position: "bottom-left",
             autoClose: 800,
@@ -389,7 +389,7 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
     if (IceServers.current) {
         configuration = configuration.iceServers.concat(IceServers.current)
     }
-    console.log('configuration', configuration)
+    
     const streamToUse = ScreenSharingStream.current ? ScreenSharingStream.current : localStream.current;
     const peer = new Peer({
         initiator: isInitiator,
@@ -397,11 +397,11 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         stream: streamToUse,
         config: configuration
     })
-    console.log('peer before transfer', peer)
+    
     peers.current[connUserSocketId] = peer
     peers.current[connUserSocketId].on('signal', (data) => {
 
-        console.log('signal data', data)
+        
         const SignalData = {
             signal: data,
             connUserSocketId: connUserSocketId,
@@ -409,10 +409,10 @@ export const prepareNewPeerConnection = (socket, peers, connUserSocketId, isInit
         }
         SignalPeerData(socket, SignalData)
     })
-    console.log('peer after transfer', peer)
+    
 
     peers.current[connUserSocketId].on('stream', (stream) => {
-        console.log(stream)
+        
         addStream(stream, connUserSocketId, innerWidth, length_of_participants, video, peervideo);
     })
     peers.current[connUserSocketId].on('data', (peerdata) => {

@@ -11,7 +11,7 @@ export default function SpeechToTextEditor({
 }) {
   const {auth} = useContext(Context)
   const [loading,setloading] = useState(false)
-  console.log(auth)
+  
   const handleSummarizeAndDownload = () => {
     setloading(true)
     const prompt = `
@@ -34,14 +34,14 @@ export default function SpeechToTextEditor({
         }
       )
       .then(async (response) => {
-        console.log(response.data.choices[0].message.content);
+        
         const htmlString = response.data.choices[0].message.content;
         await axios.post('https://www.pradeeps-video-conferencing.store/api/v1/ConvertHtmlToDocx/',{data:response.data.choices[0].message.content},{
           headers:{
             Authorization:'Bearer '+auth.access,
           }
         }).then((response)=>{
-          console.log(response.data)
+          
           const url = response.data.download_url
           const link = document.createElement('a')
           link.href = url

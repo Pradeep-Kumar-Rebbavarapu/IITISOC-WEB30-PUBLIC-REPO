@@ -20,7 +20,7 @@ const ScreenShareConstraints = {
 //             setScreenShareOn(true);
 
 //         } catch (err) {
-//             console.log(err)
+//             
 //             alert('Screen Share Error');
 //         }
 
@@ -56,7 +56,7 @@ export const handleScreenShare = async (ScreenShareOn, ScreenSharingStream, setS
 
         } catch (err) {
             setScreenShareOn(false);
-            console.log(err)
+            
 
         }
 

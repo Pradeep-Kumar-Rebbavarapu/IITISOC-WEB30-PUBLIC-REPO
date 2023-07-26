@@ -94,11 +94,11 @@ const NewLaptopRoom = () => {
                                     Authorization: 'Bearer ' + auth.access
                                 }
                             }).then((response) => {
-                                console.log(response.data)
+                               
                                 setRoomDetails({ ...RoomDetails, roomCapacity: response.data.capacity })
                                 toast.success('Room Capacity Changed')
                             }).catch((err) => {
-                                console.log(err)
+                                
                                 toast.error('Some Error Occured')
                             })
                         }}>Change</button>
@@ -327,7 +327,7 @@ const NewLaptopRoom = () => {
                         </div>
                         <div className="flex justify-center items-center">
                             <div className="group transition-all fade-in-out mx-5" onClick={() => {
-                                console.log('clicked')
+                                
                                 localStream.current.getTracks().forEach((track) => {
                                     track.stop();
                                 });

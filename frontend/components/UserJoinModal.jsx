@@ -21,7 +21,7 @@ export default function UserJoinModal({
 	toast
 }) {
 	
-	console.log('toasts',Toasts)
+	
 	return (
 		<div id={`UserJoinModal-${peerUserID}`}  className="!z-[10000]  ">
 			<div id="popup-modal" tabindex="-1" class="z-50 p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full  ">

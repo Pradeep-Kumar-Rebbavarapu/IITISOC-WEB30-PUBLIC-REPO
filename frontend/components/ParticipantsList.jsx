@@ -41,7 +41,7 @@ export default function ParticipantsList({ participants, isRoomHost,peers,roomID
                             <div className='sm:text-xl break-all font-bold text-black text-center my-2'>Do You Want To Block The User {ele.identity}</div>
                             <div className='text-center'>He Will No More Be Able To Join The Meeting</div>
                             <div className='w-full flex justify-center items-center my-2'><button className='bg-orange-500 w-fit mx-auto text-black p-2 rounded-md my-2' onClick={()=>{
-                                console.log(BlockedData)
+                                
                                 socket.current.send(JSON.stringify({
                                     "type": "block-user",
                                     "data": {

@@ -13,10 +13,10 @@ import {toast} from 'react-toastify'
 import EmojiToast from "./EmojiToast";
 export default function Emoji({peers,props}) {
   
-  console.log()
+  
   function onClick(emojiData) {
     
-    console.log(emojiData)
+    
     for(let socketId in peers.current){
       peers.current[socketId].send(JSON.stringify({
         emoji:true,

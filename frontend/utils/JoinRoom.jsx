@@ -54,7 +54,7 @@ export const JoinRoom = (
 
 		})
 		.catch((err) => {
-			console.log(err)
+			
 			toast.error("Some Error Occured", {
 				position: toast.POSITION.TOP_LEFT,
 			});

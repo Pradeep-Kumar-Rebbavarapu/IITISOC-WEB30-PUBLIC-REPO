@@ -67,7 +67,7 @@ export default function SignupForm({ ToggleForm }) {
     const login = googleProvider.useGoogleLogin({
         flow: "auth-code",
         onSuccess: async (res) => {
-            console.log(res);
+            
             const code = res.code;
             await axios
                 .post(
@@ -105,7 +105,7 @@ export default function SignupForm({ ToggleForm }) {
                     router.push("/");
                 })
                 .catch((err) => {
-                    console.log(err);
+                    
                 });
         },
         onError: (err) => console.error("Failed to login with google", err),
@@ -186,7 +186,7 @@ const CreateUser = async (user) => {
 
 const ResendEmail = async (email) =>{
     return axios.post('https://www.pradeeps-video-conferencing.store/dj-rest-auth/registration/resend-email/',{email:email}).then((response)=>{
-        console.log(response.data)
+        
     })
 }
 
@@ -203,7 +203,7 @@ const useCreateUser = () => {
         onError: (error) => {
             const email = JSON.parse(error.config.data).email
             const newerror = error.response.data;
-            console.log(newerror)
+            
             if (error.message == "Network Error") {
                 toast.error("Network Error Please Try After Some Time", {
                     position: toast.POSITION.TOP_LEFT,

@@ -108,7 +108,7 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
 
             const { signal, connUserSocketId, video } = data
             peervideo.current = video
-            console.log('data', data)
+            
             handleSignallingData(peers, data)
         }
         else if (type === "conn-init") {

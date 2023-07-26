@@ -97,7 +97,7 @@ function sliceandsend(file, peers, setFile,id,PrivateMessaging,RecieverSocketId)
                     reader.readAsArrayBuffer(chunkBlob);
                 }
             } else {
-                console.log("Read error: " + evt.target.error);
+                
                 return;
             }
 
