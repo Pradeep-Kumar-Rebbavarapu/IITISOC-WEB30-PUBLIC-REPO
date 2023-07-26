@@ -10,7 +10,7 @@ import Context from '../context/Context'
 import { JoinRoom } from '../utils/JoinRoom'
 import axios from 'axios'
 import {toast} from 'react-toastify'
-import { NextSeo } from 'next-seo';
+
 export default function AreYouReady({ socket}) {
 
     const { setJoinRoomID,JoinRoomID,localStream, auth, video, setvideo, audio, setaudio,setjoinroom } = useContext(Context)
