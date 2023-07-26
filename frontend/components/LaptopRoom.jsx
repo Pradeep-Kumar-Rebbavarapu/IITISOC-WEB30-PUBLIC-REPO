@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Emoji from "./Emoji";
-import { NextSeo } from 'next-seo';import {
+import {
 	BsCameraVideoFill,
 	BsFillCameraVideoOffFill,
 	BsChatLeftDots,
