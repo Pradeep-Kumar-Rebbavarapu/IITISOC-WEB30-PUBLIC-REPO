@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import *
 from .models import *
+import jwt
 from rest_framework.permissions import IsAuthenticated
 from .helpers import *
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -27,6 +28,19 @@ from bs4 import BeautifulSoup
 # Create your views here.
 from django.core.files.storage import FileSystemStorage
 import html2text
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+import datetime
+import os.path
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from google.oauth2 import service_account
+import googleapiclient.discovery
+
+
 
 class VerifyOTP(APIView):  # Making a Class Based View Called Verify OTP
     def post(self, request):  # making a post reuqest
@@ -65,28 +79,29 @@ class Login(APIView):  # making a class based view called Login Using APIView
             password = request.data['password']
             email = request.data['email']
             user = User.objects.filter(username=username).first()
-            if user is None:  
+            if user is None:
                 return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
             if not user.check_password(password):
                 return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
             else:
-                if email == user.email:  
+                if email == user.email:
                     refresh = RefreshToken.for_user(user)
-                    user.last_login = datetime.datetime.now() 
-                    user.save()  
-                    tokens = requests.post('http://localhost:8000/api/token/', data={"username":username,"password":password})
-                    if(tokens.status_code == 401):
+                    user.last_login = datetime.datetime.now()
+                    user.save()
+                    tokens = requests.post(
+                        'http://localhost:8000/api/token/', data={"username": username, "password": password})
+                    if (tokens.status_code == 401):
                         return Response({'error': 'invalid username or password'}, status=status.HTTP_404_NOT_FOUND)
-                    if(tokens.status_code == 500):
+                    if (tokens.status_code == 500):
                         return Response({'error': 'Some Error Occured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                     print(tokens.json())
-                    if(tokens.status_code == 200):
+                    if (tokens.status_code == 200):
                         access_token = tokens.json()['access']
                         refresh_token = tokens.json()['refresh']
-                        return Response({  
-                            'id':user.id,
+                        return Response({
+                            'id': user.id,
                             'message': 'login successfull',
-                            'refresh':str(refresh_token),
+                            'refresh': str(refresh_token),
                             'access': str(access_token),
                             'username': user.username,
                             'last_login_date': getdate(),
@@ -94,13 +109,11 @@ class Login(APIView):  # making a class based view called Login Using APIView
                             'email': user.email},
                             status=status.HTTP_200_OK)
 
-                else:  
+                else:
                     return Response({'errors': 'email not matched'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             print(e)
             return Response({'errors': 'Some Error Occured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 
 class TokenRefresh(APIView):
@@ -129,82 +142,90 @@ class TokenRefresh(APIView):
             return Response({'error': 'Refresh token not provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
 class GetRoomDetails(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         try:
             user = self.request.user
             room_id = request.data['roomID']
             length_of_participants = request.data['length_of_participants']
-            old_room = Room.objects.filter(room_id=room_id).filter(created_by = user).first()
-            room = Room.objects.filter(room_id = room_id).first()
+            old_room = Room.objects.filter(
+                room_id=room_id).filter(created_by=user).first()
+            room = Room.objects.filter(room_id=room_id).first()
             if old_room is not None:
                 serializer = RoomSerializer(old_room)
-                return Response(serializer.data,status=status.HTTP_200_OK)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 if room is None:
                     return Response({'errors': 'Room Not Found'}, status=status.HTTP_404_NOT_FOUND)
                 else:
                     serializer = RoomSerializer(room)
-                    return Response(serializer.data,status=status.HTTP_200_OK)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             print(e)
             return Response({'errors': 'Some Error Occured'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
 
 class TurnServers(APIView):
-    def get(self,request):
+    def get(self, request):
         AccountSID = "ACceb1c26f5c6fc371a6fa793dbcb74814"
         AuthToken = "2ae496b97e92993c62610aa48756efb1"
         client = Client(AccountSID, AuthToken)
         token = client.tokens.create()
         ice_servers = token.ice_servers  # Retrieve the iceServers from the token
         return Response(ice_servers)
-    
+
 
 class UserStatus(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         user = self.request.user
         data = request.data
         room_id = data['roomID']
-        room = Room.objects.filter(room_id = room_id).first()
+        room = Room.objects.filter(room_id=room_id).first()
         if room is not None:
             return Response('joinroom')
         else:
             return Response('createroom')
+
+
 class CheckIfRoomExists(APIView):
-    def post(self,request):
+    def post(self, request):
         data = request.data
         room_id = data['roomID']
-        room = Room.objects.filter(room_id = room_id).first()
+        room = Room.objects.filter(room_id=room_id).first()
         if room is not None:
             return Response(True)
         else:
             return Response(False)
-        
+
+
 class CheckIfHostHasJoinedRoom(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         data = request.data
         room_id = data['roomID']
         user = self.request.user
-        AllRooms = Room.objects.filter(room_id = room_id)
+        AllRooms = Room.objects.filter(room_id=room_id)
         totalsum = 0
         for room in AllRooms:
             totalsum += room.participants
-        HostCreatedRoom = Room.objects.filter(room_id = room_id).filter(created_by = user).first()
-        UserCreatedRoom = Room.objects.filter(room_id = room_id).filter(joined_by = user).first()
+        HostCreatedRoom = Room.objects.filter(
+            room_id=room_id).filter(created_by=user).first()
+        UserCreatedRoom = Room.objects.filter(
+            room_id=room_id).filter(joined_by=user).first()
         if UserCreatedRoom is not None:
             if UserCreatedRoom.blocked == True:
                 return Response('Blocked')
         if totalsum >= AllRooms.first().capacity:
-            print('Room Full',Room.objects.filter(room_id = room_id).filter(is_active = True).count())
+            print('Room Full', Room.objects.filter(
+                room_id=room_id).filter(is_active=True).count())
             return Response('Room Full')
         if AllRooms.first() is not None:
             if AllRooms.first().is_active == True:
@@ -219,28 +240,30 @@ class CheckIfHostHasJoinedRoom(APIView):
                         return Response(False)
                 else:
                     return Response(False)
-                    
-    
+
+
 class GetUserDetails(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         id = request.data["id"]
-        #dont send password
-        user = User.objects.filter(id = id).first()
+        # dont send password
+        user = User.objects.filter(id=id).first()
         if user is not None:
-            #except for the password send everything else
+            # except for the password send everything else
             serializer = UserSerializer(user)
-            return Response({'id':serializer.data['id'],"email":serializer.data['email'],'username':serializer.data['username']},status=status.HTTP_200_OK)
+            return Response({'id': serializer.data['id'], "email": serializer.data['email'], 'username': serializer.data['username']}, status=status.HTTP_200_OK)
         else:
             return Response({'errors': 'User Not Found'}, status=status.HTTP_404_NOT_FOUND)
-        
+
 
 class ConvertHtmlToDocx(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self,request):
-        data=request.data['data']
+
+    def post(self, request):
+        data = request.data['data']
         html_content = str(BeautifulSoup(data))
         document = Document()
         document.add_paragraph(html2text.html2text(str(html_content)))
@@ -262,20 +285,29 @@ class ConvertHtmlToDocx(APIView):
 
         # Return the download URL in a JSON response
         return Response({'download_url': download_url})
-    
+
 
 class ChangeRoomCapacity(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self,request):
+
+    def post(self, request):
         data = request.data
         user = request.user
         room_id = data['roomID']
         capacity = data['capacity']
-        room = Room.objects.filter(room_id = room_id).filter(created_by = user).first()
+        room = Room.objects.filter(room_id=room_id).filter(
+            created_by=user).first()
         if room is not None:
             room.capacity = capacity
             room.save()
-            return Response({capacity:capacity},status=status.HTTP_200_OK)
+            return Response({capacity: capacity}, status=status.HTTP_200_OK)
         else:
-            return Response('Room Not Found',status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response('Room Not Found', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class AddCalender(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request):
+        pass

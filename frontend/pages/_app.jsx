@@ -15,6 +15,8 @@ import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
 import Footer from "../components/Footer";
 import { ThemeProvider, useTheme } from 'next-themes'
+import {SessionContextProvider} from '@supabase/auth-helpers-react'
+import { createClient } from '@supabase/supabase-js'
 export default function App({ Component, pageProps }) {
   const queryClient = new QueryClient();
   const state = store.getState();
@@ -38,10 +40,12 @@ export default function App({ Component, pageProps }) {
   }, []);
   if(!mounted) return null
   
+  const supabase = createClient('https://ddzgonhyhbnnweynggub.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkemdvbmh5aGJubndleW5nZ3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTAzNTczNjEsImV4cCI6MjAwNTkzMzM2MX0.ThzXjmbCuPB9cg6FbR7ZABndLd42D0tXK_FJkyuO7dg')
   return (
     <>
       <QueryClientProvider client={queryClient}>
       <ThemeProvider enableSystem={true} enableColorScheme={true} attribute="class">
+        <SessionContextProvider supabaseClient={supabase}>
         <ContextProvider>
           <Provider store={store}>
             <div className="dark">
@@ -65,6 +69,7 @@ export default function App({ Component, pageProps }) {
             </div>
           </Provider>
         </ContextProvider>
+        </SessionContextProvider>
         </ThemeProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

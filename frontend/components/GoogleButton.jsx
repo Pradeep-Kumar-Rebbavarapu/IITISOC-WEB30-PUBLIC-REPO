@@ -14,13 +14,12 @@ export default function GoogleButton() {
 		onScriptLoadSuccess: () => console.log('onScriptLoadSuccess'),
 	});
 	const login = googleProvider.useGoogleLogin({
-		//calender scope
 		scope: 'profile email openid https://www.googleapis.com/auth/calendar.events',
 		flow: 'auth-code',
 		onSuccess: (res) => {
 			console.log(res)
 			const code = res.code;
-			axios.post('http://127.0.0.1:8000/dj-rest-auth/google/', { code: code }).then((response) => {
+			axios.post('https://www.pradeeps-video-conferencing.store/dj-rest-auth/google/', { code: code }).then((response) => {
 				console.log(response.data)
 				setauth({ access: response.data.access, refresh: response.data.refresh })
 				Cookies.set('auth', JSON.stringify({ access: response.data.access, refresh: response.data.refresh }), { expires: 365, path: "/" })

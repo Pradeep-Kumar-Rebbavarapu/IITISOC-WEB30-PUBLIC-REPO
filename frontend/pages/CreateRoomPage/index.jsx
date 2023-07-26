@@ -9,9 +9,24 @@ import { IoCreateSharp } from 'react-icons/io5'
 import Image from 'next/image'
 import { toast } from 'react-toastify';
 import { NextSeo } from 'next-seo';
+import axios from 'axios';
+import {useSession,useSupabaseClient} from '@supabase/auth-helpers-react'
 export default function index() {
 	const {setroomID,roomID,title,settitle,setjoinroom,auth,JoinRoomID,setJoinRoomID,setisHost,setRoomCapacity,RoomCapacity } = useContext(Context)
-	
+
+	const session = useSession()
+	const supabase = useSupabaseClient()
+	async function googleSignIn(){
+		const {error} = await supabase.auth.signInWithOAuth({
+			provider:'google',
+			scopes:['profile','email','openid','https://www.googleapis.com/auth/calendar.events']
+		})
+
+		if(error){
+			toast.error('Error Signing In',{position: toast.POSITION.TOP_LEFT })
+			console.log(Error)
+		}
+	}
 	const router = useRouter()
 	useEffect(() => {
 
@@ -89,12 +104,7 @@ export default function index() {
 							}} id="roomID" name="roomID" type="text" placeholder='Enter The Room ID' className=' h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none z-1 w-full lg:w-[250px] transition-all fade-in-out duration-500' />
 						</div>
 					</div>
-					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
-						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full  transition-all fade-in-out cursor-pointer hover:font-bold w-full lg:w-[250px]'><IoCreateSharp className="w-7 h-7 mr-2" />Schedule A Meeting</button>
-						<div>
-							<input id="calender" name='calender' type="date"  className='w-full h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none  lg:w-[250px] z-1 transition-all fade-in-out duration-500' />
-						</div>
-					</div>
+					
 				</div>
 				<div className='mx-10 my-20 hidden lg:flex -skew-x-12 translate-x-[-50px] justify-center items-center '>
 					<Image src={CreateRoomPage1} width="500" placeholder="blur mx-auto " />
