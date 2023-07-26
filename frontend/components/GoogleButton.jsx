@@ -14,7 +14,7 @@ export default function GoogleButton() {
 		onScriptLoadSuccess: () => console.log('onScriptLoadSuccess'),
 	});
 	const login = googleProvider.useGoogleLogin({
-		scope: 'profile email openid https://www.googleapis.com/auth/calendar.events',
+		scope: 'profile email openid',
 		flow: 'auth-code',
 		onSuccess: (res) => {
 			console.log(res)
