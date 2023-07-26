@@ -1,5 +1,7 @@
 # Video Conferencing Website
-Video Conferencing Website project under IITISoC 2023. <a href = "https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app/" target = "blank"> (Deployment Link) ConferoLive </a>
+Video Conferencing Website project under IITISoC 2023.<br>
+Visit the website: [ConferoLive](https://iiti-so-c-23-web-40-video-conferencing-1xdm.vercel.app/)<br>
+[Backend Deployment](https://www.pradeeps-video-conferencing.store/)
 
 ![homepage](./homepage.png)
 
