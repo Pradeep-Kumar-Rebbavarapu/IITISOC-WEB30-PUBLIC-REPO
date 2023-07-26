@@ -1,21 +1,23 @@
 import useWindowSize from "@rooks/use-window-size";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef,useState } from "react";
 import Context from "../context/Context";
 import { handleFullScreen, handlePinnedUser } from "../utils/prepareNewPeerConnection";
 import { AiFillPushpin, AiOutlineFullscreen } from 'react-icons/ai'
-export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pinned, setPinned }) {
+export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pinned, setPinned ,setoverlay,loading,setloading}) {
+	
 	const { roomID, number, audio, video } = useContext(Context);
 
 	const { innerWidth } = useWindowSize();
 	const videoGridRef = useRef(null);
-
+	
 	useEffect(() => {
-		const videoGrid = document.getElementById("VideoGrid");
+		
+			const videoGrid = document.getElementById("VideoGrid");
 		const div = document.getElementById("my_div");
 		const localVideo = document.getElementById('my_video');
 		const fakeVideo = document.getElementById('my_fakevideo');
 		const localDiv = document.getElementById('my_video_container')
-
+		
 
 		localVideo.srcObject = localStream;
 
@@ -36,14 +38,8 @@ export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pi
 		localVideo.playsInline = true;
 		localVideo.controls = false;
 		localVideo.style.objectFit = "cover";
-
-
 		
 		
-
-		//set fake video height and width
-
-
 	}, [localStream]);
 
 
@@ -54,7 +50,8 @@ export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pi
 			className={`h-full  w-full px-2  !z-[10] overflow-y-scroll  py-2 rounded-md my-auto justify-center mx-auto items-center grid gap-2 grid-cols-1 ${length === 1 || length===0 ? "grid-cols-1" : "lg:grid-cols-2"} `}
 			ref={videoGridRef}
 		>
-			<div id="my_div" className="h-full w-full flex items-center justify-center rounded-md ">
+			
+				<div id="my_div" className="h-full w-full flex items-center justify-center rounded-md ">
 				<div id='my_video_container' className=" rounded-md relative ">
 					<div className="absolute z-[10000] rounded-md top-0 text-center  w-full h-full transition-all fade-in-out group overflow-hidden">
 						<div className={` font-bold w-fit  relative rounded-b-full mx-auto px-10 py-4 bg-black bg-opacity-50 text-white `}>
@@ -106,6 +103,8 @@ export default function VideoGrid({ localStream, length, props, CamOn, MicOn, Pi
 				</div>
 
 			</div>
+			
+			
 			<style jsx>
 				{`
           //hide scroll bar

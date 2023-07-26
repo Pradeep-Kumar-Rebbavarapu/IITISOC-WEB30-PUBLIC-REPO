@@ -99,6 +99,7 @@ function LaptopRoom(props) {
 	const { innerWidth } = useWindowSize();
 	const router = useRouter();
 	const worker = useRef();
+	const [loading,setloading] = useState(true)
 	const roomID = router.query.EachRoom;
 	const [LeftNavOpen, setLeftNavOpen] = useState(true);
 	const [roomHostUsername, setroomHostUsername] = useState(null);
@@ -117,6 +118,7 @@ function LaptopRoom(props) {
 		setjoinroom,
 		setvideo,
 	} = useContext(Context);
+	
 	const [MicOn, setMicOn] = useState(audio);
 	const [CamOn, setCamOn] = useState(video);
 	const [ScreenShareOn, setScreenShareOn] = useState(false);
@@ -602,10 +604,10 @@ function LaptopRoom(props) {
 
 	const ToggleMeetingsDetails = () => {
 		if (document.getElementById('MeetingDetails').classList.contains('left-[-2000px]')) {
-			document.getElementById('MeetingDetails').className = 'absolute w-full lg:w-fit p-4 h-screen lg:h-fit bg-white font-bold text-black border-2 bottom-0 lg:bottom-[100px]  z-[100] left-0 md:left-[100px] transition-all fade-in-out lg:opacity-20 lg:hover:opacity-100 text-center lg:text-start flex  lg:justify-start  items-center flex-col lg:block'
+			document.getElementById('MeetingDetails').className = 'absolute w-full lg:w-fit p-4 h-screen lg:h-fit bg-white font-bold text-black border-2 bottom-0 lg:bottom-[100px]  z-[100] left-0 md:left-[100px] transition-all fade-in-out  text-center lg:text-start flex  lg:justify-start  items-center flex-col lg:block'
 		}
 		else {
-			document.getElementById('MeetingDetails').className = 'absolute w-full lg:w-fit p-4 h-screen lg:h-fit bg-white font-bold text-black border-2 bottom-0 lg:bottom-[100px]  z-[100]  left-[-2000px] transition-all fade-in-out lg:opacity-20 lg:hover:opacity-100 text-center lg:text-start flex lg:justify-start items-center flex-col lg:block'
+			document.getElementById('MeetingDetails').className = 'absolute w-full lg:w-fit p-4 h-screen lg:h-fit bg-white font-bold text-black border-2 bottom-0 lg:bottom-[100px]  z-[100]  left-[-2000px] transition-all fade-in-out  text-center lg:text-start flex lg:justify-start items-center flex-col lg:block'
 		}
 	}
 	
@@ -735,12 +737,13 @@ function LaptopRoom(props) {
 							</div>
 							<div
 								id="Left_Nav_Recordings_Btn"
-								className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
+								className={`focus:bg-white cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${RecordingOn ? 'bg-white' : 'hover:bg-white'
+                    }  transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100`}
 								onClick={() => {
 									handleRecording();
 								}}
 							>
-								<BsFillRecordBtnFill className="w-7 h-7 " />
+								<BsFillRecordBtnFill className={RecordingOn?"w-7 h-7 text-[#33ffff]":"h-7 w-7"} />
 							</div>
 							<SpeechToText
 								Transcript={Transcript}
@@ -880,6 +883,9 @@ function LaptopRoom(props) {
 								MicOn={MicOn}
 								Pinned={Pinned}
 								setPinned={setPinned}
+								setoverlay={setoverlay}
+								loading={loading}
+								setloading={setloading}
 							/>
 
 
@@ -1054,8 +1060,8 @@ function LaptopRoom(props) {
 											track.stop();
 										});
 										peers.current = {};
-										router.push('/CreateRoomPage')
-										socket.current.close()
+										window.location.href = "/CreateRoomPage"
+										
 
 										store.dispatch(setIdentity(null))
 										store.dispatch(setRoomId(null))
@@ -1072,8 +1078,8 @@ function LaptopRoom(props) {
 											roomCapacity: null,
 											title: null
 										})
-										setjoinroom(true)
-
+										
+										localStorage.clear()
 									}}>
 										<div className="border-0 rounded-lg text-white p-2 w-fit mx-auto bg-red-500 hover:bg-red-600 transition-all fade-in-out ">
 											<IoExit className="w-4 h-4 lg:w-5 lg:h-5" />
@@ -1285,6 +1291,8 @@ function LaptopRoom(props) {
 			<LocalScreenSharePreview
 				socketId={props.socketId}
 				screenShareStream={ScreenSharingStream.current}
+				loading={loading}
+				setloading={setloading}
 			/>
 
 			<div

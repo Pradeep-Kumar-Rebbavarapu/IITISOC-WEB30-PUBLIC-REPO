@@ -53,7 +53,7 @@ export default function index() {
 								return;
 							}
 							else{
-								if(title === '' || title === undefined){
+								if(title === '' || title === undefined || title===null){
 									toast.warning('Please Enter The Title Of Your Room',{position: toast.POSITION.TOP_LEFT })
 									return;
 								}
@@ -91,8 +91,10 @@ export default function index() {
 						</div>
 					</div>
 					<div className='flex flex-col lg:flex-row justify-center lg:justify-start my-10 w-full mx-auto '>
-						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full lg:w-[250px]  transition-all fade-in-out cursor-pointer hover:font-bold w-full ' onClick={()=>{	
-							setJoinRoomID(JoinRoomID)
+						<button className='border-2 border-orange-500 p-3 hover:ring-4 hover:ring-opacity-50 hover:ring-orange-600 z-[100] bg-gradient-to-tr from-amber-400 to-orange-600 text-white flex items-center lg:rounded-l-full lg:w-[250px]  transition-all fade-in-out cursor-pointer hover:font-bold w-full ' onClick={()=>{
+							if(JoinRoomID===null || JoinRoomID==="" || JoinRoomID===undefined || JoinRoomID.length===0)	{
+								return toast.warning('Please Enter A Valid Room ID',{position: toast.POSITION.TOP_LEFT })
+							}
 							setisHost(false)
 							localStorage.setItem('roomID',JoinRoomID)
 							router.push(`/RoomPage/${JoinRoomID}`)
@@ -100,6 +102,7 @@ export default function index() {
 						}}><IoCreateSharp className="w-7 h-7 mr-2" />Join A Room</button>
 						<div>
 							<input onChange={(e)=>{
+								
 								setJoinRoomID(e.target.value)
 							}} id="roomID" name="roomID" type="text" placeholder='Enter The Room ID' className=' h-full px-2 border-2 focus:border-orange-600 py-4 lg:py-auto lg:rounded-r-full outline-none z-1 w-full lg:w-[250px] transition-all fade-in-out duration-500' />
 						</div>
