@@ -9,7 +9,11 @@ import { appendNewMessageToChatHistory } from "./MessageUtils"
 import { handleReceiveData } from "./ShareFileUtils"
 import MessageToast from "../components/MessageToast"
 import { fetchTurnCredentials } from "./TurnServers"
-export const handleDisconnectedUser = async (peers, socketId,setjoinroom) => {
+import UserJoinModal from "../components/UserJoinModal"
+import ReactDOM from "react-dom"
+
+
+export const handleDisconnectedUser = async (peers, socketId) => {
 
     const VideoGrid = document.getElementById('VideoGrid')
 
@@ -32,7 +36,7 @@ export const handleDisconnectedUser = async (peers, socketId,setjoinroom) => {
     }
 
     delete peers.current[socketId]
-    
+
 }
 
 
@@ -44,9 +48,9 @@ const handleSignallingData = (peers, data) => {
 
 let array = []
 
-export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth, user, roomID, setoverlay, title, setDownloadingText, BoardMap, setroomHostUsername, roomHostUsername, setPeerUsername, PeerUsername, RoomCapacity, setRoomDetails, peervideo) => {
+export const connectionWithSocketServer = async (socket, peers, ScreenSharingStream, localStream, worker, setGotFile, FileNameRef, FileSentBy, setProgress, isDrawing, Transcript, IceServers, setIsJoinModal, setpeerUserID, innerWidth, length_of_participants, isHost, auth, user, roomID, setoverlay, title, setDownloadingText, BoardMap, setroomHostUsername, roomHostUsername, setPeerUsername, PeerUsername, RoomCapacity, setRoomDetails, peervideo, setOpenModals,Toasts) => {
 
-    IceServers.current = await fetchTurnCredentials() //fetching turn servers
+    // IceServers.current = await fetchTurnCredentials() //fetching turn servers
     socket.current = new WebSocket(`wss://www.pradeeps-video-conferencing.store/ws/chat/${roomID}`)
 
     socket.current.onopen = () => {
@@ -54,7 +58,7 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
             "type": "get-socket-id",
             data: {}
         }))
-        getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth, user, roomID, setoverlay, title, IceServers, RoomCapacity, length_of_participants,setRoomDetails)
+        getLocalPreviewAndInitRoomConnection(socket, localStream, isHost, auth, user, roomID, setoverlay, title, IceServers, RoomCapacity, length_of_participants, setRoomDetails)
     }
 
     socket.current.onmessage = (message) => {
@@ -67,16 +71,16 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
         else if (type === "room-update") {
 
             const { connectedUsers, roomID, title, roomCapacity } = data;
-            
+
 
             localStorage.setItem('participants_length', connectedUsers.length)
             store.dispatch(setParticipants(connectedUsers))
         }
         else if (type == "conn-prepare") {
             const { connUserSocketId, connUserIdentity, PeerAudio, PeerVideo } = data
-            
+
             prepareNewPeerConnection(socket, peers, connUserSocketId, false, ScreenSharingStream, localStream, isDrawing, Transcript, IceServers, innerWidth, length_of_participants, setDownloadingText, BoardMap, localStream.current.getVideoTracks()[0].enabled, peervideo)
-            toast(`${connUserIdentity} has joined the meeting`,{
+            toast(`${connUserIdentity} has joined the meeting`, {
                 position: "top-left",
                 hideProgressBar: false,
                 closeOnClick: false,
@@ -88,7 +92,7 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
                     maxHeight: 'fit-content',
                     backgroundColor: '#ff6f00',
                     color: 'white',
-                    
+
                 }
             })
             socket.current.send(JSON.stringify({
@@ -114,31 +118,79 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
 
         }
         else if (type === "user-disconnected") {
-            toast(`${data.username} has left the meeting`, {
-                position: "top-left",
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: false,
-                draggable: true,
-                theme: "colored",
-                style: {
-                    maxWidth: 'fit-content',
-                    maxHeight: 'fit-content',
-                    backgroundColor: '#ff6f00',
-                    color: 'white',
-                    
-                }
-            })
-            handleDisconnectedUser(peers, data['socketId'], length_of_participants, innerWidth)
+            const { username, socketId, blocked } = data
+            if (blocked) {
+                toast(`${data.username} Has Been Kicked Out Of The Meeting By The Host`, {
+                    position: "top-left",
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    theme: "colored",
+                    style: {
+                        maxWidth: 'fit-content',
+                        maxHeight: 'fit-content',
+                        backgroundColor: '#ff6f00',
+                        color: 'white',
+
+                    }
+                })
+            }
+            else {
+                toast(`${data.username} has left the meeting`, {
+                    position: "top-left",
+                    hideProgressBar: false,
+                    closeOnClick: false,
+                    pauseOnHover: false,
+                    draggable: true,
+                    theme: "colored",
+                    style: {
+                        maxWidth: 'fit-content',
+                        maxHeight: 'fit-content',
+                        backgroundColor: '#ff6f00',
+                        color: 'white',
+
+                    }
+                })
+            }
+
+            handleDisconnectedUser(peers, data['socketId'])
         }
         else if (type === 'direct-message') {
             appendNewMessageToChatHistory(data)
+
         }
         else if (type === "acceptance-letter") {
+
             setroomHostUsername(data.RoomHostUsername)
             setPeerUsername(data.PeerUsername)
             setpeerUserID(data.connUserSocketId)
-            setIsJoinModal(true)
+            const toastId = data.connUserSocketId
+            
+            const newToast = toast(<UserJoinModal toast={toast} socket={socket} user={user} auth={auth} PeerUsername={data.PeerUsername} peerUserID={data.connUserSocketId} Toasts={Toasts} />, {
+                position: "top-center",
+                autoClose: false,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "colored",
+                closeButton: true,
+                style: {
+                    padding: 0,
+                    margin: 0,
+                    width: '100%',
+                    height: '100%',
+                    zIndex: "100000000",
+
+                }
+            });
+            //Toasts is a ref map
+            Toasts.current.set(data.connUserSocketId, newToast)
+
+
+           
         }
         else if (type === "ask-peer-to-prepare-conn") {
 
@@ -157,10 +209,15 @@ export const connectionWithSocketServer = async (socket, peers, ScreenSharingStr
                     data: data,
                 })
             );
+        
         }
         else if (type === 'reject-join-request') {
             window.location.href = "/CreateRoomPage";
             toast("You are not allowed to join this meeting", { position: toast.POSITION.TOP_LEFT })
+        }
+        else if (type === "user-blocked") {
+            window.location.href = "/CreateRoomPage";
+            toast("You have been blocked by the host", { position: toast.POSITION.TOP_LEFT })
         }
 
 
