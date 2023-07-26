@@ -28,7 +28,7 @@ export default function Document() {
         <meta itemprop="name" content="The Cynaptics Club - IIT Indore" />
         <meta itemprop="description" content="The Cynaptics Club(AI/ML) - IIT INDORE" />
         <meta itemprop="image" content="https://drive.google.com/file/d/1jBGW4IqOp00Hqjs4SZJTf5Aap3d58xeL/view?usp=drive_link" />
-        <meta name="keywords" content="your, keywords, here" />
+        <meta name="keywords" content="Video Conferencing ConferoLive Next js Django Django Rest Framework" />
         <meta name="author" content="Your Name" />
         <meta name="robots" content="index, follow" />
       </head>
