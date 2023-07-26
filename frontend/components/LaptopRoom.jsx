@@ -93,7 +93,8 @@ import { setActiveConversation, setDirectChatHistotry, setIdentity, setIsRoomHos
 import { store } from "../store/store";
 import NewLaptopRoom from "./NewLaptomRoom";
 import EmailBody from "./EmailBody";
-
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css'; // optional
 function LaptopRoom(props) {
 	const { socket } = props;
 	const { innerWidth } = useWindowSize();
@@ -708,15 +709,18 @@ function LaptopRoom(props) {
 							id="Left_Nav"
 							className="hidden bg-[#D3D3D3] lg:flex  h-full flex-col items-center justify-center transition-all fade-in-out w-[80px] "
 						>
-							<div
-								onClick={() => {
-									handleToggleChatParticipantsArea("Video");
-								}}
-								id="Left_Nav_Video_Btn"
-								className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
-							>
-								<BsCameraVideoFill className="w-7 h-7 " />
-							</div>
+							<Tippy content="Video View" placement="right">
+								<button
+									onClick={() => {
+										handleToggleChatParticipantsArea("Video");
+									}}
+									id="Left_Nav_Video_Btn"
+									className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
+								>
+									<BsCameraVideoFill className="w-7 h-7 " />
+								</button>
+							</Tippy>
+							<Tippy content="Messages" placement="right">
 							<div
 								id="Left_Nav_Message_Btn"
 								className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
@@ -726,6 +730,8 @@ function LaptopRoom(props) {
 							>
 								<BsChatLeftDots className="w-7 h-7 " />
 							</div>
+							</Tippy>
+							<Tippy content="Participants" placement="right">
 							<div
 								id="Left_Nav_Participants_Btn"
 								className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
@@ -735,16 +741,20 @@ function LaptopRoom(props) {
 							>
 								<BsPeople className="w-7 h-7 " />
 							</div>
-							<div
-								id="Left_Nav_Recordings_Btn"
-								className={`focus:bg-white cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${RecordingOn ? 'bg-white' : 'hover:bg-white'
-                    }  transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100`}
-								onClick={() => {
-									handleRecording();
-								}}
-							>
-								<BsFillRecordBtnFill className={RecordingOn?"w-7 h-7 text-[#33ffff]":"h-7 w-7"} />
-							</div>
+							</Tippy>
+							<Tippy content={RecordingOn?"Turn Of Recording":"Turn On Recording"} placement="right">
+								<div
+									id="Left_Nav_Recordings_Btn"
+									className={`focus:bg-white cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${RecordingOn ? 'bg-white' : 'hover:bg-white'
+						}  transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100`}
+									onClick={() => {
+										handleRecording();
+									}}
+								>
+									<BsFillRecordBtnFill className={RecordingOn?"w-7 h-7 text-[#33ffff]":"h-7 w-7"} />
+								</div>
+							</Tippy>
+							
 							<SpeechToText
 								Transcript={Transcript}
 								speechToText={speechToText}
@@ -756,7 +766,8 @@ function LaptopRoom(props) {
 									browserSupportsSpeechRecognition
 								}
 							/>
-
+							
+							<Tippy content={`Speech To Text Look Up`} placement="right">
 							<div
 								id="Left_Nav_Editor_Btn"
 								className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
@@ -766,7 +777,8 @@ function LaptopRoom(props) {
 							>
 								<AiFillFileText className="w-7 h-7 " />
 							</div>
-
+							</Tippy>
+							<Tippy content={`Private Messaging`} placement="right">
 							<div
 								id="Left_Nav_Editor_Btn"
 								className="focus:bg-white cursor-pointer !h-fit my-5 p-3 rounded-lg hover:bg-white transition-all text-orange-600 bg-opacity-100 hover:bg-opacity-100"
@@ -776,12 +788,14 @@ function LaptopRoom(props) {
 							>
 								<BiMessageAltError className="w-7 h-7" />
 							</div>
-
+							</Tippy>
+							<Tippy content={`Meeting Details`} placement="right">
 							<div className="w-[60px] h-[60px] rounded-full bg-white border-2 border-black bottom-0 mt-auto mb-5 flex justify-center items-center " onClick={() => {
 								ToggleMeetingsDetails()
 							}}>
 								<TbListDetails className="w-7 h-7" />
 							</div>
+							</Tippy>
 						</div>
 						<div id="MeetingDetails" className="absolute w-fit p-4 h-fit bg-white font-bold text-black border-2 bottom-[100px]   z-[100] left-[-2000px] transition-all fade-in-out">
 							<div className="p-2 cursor-pointer bg-white  text-xl lg:hidden w-fit rounded-md" onClick={()=>{

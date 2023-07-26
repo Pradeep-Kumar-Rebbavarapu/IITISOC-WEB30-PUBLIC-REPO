@@ -78,6 +78,7 @@ export default function SpeechToTextEditor({
       </div>
       <div className="w-full h-fit flex justify-center items-center border-t-2 py-4">
         <button
+          disabled={listening || loading}
           onClick={handleSummarizeAndDownload}
           className="bg-black font-bold text-white p-2 rounded-md hover:ring-4 hover:ring-opacity-50 hover:ring-black transition-all fade-in-out text-xl"
         >

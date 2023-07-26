@@ -5,13 +5,12 @@ import {MdRecordVoiceOver } from 'react-icons/md'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import { SendYourSpokenDataToOtherPeers } from './SpokenData';
 import { setTranscript } from '../store/actions';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/dist/tippy.css'; // optional
 import { store } from '../store/store';
 import parse from 'html-react-parser';
+
 export default function SpeechToText({speechToText,setSpeechToText,resetTranscript,transcript,peers,browserSupportsSpeechRecognition,Transcript}) {
-   
-    
-    
-   
 
     const toggleSpeechToTextBtn = async () => {
         if (!speechToText) {
@@ -39,6 +38,7 @@ export default function SpeechToText({speechToText,setSpeechToText,resetTranscri
     return (
         <>
         <div className='h-fit w-fit hidden lg:block '>
+        <Tippy content={`${speechToText?"Turn Of AI Speech To Text":"Turn On AI Speech To Text"}`} placement="right">
             <div
                 id="Left_Nav_SpeechToText_Btn"
                 className={`focus:bg-white cursor-pointer w-fit h-fit my-5  flex items-center flex-col justify-center lg:block p-3 rounded-lg ${speechToText ? 'bg-white' : 'hover:bg-white'
@@ -48,8 +48,9 @@ export default function SpeechToText({speechToText,setSpeechToText,resetTranscri
                 
                 <MdRecordVoiceOver className="w-7 h-7 mx-auto" />
                 <div className="text-md lg:hidden transition-all fade-in-out text-gray-400 mt-2 group-hover:text-orange-500 text-center">{speechToText? "Stop Speech To Text" : "Start Speech To Text"}</div>
+                
             </div>
-            
+            </Tippy>
         </div>
         <div className='h-full w-full my-auto lg:hidden'>
             <div
