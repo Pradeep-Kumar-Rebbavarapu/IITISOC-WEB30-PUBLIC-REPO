@@ -1,14 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import LaptopRoom from '../../components/LaptopRoom'
-import MobileRoom from '../../components/MobileRoom'
 import Context from '../../context/Context'
 import AreYouReady from '../../components/AreYouReady'
 import axios from 'axios'
-import useWindowSize from "@rooks/use-window-size"
 import { toast } from 'react-toastify'
-import { data } from 'jquery'
 
 const EachRoom = (props) => {
     const { auth, joinroom, localStream, setJoinRoomID } = useContext(Context);
